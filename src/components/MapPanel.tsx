@@ -1,14 +1,14 @@
-import React, { ComponentProps, createElement, FC, Fragment, memo, useEffect, useMemo, useState } from 'react'
+import { ComponentProps, Fragment, useEffect, useMemo, useState } from 'react';
 
-import { Ellipsoid, SceneMode, WebMercatorProjection, Ion, Color, Cartesian3, Transforms, CornerType, LabelStyle, EllipseGeometry, VertexFormat, Geometry, GeometryInstance, EllipsoidSurfaceAppearance, Material, SampledPositionProperty, ReferenceFrame, JulianDate, ClockStep, Cartesian2, PolylineDashMaterialProperty, SampledProperty, InterpolationAlgorithm, HermitePolynomialApproximation, LinearApproximation, VelocityOrientationProperty, VelocityVectorProperty, CallbackProperty, Cartographic, SceneTransforms, HeadingPitchRoll } from 'cesium'
-import { Billboard, BillboardCollection, BillboardGraphics, Clock, CorridorGraphics, Entity, KmlDataSource, LabelGraphics, PointGraphics, PointPrimitive, PointPrimitiveCollection, Primitive, ShadowMap, useCesium, Viewer } from 'resium'
+import { CallbackProperty, Cartesian2, Cartesian3, ClockStep, Color, Ellipsoid, HeadingPitchRoll, Ion, JulianDate, PolylineDashMaterialProperty, ReferenceFrame, SampledPositionProperty, SceneMode, VelocityOrientationProperty, VelocityVectorProperty, WebMercatorProjection } from 'cesium';
+import { Clock, Entity, useCesium, Viewer } from 'resium';
 
 import { useResizeDetector } from 'react-resize-detector';
 
-import tracklogJson from './tracklog.json';
-import configFile from '../../config/noda-config.json';
 import { AircraftStateBoard } from './C2Panel';
 import { RadioCommunicationBoard } from './RadioPanel';
+
+import configFile from '../../config/noda-config.json';
 
 Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3MjBkYTg4OC1hNTkwLTRkZTgtOGFiOS01MGJmMmIzYmE1MTMiLCJpZCI6MjI3NTE3LCJpYXQiOjE3MjA1ODQxOTV9.LxcjcFed2nuTnsX5wBV7B6NH_ks1Wjg__3EBWBaQnas';
 
@@ -109,14 +109,9 @@ type EntitiesProps = {
   aircraft: Array<AircraftStateBoard> | undefined,
   radios: Array<RadioCommunicationBoard> | undefined;
   selectedAircraftCallsign: string | undefined;
+  onSelectAircraft: (aircraftCallsign: string | undefined) => void;
 }
-export function Entities({ radios, selectedAircraftCallsign }: EntitiesProps) {
-  const cartesians = useMemo(() => {
-    const positions = tracklogJson.features[0].geometry.coordinates as number[][];
-
-    return positions.map(([lng, lat]) => Cartesian3.fromDegrees(lng, lat));
-  }, []);
-
+export function Entities({ radios, selectedAircraftCallsign, onSelectAircraft }: EntitiesProps) {
   const aircraftEvents = useMemo(() => Object.groupBy(configFile.events, (event) => event.aircraft), []);
 
   const aircraftEventTimes = useMemo(() => Object.fromEntries(Object.entries(aircraftEvents).map(([aircraft, events]) => [aircraft, events?.map((event) => JulianDate.fromDate(new Date(Date.now() + event.time * 1000)))])), [aircraftEvents]);
@@ -164,8 +159,9 @@ export function Entities({ radios, selectedAircraftCallsign }: EntitiesProps) {
           position={aircraftSampledPositions[aircraft]}
           billboard={{ image: 'images/ownship-map.svg', color: entityColor, alignedAxis: velocityVector, rotation }}
           path={{ leadTime: -0.5, trailTime: 60, show: true, width: 10, material: new PolylineDashMaterialProperty({ color: entityColor, gapColor: Color.TRANSPARENT, dashLength: 10 }) }}
+          onClick={() => onSelectAircraft(aircraft)}
         />
-        <LabelEntity position={aircraftSampledPositions[aircraft]} callsign={aircraft} receiving={receivingMap?.[aircraft] ?? false} selected={selected} />
+        <LabelEntity position={aircraftSampledPositions[aircraft]} callsign={aircraft} receiving={receivingMap?.[aircraft] ?? false} selected={selected} onClick={() => onSelectAircraft(aircraft)} />
       </Fragment>
     )
   }
@@ -188,30 +184,31 @@ type MapPanelProps = {
   aircraft: Array<AircraftStateBoard> | undefined,
   radios: Array<RadioCommunicationBoard> | undefined;
   selectedAircraftCallsign: string | undefined;
+  onSelectAircraft: (aircraftCallsign: string | undefined) => void;
 }
-export default function MapPanel({ aircraft, radios, selectedAircraftCallsign }: MapPanelProps) {
+export default function MapPanel({ aircraft, radios, selectedAircraftCallsign, onSelectAircraft }: MapPanelProps) {
   const startTime = useMemo(() => JulianDate.now(), []);
   const mapProjection = useMemo(() => new WebMercatorProjection(Ellipsoid.WGS84), []);
   const creditContainer = useMemo(() => new DocumentFragment() as any, []);
 
   return (
-      <Viewer
-        sceneMode={SceneMode.SCENE2D}
-        mapProjection={mapProjection}
-        fullscreenButton={false}
-        animation={false}
-        timeline={false}
-        infoBox={false}
-        selectionIndicator={false}
-        creditContainer={creditContainer}
-        creditDisplay={undefined}
-        msaaSamples={4}
-        style={{ height: '100%' }}
-      >
-        <Clock startTime={startTime} currentTime={JulianDate.now()} clockStep={ClockStep.SYSTEM_CLOCK_MULTIPLIER} shouldAnimate />
-        <ConfigureCesium />
+    <Viewer
+      sceneMode={SceneMode.SCENE2D}
+      mapProjection={mapProjection}
+      fullscreenButton={false}
+      animation={false}
+      timeline={false}
+      infoBox={false}
+      selectionIndicator={false}
+      creditContainer={creditContainer}
+      creditDisplay={undefined}
+      msaaSamples={4}
+      style={{ height: '100%' }}
+    >
+      <Clock startTime={startTime} currentTime={JulianDate.now()} clockStep={ClockStep.SYSTEM_CLOCK_MULTIPLIER} shouldAnimate />
+      <ConfigureCesium />
 
-        <Entities aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} />
-      </Viewer>
+      <Entities aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={onSelectAircraft} />
+    </Viewer>
   )
 }

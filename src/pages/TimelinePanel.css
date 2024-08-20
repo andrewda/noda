@@ -1,15 +1,32 @@
 #timeline-container {
   .line {
     @apply stroke-zinc-300;
-    /* stroke: #d3d3d3; */
     stroke-width: 6px;
+  }
+
+  .selected {
+    @apply stroke-fuchsia-500;
   }
 }
 
 .tooltip {
-  @apply absolute bg-zinc-800 text-white px-3 py-2 mb-1 rounded-md;
+  @apply absolute bg-zinc-700 text-white text-sm font-mono font-bold tracking-wide px-3 py-2 mb-1.5 rounded-md;
 
   position-anchor: --anchor-1-0;
   bottom: anchor(top);
   justify-self: anchor-center;
+}
+
+.tooltip::after {
+  content:'';
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: 0;
+  height: 0;
+  bottom: -6px;
+  border-top: 6px solid #3f3f46;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
 }

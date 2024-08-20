@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
 import * as d3 from 'd3';
+import { useEffect } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
 import Ownship from '../../public/images/ownship.svg';
-import { MonitorIndicator, RadioCommunicationBoard } from './RadioPanel';
 import { AircraftStateBoard } from './C2Panel';
+import { MonitorIndicator, RadioCommunicationBoard } from './RadioPanel';
 
 type TimelinePanelProps = {
   aircraft: Array<AircraftStateBoard> | undefined,
@@ -78,7 +78,7 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
         .attr('y1', y(d.line))
         .attr('x2', x(d.end))
         .attr('y2', y(d.line))
-        .attr('class', 'line');
+        .attr('class', `line ${d.selected ? 'selected' : ''}`);
 
       d.times.forEach((time, i2) => {
         const anchorName = `--anchor-${i}-${i2}`;
@@ -96,7 +96,7 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
               .attr('class', 'tooltip')
               .style('visibility', 'visible')
               .style('position-anchor', anchorName)
-              .text(`Time: ${time}s`);
+              .text('SHEDD');
           })
           .on('mouseout', () => {
             d3.selectAll('.tooltip').remove();
@@ -155,7 +155,7 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
     return () => {
       container.selectAll('*').remove();
     };
-  }, [width, height]);
+  }, [data, width, height]);
 
   return <div className='w-full h-full flex flex-row bg-zinc-900'>
     <div className="relative w-full basis-32 flex-shrink-0">

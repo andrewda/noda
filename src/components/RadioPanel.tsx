@@ -1,7 +1,7 @@
-import Ownship from '../../public/images/ownship.svg';
-import Monitor from '../../public/images/monitor.svg';
-import Transmit from '../../public/images/transmit.svg';
 import Flop from '../../public/images/flop.svg';
+import Monitor from '../../public/images/monitor.svg';
+import Ownship from '../../public/images/ownship.svg';
+import Transmit from '../../public/images/transmit.svg';
 
 export type RadioCommunicationBoard = {
   aircraft: string | undefined;

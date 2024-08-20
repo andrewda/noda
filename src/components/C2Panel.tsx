@@ -1,10 +1,9 @@
-import { useMemo } from "react"
-import Image from "next/image"
+import { useMemo } from 'react';
 
-import Ownship from '../../public/images/ownship.svg';
-import FromTo from '../../public/images/from_to.svg';
 import Airport from '../../public/images/airport.svg';
-import { MonitorIndicator, RadioCommunicationBoard } from "./RadioPanel";
+import FromTo from '../../public/images/from_to.svg';
+import Ownship from '../../public/images/ownship.svg';
+import { MonitorIndicator, RadioCommunicationBoard } from './RadioPanel';
 
 enum AircraftState {
   Ground,

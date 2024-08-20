@@ -1,12 +1,12 @@
-import Head from 'next/head'
-import dynamic from 'next/dynamic'
-import { Pane, ResizablePanes } from 'resizable-panes-react'
-import toast, { Toaster } from 'react-hot-toast'
-import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import C2Panel from '@/components/C2Panel'
 import RadioPanel from '@/components/RadioPanel'
-import { useResizeDetector } from 'react-resize-detector'
 import TimelinePanel from '@/components/TimelinePanel'
+import dynamic from 'next/dynamic'
+import Head from 'next/head'
+import { useEffect, useRef, useState } from 'react'
+import { Toaster } from 'react-hot-toast'
+import { useResizeDetector } from 'react-resize-detector'
+import { Pane, ResizablePanes } from 'resizable-panes-react'
 
 const MapPanel = dynamic(
   () => import('../components/MapPanel'),
@@ -18,7 +18,12 @@ type LatLonTuple = [number, number]
 export default function Home() {
   const [selectedAircraftCallsign, setSelectedAircraftCallsign] = useState<string | undefined>(undefined);
 
-  const { width, height, ref } = useResizeDetector();
+  const apiRef = useRef<any>();
+  const { width, ref } = useResizeDetector();
+
+  useEffect(() => {
+    apiRef.current?.setSize?.('P0', 600);
+  }, [apiRef, width]);
 
   const aircraft = [
     {
@@ -179,7 +184,7 @@ export default function Home() {
 
       <div ref={ref} style={{ height: '100vh', width: '100vw', position: 'relative' }}>
         {width && width > leftPanelWidth && (
-        <ResizablePanes uniqueId="one" unit="pixel" minMaxUnit="pixel" vertical resizerSize={resizerWidth}>
+        <ResizablePanes uniqueId="one" unit="ratio" minMaxUnit="pixel" vertical resizerSize={resizerWidth} onReady={(api: any) => { apiRef.current = api }}>
           <Pane id="P0" size={leftPanelWidth} minSize={leftPanelWidth}>
             <div className="w-full h-full flex flex-col">
               <C2Panel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
@@ -190,7 +195,7 @@ export default function Home() {
             <ResizablePanes uniqueId='two'>
               <Pane id="P0" size={3}>
                 <Toaster position="top-left" containerStyle={{ position: 'relative' }} />
-                <MapPanel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} />
+                <MapPanel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
               </Pane>
               <Pane id="P1" size={1} minSize={1}>
                 <TimelinePanel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
