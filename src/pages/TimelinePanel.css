@@ -1,0 +1,15 @@
+#timeline-container {
+  .line {
+    @apply stroke-zinc-300;
+    /* stroke: #d3d3d3; */
+    stroke-width: 6px;
+  }
+}
+
+.tooltip {
+  @apply absolute bg-zinc-800 text-white px-3 py-2 mb-1 rounded-md;
+
+  position-anchor: --anchor-1-0;
+  bottom: anchor(top);
+  justify-self: anchor-center;
+}

@@ -110,7 +110,7 @@
       });
 
       if (d.start > 0) {
-        const anchorName = `--anchor-${i}`;
+        const anchorName = `--anchor-${i}-start`;
 
         chartContainer.append("img")
           .attr("src", "public/images/airport.svg")
@@ -134,7 +134,7 @@
       }
 
       if (d.end < 600) {
-        const anchorName = `--anchor-${i}`;
+        const anchorName = `--anchor-${i}-end`;
 
         chartContainer.append("img")
           .attr("src", "public/images/airport.svg")

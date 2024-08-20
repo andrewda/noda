@@ -59,7 +59,7 @@ function AircraftListGutter({ aircraft, selectedAircraftCallsign, onSelectAircra
       {aircraft.map((aircraftStateBoard) => (
         <div
           key={aircraftStateBoard.callsign}
-          className={`flex flex-col items-start self-stretch pl-3 pr-4 pt-3 pb-3 cursor-pointer border-gray-400 border-b-2 ${aircraftStateBoard.callsign === selectedAircraftCallsign ? 'text-fuchsia-400' : 'text-gray-400'}`}
+          className={`flex flex-col items-start self-stretch pl-3 pr-4 pt-3 pb-3 cursor-pointer border-gray-400 border-b-2 hover:brightness-125 ${aircraftStateBoard.callsign === selectedAircraftCallsign ? 'text-fuchsia-400' : 'text-gray-400'}`}
           onClick={() => onSelectAircraft(aircraftStateBoard.callsign)}
         >
           <div className="flex gap-2 items-center">

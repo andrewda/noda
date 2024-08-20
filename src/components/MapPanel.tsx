@@ -7,7 +7,6 @@ import { useResizeDetector } from 'react-resize-detector';
 
 import tracklogJson from './tracklog.json';
 import configFile from '../../config/noda-config.json';
-import { text } from 'stream/consumers';
 import { AircraftStateBoard } from './C2Panel';
 import { RadioCommunicationBoard } from './RadioPanel';
 

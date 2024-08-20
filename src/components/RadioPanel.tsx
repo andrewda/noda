@@ -32,13 +32,13 @@ function Radio({ radio, selected, className, onSelect }: RadioProps) {
   return (
     <div className={`w-full h-20 px-1 py-1.5 rounded border border-[#ababab] flex-col justify-between items-start inline-flex overflow-hidden ${className}`}>
       <div className="self-stretch px-0.5 justify-between items-center inline-flex">
-        <div onClick={onSelect} className={`relative flex flex-row items-center gap-1 cursor-pointer hover:brightness-75 ${selected ? 'text-fuchsia-400' : 'text-gray-200'}`}>
+        <div onClick={onSelect} className={`h-5 relative flex flex-row items-center gap-1 ${radio.aircraft ? 'cursor-pointer hover:brightness-75' : ''} ${selected ? 'text-fuchsia-400' : 'text-gray-200'}`}>
           {radio.aircraft ? (
             <>
               <Ownship width={16} height={16} />
               <div className="text-sm font-bold font-mono">{radio.aircraft}</div>
             </>
-          ) : null}
+          ) : <div className="text-xs italic font-bold">No Aircraft</div>}
         </div>
         <MonitorIndicator receive={radio.receiving} className="w-3.5 h-3.5" />
       </div>
@@ -73,7 +73,7 @@ export default function RadioPanel({ radios, selectedAircraftCallsign, onSelectA
   return (
     <div className="grid grid-cols-4 gap-4 m-3">
       {radios.map((radio) => (
-        <Radio key={radio.aircraft ?? 'wild'} radio={radio} selected={radio.aircraft === selectedAircraftCallsign} onSelect={() => onSelectAircraft(radio.aircraft)} className="last:col-start-4 justify-self-center" />
+        <Radio key={radio.aircraft ?? 'wild'} radio={radio} selected={radio.aircraft ? radio.aircraft === selectedAircraftCallsign : false} onSelect={() => radio.aircraft ? onSelectAircraft(radio.aircraft) : null} className="last:col-start-4 justify-self-center" />
       ))}
     </div>
   );

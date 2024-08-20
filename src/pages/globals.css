@@ -6,6 +6,7 @@
 
 /* @import url('/cesium/Widgets/widgets.css'); */
 @import url('components.css');
+@import url('TimelinePanel.css');
 
 :root {
   --foreground-rgb: 0, 0, 0;
