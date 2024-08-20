@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Audio Client</title>
+  </head>
+  <body>
+    <script src="client.js" type="module"></script>
+
+    <h1>Audio Client</h1>
+
+    <div class="radios">
+      <div class="radio">
+        <h2>Radio 1</h2>
+        <input type="text" id="channelId1" placeholder="channel id" />
+        <button id="joinChannel1">Join Channel</button>
+        <button id="ptt1">PTT</button>
+        <br />
+        <audio id="audio1" controls autoplay></audio>
+        <span>Audio Levels: <span id="audio1Level">0</span></span>
+      </div>
+
+      <div class="radio">
+        <h2>Radio 2</h2>
+        <input type="text" id="channelId2" placeholder="channel id" />
+        <button id="joinChannel2">Join Channel</button>
+        <button id="ptt2">PTT</button>
+        <br />
+        <audio id="audio2" controls autoplay></audio>
+        <span>Audio Levels: <span id="audio2Level">0</span></span>
+      </div>
+
+      <div class="radio">
+        <h2>Radio 3</h2>
+        <input type="text" id="channelId3" placeholder="channel id" />
+        <button id="joinChannel3">Join Channel</button>
+        <button id="ptt3">PTT</button>
+        <br />
+        <audio id="audio3" controls autoplay></audio>
+        <span>Audio Levels: <span id="audio3Level">0</span></span>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,94 @@
+<html>
+  <head>
+    <style>
+      /* The demo */
+
+
+      .anchored-notice {
+        position: absolute;
+        /*  Anchor reference  */
+        /* position-anchor: --anchor-el; */
+        bottom: anchor(top);
+        justify-self: anchor-center;
+      }
+
+      /* Misc styling */
+
+      .anchor {
+        background: linear-gradient(45deg, blueviolet, blue);
+        font-size: 2rem;
+        display: grid;
+        place-items: center;
+        border-radius: 100%;
+        aspect-ratio: 1 / 1;
+        width: 3.5rem;
+        line-height: 0;
+        margin-top: 60dvh;
+
+        p {
+          filter: brightness(2);
+        }
+      }
+
+      .anchored-notice {
+        visibility: hidden;
+        font-family: system-ui, sans-serif;
+        background: #333;
+        border-radius: 0.75rem;
+        color: white;
+        padding: 1rem;
+        max-width: 250px;
+        line-height: 1.5;
+      }
+
+      code {
+        font-family: monospace;
+        background: dimgray;
+        padding: 0.25rem;
+        border-radius: 0.25rem;
+        border: 1px solid gray;
+      }
+
+      body {
+        display: grid;
+        grid-template-rows: 2fr;
+        justify-content: center;
+        height: 100vh;
+      }
+    </style>
+    <script>
+      function showNotice(anchorName) {
+        console.log('showNotice');
+        const notice = document.querySelector('.anchored-notice');
+        notice.style.visibility = 'visible';
+        notice.style['position-anchor'] = anchorName;
+      }
+
+      function hideNotice() {
+        console.log('hideNotice');
+        const notice = document.querySelector('.anchored-notice');
+        notice.style.visibility = 'hidden';
+      }
+
+      (() => {
+        setTimeout(() => {
+          const anchor = document.querySelector('#anchor2');
+          anchor2.style['anchor-name'] = '--anchor-el-2';
+        }, 10000);
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="anchor1" class="anchor" style="anchor-name: --anchor-el-1" onmouseenter="showNotice('--anchor-el-1')" onmouseleave="hideNotice()">
+      <p>⚓︎</p>
+    </div>
+
+    <div id="anchor2" class="anchor" onmouseenter="showNotice('--anchor-el-2')" onmouseleave="hideNotice()">
+      <p>⚓︎</p>
+    </div>
+
+    <div class="anchored-notice">
+      <p>I am a <i>positioned element</i> that is tethered to the top of the <code>anchor</code> at my bottom. I also use justify-self for centering.<p>
+    </div>
+  </body>
+</html>

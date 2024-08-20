@@ -1,0 +1,41 @@
+{
+  "name": "Test simulation",
+
+  "ownships": [
+    "N73146",
+    "N66083",
+    "N72PE"
+  ],
+
+  "events": [
+    { "time": 0, "aircraft": "N72PE","position": [-122.604006, 45.585711, 0], "state": "ground"  },
+    { "time": 10, "aircraft": "N72PE", "position": [-122.604006, 45.585711, 0] },
+    { "time": 70, "aircraft": "N72PE", "position": [-122.600965, 45.585909, 0] },
+    { "time": 130, "aircraft": "N72PE", "position": [-122.585269, 45.579788, 0] },
+    { "time": 160, "aircraft": "N72PE", "position": [-122.585269, 45.579788, 0], "state": "takeoff" },
+    { "time": 170, "aircraft": "N72PE", "position": [-122.584574, 45.579934, 0] },
+    { "time": 180, "aircraft": "N72PE", "position": [-122.584106, 45.580591, 0] },
+    { "time": 210, "aircraft": "N72PE", "position": [-122.621303, 45.595100, 500], "state": "departure" },
+    { "time": 780, "aircraft": "N72PE", "position": [-123.027833, 45.752167, 3500] },
+
+    { "time": 0, "aircraft": "N73146","position": [-122.604006, 45.585711, 0], "state": "ground"  },
+    { "time": 60, "aircraft": "N73146", "position": [-122.604006, 45.585711, 0] },
+    { "time": 90, "aircraft": "N73146", "position": [-122.600965, 45.585909, 0] },
+    { "time": 150, "aircraft": "N73146", "position": [-122.585269, 45.579788, 0] },
+    { "time": 180, "aircraft": "N73146", "position": [-122.585269, 45.579788, 0], "state": "takeoff" },
+    { "time": 190, "aircraft": "N73146", "position": [-122.584574, 45.579934, 0] },
+    { "time": 200, "aircraft": "N73146", "position": [-122.584106, 45.580591, 0] },
+    { "time": 230, "aircraft": "N73146", "position": [-122.621303, 45.595100, 500], "state": "departure" },
+    { "time": 800, "aircraft": "N73146", "position": [-123.027833, 45.752167, 3500] },
+
+    { "time": 80, "aircraft": "N66083","position": [-122.604006, 45.585711, 0], "state": "ground"  },
+    { "time": 120, "aircraft": "N66083", "position": [-122.604006, 45.585711, 0] },
+    { "time": 150, "aircraft": "N66083", "position": [-122.600965, 45.585909, 0] },
+    { "time": 210, "aircraft": "N66083", "position": [-122.585269, 45.579788, 0] },
+    { "time": 240, "aircraft": "N66083", "position": [-122.585269, 45.579788, 0], "state": "takeoff" },
+    { "time": 250, "aircraft": "N66083", "position": [-122.584574, 45.579934, 0] },
+    { "time": 260, "aircraft": "N66083", "position": [-122.584106, 45.580591, 0] },
+    { "time": 290, "aircraft": "N66083", "position": [-122.621303, 45.595100, 500], "state": "departure" },
+    { "time": 860, "aircraft": "N66083", "position": [-123.027833, 45.752167, 3500] }
+  ]
+}

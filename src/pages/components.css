@@ -1,0 +1,5 @@
+.btn-primary {
+  @apply flex items-center justify-center h-9 gap-1 self-stretch;
+  @apply rounded-md border-2 border-solid border-neutral-500 bg-neutral-700;
+  @apply hover:bg-neutral-600 hover:border-neutral-400;
+}

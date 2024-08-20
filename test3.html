@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>D3 Time Line Graph with Icons</title>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <style>
+    .line {
+      stroke: #d3d3d3;
+      stroke-width: 12px;
+    }
+
+    .icon {
+      fill: steelblue;
+    }
+
+    .tooltip {
+      position: absolute;
+      position-anchor: --anchor-1-0;
+      bottom: anchor(top);
+      justify-self: anchor-center;
+
+      /* visibility: hidden; */
+      background-color: lightgray;
+      padding: 8px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="something" style="width: 10px; height: 10px; background: blue; anchor-name: --test-anchor;"></div>
+  <div id="tooltip" class="tooltip" style="position-anchor: --anchor-01">
+    Hello World
+  </div>
+
+  <div id="chart">
+    <svg width="960" height="400">
+      <g transform="translate(40,20)">
+        <g transform="translate(0,360)" fill="none" font-size="10" font-family="sans-serif" text-anchor="middle">
+          <path class="domain" stroke="currentColor" d="M0,6V0H890V6"></path>
+          <g class="tick" opacity="1" transform="translate(0,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">0</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(74.16666666666666,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">50</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(148.33333333333331,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">100</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(222.5,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">150</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(296.66666666666663,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">200</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(370.83333333333337,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">250</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(445,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">300</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(519.1666666666667,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">350</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(593.3333333333333,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">400</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(667.5,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">450</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(741.6666666666667,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">500</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(815.8333333333333,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">550</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(890,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">600</text>
+          </g>
+        </g>
+
+        <g x="100" y="100" style="position: absolute; left: anchor(left); top: anchor(top); position-anchor: --anchor-01;">
+          <rect width="100" height="100" fill="red" style="position: absolute; left: anchor(left); top: anchor(top); position-anchor: --anchor-01;"></rect>
+          <text x="0" y="50" font-family="Verdana" font-size="35" fill="blue">Hello</text>
+        </g>
+
+        <line x1="0" y1="72" x2="890" y2="72" class="line"></line>
+        <image xlink:href="public/images/latlon.svg" x="-12" y="60" width="24" height="24"
+          style="anchor-name: --anchor-00;"></image>
+        <image xlink:href="public/images/latlon.svg" x="433" y="60" width="24" height="24"
+          style="anchor-name: --anchor-01;"></image>
+        <image xlink:href="public/images/latlon.svg" x="878" y="60" width="24" height="24"
+          style="anchor-name: --anchor-02;"></image>
+        <line x1="0" y1="144" x2="890" y2="144" class="line"></line>
+        <image xlink:href="public/images/latlon.svg" x="10.25" y="132" width="24" height="24"
+          style="anchor-name: --anchor-10;"></image>
+        <image xlink:href="public/images/latlon.svg" x="54.75" y="132" width="24" height="24"
+          style="anchor-name: --anchor-11;"></image>
+        <image xlink:href="public/images/latlon.svg" x="121.5" y="132" width="24" height="24"
+          style="anchor-name: --anchor-12;"></image>
+        <image xlink:href="public/images/latlon.svg" x="581.3333333333333" y="132" width="24" height="24"
+          style="anchor-name: --anchor-13;"></image>
+        <image xlink:href="public/images/latlon.svg" x="655.5" y="132" width="24" height="24"
+          style="anchor-name: --anchor-14;"></image>
+        <line x1="44.5" y1="216" x2="890" y2="216" class="line"></line>
+        <image xlink:href="public/images/latlon.svg" x="173.41666666666669" y="204" width="24" height="24"
+          style="anchor-name: --anchor-20;"></image>
+        <image xlink:href="public/images/latlon.svg" x="358.83333333333337" y="204" width="24" height="24"
+          style="anchor-name: --anchor-21;"></image>
+        <image xlink:href="public/images/latlon.svg" x="544.25" y="204" width="24" height="24"
+          style="anchor-name: --anchor-22;"></image>
+        <image xlink:href="public/images/latlon.svg" x="729.6666666666667" y="204" width="24" height="24"
+          style="anchor-name: --anchor-23;"></image>
+        <image xlink:href="public/images/airport.svg" x="32.5" y="204" fill="blue" width="24" height="24"></image>
+        <line x1="0" y1="288" x2="667.5" y2="288" class="line"></line>
+        <image xlink:href="public/images/latlon.svg" x="32.5" y="276" width="24" height="24"
+          style="anchor-name: --anchor-30;"></image>
+        <image xlink:href="public/images/latlon.svg" x="121.5" y="276" width="24" height="24"
+          style="anchor-name: --anchor-31;"></image>
+        <image xlink:href="public/images/latlon.svg" x="166" y="276" width="24" height="24"
+          style="anchor-name: --anchor-32;"></image>
+        <image xlink:href="public/images/latlon.svg" x="255" y="276" width="24" height="24"
+          style="anchor-name: --anchor-33;"></image>
+        <image xlink:href="public/images/airport.svg" x="655.5" y="276" fill="blue" width="24" height="24"></image>
+      </g>
+    </svg></div>
+</body>
+
+</html>

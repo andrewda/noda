@@ -1,0 +1,556 @@
+<html>
+
+<body>
+    <style>
+        #outgoing {
+            width: 600px;
+            word-wrap: break-word;
+            white-space: normal;
+        }
+    </style>
+
+    <h1>WebRTC</h1>
+    <h2>Hello world</h2>
+
+    <button id="demoSpatialAudio">Spatial Audio Demo</button>
+    <button id="demoSpatialVerbalAudio">Spatial Verbal Audio Demo</button>
+
+    <video id="remoteVideo" autoplay muted></video>
+    <audio id="remoteAudio" autoplay></audio>
+
+    <input type="text" disabled id="myID" placeholder="My Peer ID">
+    <input type="text" id="peerId" placeholder="Peer ID">
+    <button id="connect">Connect</button>
+
+    <script src="https://tonejs.github.io/build/Tone.js"></script>
+    <script src="https://tonejs.github.io/examples/js/tone-ui.js"></script>
+    <script src="https://tonejs.github.io/examples/js/components.js"></script>
+
+    <script type="module">
+        import { Peer } from "https://esm.sh/peerjs@1.5.4?bundle-deps"
+        // import * as Tone from "https://esm.sh/tone@15.0.4?bundle-deps"
+
+        console.log(Tone)
+
+        const peer = new Peer()
+
+        const myID = document.querySelector('#myID')
+        const peerId = document.querySelector('#peerId')
+        const connectButton = document.querySelector('#connect')
+
+        const remoteVideo = document.querySelector('#remoteVideo')
+        const remoteAudio = document.querySelector('#remoteAudio')
+
+        const options = {
+            constraints: {
+                mandatory: {
+                    OfferToReceiveAudio: true,
+                    OfferToReceiveVideo: true
+                },
+                offerToReceiveAudio: 1,
+                offerToReceiveVideo: 1,
+            },
+            sdpTransform: (test) => {
+                return test.replace('useinbandfec=1', 'useinbandfec=1; stereo=0; maxaveragebitrate=510000');
+            }
+        }
+
+        // navigator.mediaDevices.enumerateDevices().then(console.log).catch(console.error);
+
+
+        // const mediaElementSource = Tone.context.createMediaElementSource(remoteAudio)
+        // const filter = new Tone.Filter(100000, 'highpass');
+        // Tone.connect(mediaElementSource, filter);
+
+        // const addFilter = async (mediaStream) => {
+        //     const sourceNode = Tone.context.createMediaStreamSource(mediaStream);
+
+        //     const toneGain = new Tone.Gain(3);
+        //     Tone.connect(sourceNode, toneGain);
+
+            // const distortion = new Tone.Distortion(1.0);
+
+            // const highpass = new Tone.Filter({
+            //     type: 'highpass',
+            //     frequency: 300, // Center frequency
+            //     rolloff: -48,
+            // });
+
+            // const lowpass = new Tone.Filter({
+            //     type: 'lowpass',
+            //     frequency: 2700, // Center frequency
+            //     rolloff: -48,
+            // })
+
+            // const noise = new Tone.Noise("pink").start();
+            // const noiseLevel = new Tone.Gain(0.008); // Control the noise volume
+            // noise.connect(noiseLevel);
+
+            // toneGain.connect(distortion).connect(highpass).connect(lowpass);
+            // noiseLevel.connect(highpass).connect(lowpass);
+
+            // const panner = new Tone.Panner3D({
+            //     panningModel: 'HRTF',
+            //     positionX: 1,
+            //     positionY: 0,
+            //     positionZ: 3,
+            // });
+
+        //     lowpass.connect(panner);
+
+        //     // Final output to Tone.js destination
+        //     panner.toDestination();
+        // }
+
+        const playToneAtLocation = async (type, x, y, z) => {
+            let audio;
+            if (type === 'static') {
+                const noise = new Tone.Noise("pink").start();
+                const noiseLevel = new Tone.Gain(0.03); // Control the noise volume
+                audio = noise.connect(noiseLevel);
+            } else if (type === 'synth') {
+                audio = new Tone.Synth();
+                const now = Tone.now();
+                audio.triggerAttackRelease("C4", "8n", now);
+                audio.triggerAttackRelease("E4", "8n", now + 0.5);
+                audio.triggerAttackRelease("G4", "8n", now + 1);
+            }
+
+            const panner = new Tone.Panner3D({
+                panningModel: 'HRTF',
+                positionX: x,
+                positionY: y,
+                positionZ: z,
+                rolloffFactor: 2,
+            });
+
+
+            audio.connect(panner);
+            panner.toDestination();
+
+            await new Promise(resolve => setTimeout(resolve, 1750));
+
+            panner.dispose();
+
+            // await synth.fadeOut();
+            await new Promise(resolve => setTimeout(resolve, 750));
+        };
+
+        const playClipAtLocation = async (clip, spatial, x, y, z, playStatic = true) => {
+            const player = new Tone.Player(clip);
+            player.autostart = true;
+
+            const distortion = new Tone.Distortion(1.0);
+
+            const highpass = new Tone.Filter({
+                type: 'highpass',
+                frequency: 300,
+                rolloff: -48,
+            });
+
+            const lowpass = new Tone.Filter({
+                type: 'lowpass',
+                frequency: 2700,
+                rolloff: -48,
+            })
+
+            const noise = new Tone.Noise("pink").start();
+            const noiseLevel = new Tone.Gain(playStatic ? 0.015 : 0);
+            noise.connect(noiseLevel);
+
+            player.connect(distortion).connect(highpass).connect(lowpass);
+            noiseLevel.connect(highpass).connect(lowpass);
+
+            let audio;
+            if (spatial) {
+                audio = new Tone.Panner3D({
+                    panningModel: 'HRTF',
+                    positionX: x,
+                    positionY: y,
+                    positionZ: z,
+                    rolloffFactor: 2,
+                });
+
+
+                lowpass.connect(audio);
+                audio.toDestination();
+            } else {
+                audio = new Tone.Gain(0.2);
+                lowpass.connect(audio);
+                audio.toDestination();
+            }
+
+            await new Promise(resolve => player.onstop = resolve);
+
+            return audio;
+        };
+
+        const demoSpatialAudio = async () => {
+            await Tone.start();
+            console.log('started Tone.js')
+
+            const xzPairs = [
+                [-3, 3],
+                [-1, 3],
+                [1, 3],
+                [3, 3],
+
+                [3, -3],
+                [1, -3],
+                [-1, -3],
+                [-3, -3],
+            ];
+
+            const randomizedPairs = xzPairs.map(pair => [Math.random(), ...pair]).toSorted((a, b) => a[0] - b[0]).map(([_, x, y]) => [x, y]);
+            console.log(randomizedPairs)
+
+            for (const [x, z] of xzPairs) {
+                await playToneAtLocation('synth', x, 0, z);
+            }
+
+            for (const [x, z] of randomizedPairs) {
+                await playToneAtLocation('static', x, 0, z);
+            }
+        }
+        document.querySelector('#demoSpatialAudio').addEventListener('click', demoSpatialAudio);
+
+
+        const demoSpatialVerbalAudio = async () => {
+            console.log('starting spatial verbal audio demo')
+            await Tone.start();
+            console.log('started Tone.js')
+
+            const xzPairs = [
+                [-3, 3],
+                [-1, 3],
+                [1, 3],
+                [3, 3],
+
+                [3, -3],
+                [1, -3],
+                [-1, -3],
+                [-3, -3],
+            ];
+
+            const aircraftIdentsUs = ['HBT4606', 'HBT4619', 'HBT4627', 'HBT4664', 'HBT4671', 'HBT4687', 'HBT4698'];
+            const aircraftIdentsThem = ['AA671', 'HBT3782', 'HBT9823', 'N4DX', 'N87PL', 'SLM4923', 'UA562'];
+            const aircraftInstructions = ['bravo_intentions', 'descend_11', 'direct_pdx', 'left_300', 'ptac_12', 'recycle_xpdr', 'squawk_0078', 'climb_fl220', 'descend_syndy', 'left_120', 'left_shedd', 'ptac_26r', 'right_060', 'traffic_3_6nm'];
+
+            const shuffle = (arr) => arr.map(a => [Math.random(), a]).toSorted((a, b) => a[0] - b[0]).map(([_, a]) => a);
+
+            const randomizedLocations = shuffle(xzPairs);
+            const randomizedIdents = shuffle(shuffle(aircraftIdentsUs).concat(shuffle(aircraftIdentsThem)));
+            // const randomizedIdents = aircraftIdentsUs.map(clip => [Math.random(), clip]).toSorted((a, b) => a[0] - b[0]).map(([_, clip]) => clip).slice(0, 4).concat(aircraftIdentsThem.map(clip => [Math.random(), clip]).toSorted((a, b) => a[0] - b[0]).map(([_, clip]) => clip).slice(0, 4));
+            const randomizedInstructions = shuffle(aircraftInstructions);
+
+            // for (const [x, z] of xzPairs) {
+            //     await playToneAtLocation('synth', x, 0, z);
+            // }
+
+            // Hallibut 4627, turn left heading 3-0-0
+            // Hallibut 4619, climb and maintain flight level 2 2 0
+            // Hallibut 4698, descent via the SYNDY arrival and maintain 1-1 thousand
+            // Hallibut 4606, 1-0 miles south of BLINK, cross BLINK at or above 3 thousand 2 hundred, cleared for the ILS 2-6 right approach
+            // Hallibut 4687, cleared into the bravo, and uhhh say intentions
+            // Hallibut 4664, traffix three  o'clock, six miles, altitude indicates 3 thousand 2 hundred
+            // Hallibut 4671, 1-2 miles north of DOINK, cross DOINK at or above 4 thousand 5 hundred, cleared for the RNAV Zulu 1-2 approach
+
+            // Hallibut 9823, descent and maintain 1-1 thousand
+            // Hallibut 3782, turn left direct SHEDD
+            // Salmon 4923, turn right heading 0-6-0, vectors for traffic
+            // United 562, turn left heading 1-2-0, vectors for approach
+            // American 671, cleared direct Portland
+            // November 8-7 Papa Lima, squawk 0-0-7-8
+            // November 4 Delta Xray, recycle transponder please, it looks like we're not picking you up
+
+
+            const run = async (from, to, spatial = true) => {
+                if (from > 0) {
+                    await new Promise(resolve => setTimeout(resolve, 1000 + 1000 * (Math.random() - 0.5)));
+                }
+
+                const runStart = Date.now();
+
+                for (let idx = from; idx < to; idx++) {
+                    const [x, z] = randomizedLocations[idx % randomizedLocations.length];
+                    const ident = randomizedIdents[idx % randomizedIdents.length];
+                    const instruction = randomizedInstructions[idx % randomizedInstructions.length];
+
+                    const start = Date.now() - runStart;
+
+                    const a1 = await playClipAtLocation(`/clips/Aircraft/${ident}.wav`, spatial, x, 0, z);
+                    const a2 = await playClipAtLocation(`/clips/Instructions/${instruction}.wav`, spatial, x, 0, z, false);
+
+                    const end = Date.now() - runStart;
+
+                    console.log([start, end, idx, x, z, ident, instruction])
+
+                    a1.dispose();
+                    a2.dispose();
+
+                    await new Promise(resolve => setTimeout(resolve, 2000 + 2000 * (Math.random() - 0.5)));
+                }
+            }
+
+            console.log(randomizedIdents)
+
+            const useSpatial = true;
+            run(0, 6, useSpatial);
+            run(6, 12, useSpatial);
+            // run(12, 18, useSpatial);
+        }
+        document.querySelector('#demoSpatialVerbalAudio').addEventListener('click', demoSpatialVerbalAudio);
+
+
+        const getUserMedia = (onSuccess, onError) =>
+            navigator.getUserMedia({
+                video: true,
+                audio: {
+                    autoGainControl: false,
+                    channelCount: 1,
+                    echoCancellation: false,
+                    latency: 0,
+                    noiseSuppression: false,
+                    sampleRate: 48000,
+                    sampleSize: 16,
+                    volume: 1.0,
+                    deviceId: { exact: '63f3653e3a34156997c98f32d517354db85c1d1a18e634cb6fb80521e0f4ddc6' }
+                }
+            }, onSuccess, onError);
+
+
+        connectButton.addEventListener('click', () => {
+            console.log('button clicked')
+            // TODO: can't use promise because of peerjs shim?
+            getUserMedia((stream) => {
+                console.log('got local stream, calling peer')
+                const call = peer.call(peerId.value, stream, { ...options, metadata: { frequency: '123.075' } });
+                call.on('stream', (remoteStream) => {
+                    console.log('Received remote stream');
+                    console.log(remoteStream);
+                    console.log('audio track:', remoteStream.getAudioTracks()[0])
+
+                    // Show stream in some video/canvas element.
+                    remoteVideo.srcObject = remoteStream;
+                    remoteVideo.muted = true;
+                    // remoteAudio.srcObject = remoteStream;
+
+                    // create audio new element and append to dom
+                    // remoteAudio = document.createElement('audio');
+                    // remoteAudio.srcObject = remoteStream;
+                    // document.body.appendChild(remoteAudio);
+
+                    console.log('calling addFilter from call maker')
+                    addFilter(remoteStream);
+                });
+            }, (err) => {
+                console.log('Failed to get local stream', err);
+            });
+        });
+
+        peer.on('open', (id) => {
+            console.log('my id is', id)
+            myID.value = id
+        })
+
+        peer.on('call', (call) => {
+            // TODO: can't use promise because of peerjs shim?
+            getUserMedia((stream) => {
+                call.answer(stream, { ...options, metadata: { frequency: '123.075' } }); // Answer the call with an A/V stream.
+                call.on('stream', (remoteStream) => {
+                    console.log('Received remote stream');
+                    console.log(remoteStream);
+
+                    console.log(remoteStream);
+                    console.log(remoteStream.getAudioTracks()[0])
+
+                    // Show stream in some video/canvas element.
+                    remoteVideo.srcObject = remoteStream;
+                    remoteVideo.muted = true;
+                    // remoteAudio.srcObject = remoteStream;
+
+                    // create audio new element and append to dom
+                    // remoteAudio = document.createElement('audio');
+                    // remoteAudio.srcObject = remoteStream;
+                    // document.body.appendChild(remoteAudio);
+
+                    console.log('calling addFilter from call receiver')
+                    addFilter(remoteStream);
+                });
+            }, (err) => {
+                console.log('Failed to get local stream', err);
+            });
+        });
+    </script>
+
+    <!-- <script src="simplepeer.min.js"></script> -->
+    <!-- <script src="/socket.io/socket.io.js"></script> -->
+
+    <!-- <script>
+        const RTC_CONFIG = { 'iceServers': [] };
+        // const RTC_CONFIG = { 'iceServers': [{ urls: 'stun:stun.l.google.com:19302' }] };
+        // const RTC_CONFIG = { 'iceServers': [ { urls: 'stun:global.stun.twilio.com:3478' }, { urls: 'turn:freestun.net:3478', username: 'free', credential: 'free' } ]};
+
+        const socket = io('/', { autoConnect: false });
+        const peers = {};
+
+        const remoteStream = new MediaStream();
+        const remoteAudioElement = document.querySelector('#remoteAudio');
+        remoteAudioElement.srcObject = remoteStream;
+
+        let localStream;
+
+
+        const start = async () => {
+            console.log('requesting local stream')
+            navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+                .then(stream => {
+                    console.log('got local stream')
+                    localStream = stream
+                    socket.open()
+                })
+                .catch(err => {
+                    console.error('error getting local stream', err)
+                    console.error(err)
+                })
+        }
+
+        const startButton = document.querySelector('#start')
+        startButton.addEventListener('click', start)
+
+        socket.on('connect', () => {
+            console.log(`i am ${socket.id}`)
+
+            // when a user joins the server
+            socket.on('user:join', initRTCPeerConnection)
+
+            // when a user leaves
+            socket.on('user:leave', removeRTCPeerConnection)
+
+            // when new user sent an answer
+            socket.on('user:rtc:answer', onRTCAnswer)
+
+            // when a user gets an offer
+            socket.on('user:rtc:offer', onRTCoffer)
+
+            // when a candidate arrives
+            socket.on('user:rtc:candidate', onRTCIceCandidate)
+        })
+
+        const onRTCIceCandidate = async ({ id, candidate }) => {
+            console.log(`got ice candidate from ${id}`, candidate)
+
+            if (!candidate) return
+
+            const pc = peers[id]
+
+            if (!pc) return
+
+            await pc.addIceCandidate(candidate)
+
+        }
+
+        const removeRTCPeerConnection = id => {
+            const pc = peers[id]
+
+            if (!pc) return
+
+            pc.close()
+
+            delete peers[id]
+
+            // users.update(v => keys(peers))
+
+            console.log(`removed rtc peer connection ${id}`)
+        }
+
+        const initRTCPeerConnection = async id => {
+            console.log(`begin init new rtc peer connection for client ${id}`)
+
+            const pc = new RTCPeerConnection(RTC_CONFIG)
+
+            addLocalStream(pc)
+            addRemoteStream(pc)
+
+            pc.onicecandidate = sendIceCandidate(id)
+
+            // add peerconnection to peerlist
+            peers[id] = pc
+
+            // update userlist
+            // users.update(v => keys(peers))
+
+            // create a new offer
+            const offer = await pc.createOffer()
+
+            // set offer as local descrioption
+            await pc.setLocalDescription(offer)
+
+            // send offer out
+            socket.emit('user:rtc:offer', { id, offer })
+
+            // log
+            console.log(`init new rtc peer connection for client ${id}`, offer)
+        }
+
+        const onRTCAnswer = async ({ id, answer }) => {
+            console.log(`got answer from ${id}`, answer)
+
+            const pc = peers[id]
+
+            if (!pc) return
+            if (!answer) return
+
+            const desc = new RTCSessionDescription(answer)
+
+            await pc.setRemoteDescription(desc)
+        }
+
+        const onRTCoffer = async ({ id, offer }) => {
+
+            console.log(`got offer from ${id}`, offer)
+
+            if (!offer) return
+
+            const pc = new RTCPeerConnection(RTC_CONFIG)
+
+            addLocalStream(pc)
+            addRemoteStream(pc)
+
+            pc.onicecandidate = sendIceCandidate(id)
+
+            peers[id] = pc
+
+            // users.update(v => keys(peers))
+
+            const desc = new RTCSessionDescription(offer)
+
+            pc.setRemoteDescription(desc)
+
+            const answer = await pc.createAnswer()
+
+            await pc.setLocalDescription(answer)
+
+            socket.emit('user:rtc:answer', { id, answer })
+        }
+
+        const sendIceCandidate = id => ({ candidate }) => {
+            if (candidate) {
+                socket.emit('user:rtc:candidate', { id, candidate })
+            }
+        }
+
+        const addLocalStream = pc => {
+            localStream.getTracks().forEach(track => pc.addTrack(track, localStream))
+        }
+
+        const addRemoteStream = pc => {
+            pc.ontrack = async evt => {
+                remoteStream.addTrack(evt.track, remoteStream)
+            }
+        }
+
+    </script> -->
+</body>
+
+</html>
