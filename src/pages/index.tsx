@@ -1,6 +1,7 @@
 import C2Panel from '@/components/C2Panel'
 import RadioPanel from '@/components/RadioPanel'
 import TimelinePanel from '@/components/TimelinePanel'
+import { ThemeProvider } from '@/components/ui/theme-provider'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { useEffect, useRef, useState } from 'react'
@@ -182,29 +183,31 @@ export default function Home() {
         <link rel="stylesheet" href="cesium/Widgets/widgets.css" />
       </Head>
 
-      <div ref={ref} style={{ height: '100vh', width: '100vw', position: 'relative' }}>
-        {width && width > leftPanelWidth && (
-        <ResizablePanes uniqueId="one" unit="ratio" minMaxUnit="pixel" vertical resizerSize={resizerWidth} onReady={(api: any) => { apiRef.current = api }}>
-          <Pane id="P0" size={leftPanelWidth} minSize={leftPanelWidth}>
-            <div className="w-full h-full flex flex-col">
-              <C2Panel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
-              <RadioPanel radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
-            </div>
-          </Pane>
-          <Pane id="P1" size={width - leftPanelWidth - 2}>
-            <ResizablePanes uniqueId='two'>
-              <Pane id="P0" size={3}>
-                <Toaster position="top-left" containerStyle={{ position: 'relative' }} />
-                <MapPanel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
+      <ThemeProvider attribute="class" defaultTheme="dark">
+        <div ref={ref} style={{ height: '100vh', width: '100vw', position: 'relative' }}>
+          {width && width > leftPanelWidth && (
+            <ResizablePanes uniqueId="one" unit="ratio" minMaxUnit="pixel" vertical resizerSize={resizerWidth} onReady={(api: any) => { apiRef.current = api }}>
+              <Pane id="P0" size={leftPanelWidth} minSize={leftPanelWidth}>
+                <div className="w-full h-full flex flex-col">
+                  <C2Panel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
+                  <RadioPanel radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
+                </div>
               </Pane>
-              <Pane id="P1" size={1} minSize={1}>
-                <TimelinePanel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
+              <Pane id="P1" size={width - leftPanelWidth - 2}>
+                <ResizablePanes uniqueId='two'>
+                  <Pane id="P0" size={3}>
+                    <Toaster position="top-left" containerStyle={{ position: 'relative' }} />
+                    <MapPanel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
+                  </Pane>
+                  <Pane id="P1" size={1} minSize={1}>
+                    <TimelinePanel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
+                  </Pane>
+                </ResizablePanes>
               </Pane>
             </ResizablePanes>
-          </Pane>
-        </ResizablePanes>
-        )}
-      </div>
+          )}
+        </div>
+      </ThemeProvider>
     </>
   )
 }

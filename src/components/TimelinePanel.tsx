@@ -33,7 +33,7 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
     selected: aircraftStateBoard.callsign === selectedAircraftCallsign,
     receiving: radios?.find((radio) => radio.aircraft === aircraftStateBoard.callsign)?.receiving ?? false,
     start: 0,
-    end: 3600,
+    end: 2900,
     times: [0, 1300, 2600],
   })) ?? [];
 
@@ -70,7 +70,7 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
 
     svg.append('g')
       .attr('transform', `translate(0,${containerHeight - margin.bottom})`)
-      .call(d3.axisBottom(x).tickFormat((d: any) => d === 0 ? 'Now' : `+${Math.floor(d / 60)} min`).tickValues([0, 600, 1200, 1800, 2400, 3000, 3600]));
+      .call(d3.axisBottom(x).tickFormat((d: any) => d === 0 ? 'Now' : `+${Math.floor(d / 60)} min`).tickValues([0, 1, 2, 3, 4, 5, 6].map((d) => timeEnd * (d/6))));
 
     data.forEach((d, i) => {
       svg.append('line')
@@ -160,9 +160,9 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
   return <div className='w-full h-full flex flex-row bg-zinc-900'>
     <div className="relative w-full basis-32 flex-shrink-0">
       {data.map((d, i) =>
-        <div key={i} className="h-6 flex items-center gap-2 self-stretch absolute cursor-pointer hover:brightness-75" style={{top: yDom(i + 1) - 12, right: 0}} onClick={() => onSelectAircraft(d.aircraft)}>
+        <div key={i} className={`h-6 flex items-center gap-2 self-stretch absolute cursor-pointer hover:brightness-75 ${d.selected ? 'text-fuchsia-400' : 'text-gray-200'}`} style={{top: yDom(i + 1) - 12, right: 0}} onClick={() => onSelectAircraft(d.aircraft)}>
           <Ownship width={18} height={18} />
-          <div className={`font-mono text-sm ${d.selected ? 'text-fuchsia-400' : 'text-gray-200'}`}>{d.aircraft}</div>
+          <div className="font-mono text-sm">{d.aircraft}</div>
           <MonitorIndicator receive={d.receiving} className="w-3.5 h-3.5" />
         </div>
       )}

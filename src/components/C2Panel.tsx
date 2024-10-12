@@ -4,6 +4,8 @@ import Airport from '../../public/images/airport.svg';
 import FromTo from '../../public/images/from_to.svg';
 import Ownship from '../../public/images/ownship.svg';
 import { MonitorIndicator, RadioCommunicationBoard } from './RadioPanel';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
 
 enum AircraftState {
   Ground,
@@ -81,6 +83,8 @@ type AircraftCommandPanelProps = {
 function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
   if (!aircraft) return <></>
 
+  console.log('loading');
+
   return (
     <div className="flex flex-col w-full h-full pl-3 pr-3 pt-4 pb-4 items-center gap-4 flex-grow self-stretch min-w-0 bg-zinc-900">
       <div className="flex flex-col items-center gap-2 self-stretch">
@@ -110,23 +114,17 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
           </div>
         </div>
         <hr className="w-full border-neutral-600 border-b-2" />
-        <div>
-          <input type="text" className="w-full text-sm text-gray-200 bg-zinc-950 border-none focus:outline-none" />
-          <input type="text" className="w-full text-sm text-gray-200 bg-zinc-950 border-none focus:outline-none" />
-          <button className="btn-primary w-full text-sm">Send Test</button>
-          <button className="w-full text-sm text-gray-200 bg-zinc-950 border-none focus:outline-none">Send</button>
-          <div className="flex items-center gap-2 self-stretch">
-            <button className="w-full text-sm text-gray-200 bg-zinc-950 border-none focus:outline-none"></button>
-            <button className="w-full text-sm text-gray-200 bg-zinc-950 border-none focus:outline-none"></button>
-          </div>
+        <div className="w-full flex flex-col gap-2">
+          <Input type="text" onClick={() => console.log('click')} onFocus={() => console.log('focus')} onBlur={() => console.log('blur')} />
+          <input type="text" onClick={() => console.log('click')} onFocus={() => console.log('focus')} onBlur={() => console.log('blur')} />
         </div>
         <hr className="w-full border-neutral-600 border-b-2" />
-        <div>
+        <div className="w-full flex flex-col gap-2">
           <div>Armed Command</div>
           <div>Climb 3500</div>
           <div className="flex items-center gap-2 self-stretch">
-            <button className="w-full text-sm text-gray-200 bg-zinc-950 border-none focus:outline-none">Execute</button>
-            <button className="w-full text-sm text-gray-200 bg-zinc-950 border-none focus:outline-none">Disarm</button>
+            <Button className="flex-1" onClick={() => console.log('execute')}>Execute</Button>
+            <Button className="flex-1" variant="outline">Disarm</Button>
           </div>
         </div>
       </div>

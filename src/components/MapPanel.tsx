@@ -1,6 +1,6 @@
 import { ComponentProps, Fragment, useEffect, useMemo, useRef, useState } from 'react';
 
-import { ArcGisMapServerImageryProvider, BaseLayerPicker, BingMapsImageryProvider, BingMapsStyle, buildModuleUrl, CallbackProperty, Cartesian2, Cartesian3, ClockStep, Color, Ellipsoid, HeadingPitchRoll, Ion, JulianDate, PolylineDashMaterialProperty, ProviderViewModel, ReferenceFrame, SampledPositionProperty, SceneMode, TextureMagnificationFilter, TextureMinificationFilter, TileMapServiceImageryProvider, VelocityOrientationProperty, VelocityVectorProperty, WebMercatorProjection } from 'cesium';
+import { buildModuleUrl, CallbackProperty, Cartesian2, Cartesian3, ClockStep, Color, Ellipsoid, HeadingPitchRoll, Ion, IonImageryProvider, IonWorldImageryStyle, JulianDate, PolylineDashMaterialProperty, ProviderViewModel, ReferenceFrame, SampledPositionProperty, SceneMode, TileMapServiceImageryProvider, VelocityOrientationProperty, VelocityVectorProperty, WebMercatorProjection } from 'cesium';
 import { Clock, Entity, useCesium, Viewer } from 'resium';
 
 import { useResizeDetector } from 'react-resize-detector';
@@ -18,26 +18,24 @@ function ConfigureCesium() {
   const { scene, viewer } = useCesium();
   const { width, height, ref } = useResizeDetector();
 
-  console.log(viewer?.baseLayerPicker?.viewModel?.imageryProviderViewModels);
-
   if (viewer?.baseLayerPicker) {
-    console.log(viewer.baseLayerPicker.viewModel.imageryProviderViewModels);
-
     viewer.baseLayerPicker.viewModel.imageryProviderViewModels = [
       new ProviderViewModel({
         name: 'Aerial',
         iconUrl: buildModuleUrl('Widgets/Images/ImageryProviders/bingAerial.png'),
         tooltip: '',
-        creationFunction: () => BingMapsImageryProvider.fromUrl('https://dev.virtualearth.net', { mapStyle: BingMapsStyle.AERIAL }),
+        // @ts-ignore
+        creationFunction: () => [IonImageryProvider.fromAssetId(IonWorldImageryStyle.AERIAL)],
       }),
       new ProviderViewModel({
         name: 'VFR Sectional',
         iconUrl: buildModuleUrl('Widgets/Images/ImageryProviders/bingRoads.png'),
         tooltip: '',
+        // @ts-ignore
         creationFunction: () => [
-          BingMapsImageryProvider.fromUrl('https://dev.virtualearth.net', { mapStyle: BingMapsStyle.AERIAL }),
+          IonImageryProvider.fromAssetId(IonWorldImageryStyle.AERIAL),
           TileMapServiceImageryProvider.fromUrl('https://r2dassonville.github.io/faa-geo/tiles/current/sectional/'),
-          ArcGisMapServerImageryProvider.fromUrl('https://tiles.arcgis.com/tiles/ssFJjBXIUyZDrSYZ/arcgis/rest/services/VFR_Sectional/MapServer', { enablePickFeatures: false }),
+          // ArcGisMapServerImageryProvider.fromUrl('https://tiles.arcgis.com/tiles/ssFJjBXIUyZDrSYZ/arcgis/rest/services/VFR_Sectional/MapServer', { enablePickFeatures: false }),
         ],
       }),
     ];
