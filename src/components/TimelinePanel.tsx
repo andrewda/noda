@@ -167,6 +167,6 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
         </div>
       )}
     </div>
-    <div id='timeline-container' className="relative w-full flex-shrink flex-grow" ref={ref}></div>
+    <div id='timeline-container' className="relative w-full min-w-0 flex-shrink flex-grow" ref={ref}></div>
   </div>;
 }

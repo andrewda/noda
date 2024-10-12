@@ -1,6 +1,6 @@
-import { ComponentProps, Fragment, useEffect, useMemo, useState } from 'react';
+import { ComponentProps, Fragment, useEffect, useMemo, useRef, useState } from 'react';
 
-import { CallbackProperty, Cartesian2, Cartesian3, ClockStep, Color, Ellipsoid, HeadingPitchRoll, Ion, JulianDate, PolylineDashMaterialProperty, ReferenceFrame, SampledPositionProperty, SceneMode, VelocityOrientationProperty, VelocityVectorProperty, WebMercatorProjection } from 'cesium';
+import { ArcGisMapServerImageryProvider, BaseLayerPicker, BingMapsImageryProvider, BingMapsStyle, buildModuleUrl, CallbackProperty, Cartesian2, Cartesian3, ClockStep, Color, Ellipsoid, HeadingPitchRoll, Ion, JulianDate, PolylineDashMaterialProperty, ProviderViewModel, ReferenceFrame, SampledPositionProperty, SceneMode, TextureMagnificationFilter, TextureMinificationFilter, TileMapServiceImageryProvider, VelocityOrientationProperty, VelocityVectorProperty, WebMercatorProjection } from 'cesium';
 import { Clock, Entity, useCesium, Viewer } from 'resium';
 
 import { useResizeDetector } from 'react-resize-detector';
@@ -17,6 +17,33 @@ const kFeetToMeters = 0.3048;
 function ConfigureCesium() {
   const { scene, viewer } = useCesium();
   const { width, height, ref } = useResizeDetector();
+
+  console.log(viewer?.baseLayerPicker?.viewModel?.imageryProviderViewModels);
+
+  if (viewer?.baseLayerPicker) {
+    console.log(viewer.baseLayerPicker.viewModel.imageryProviderViewModels);
+
+    viewer.baseLayerPicker.viewModel.imageryProviderViewModels = [
+      new ProviderViewModel({
+        name: 'Aerial',
+        iconUrl: buildModuleUrl('Widgets/Images/ImageryProviders/bingAerial.png'),
+        tooltip: '',
+        creationFunction: () => BingMapsImageryProvider.fromUrl('https://dev.virtualearth.net', { mapStyle: BingMapsStyle.AERIAL }),
+      }),
+      new ProviderViewModel({
+        name: 'VFR Sectional',
+        iconUrl: buildModuleUrl('Widgets/Images/ImageryProviders/bingRoads.png'),
+        tooltip: '',
+        creationFunction: () => [
+          BingMapsImageryProvider.fromUrl('https://dev.virtualearth.net', { mapStyle: BingMapsStyle.AERIAL }),
+          TileMapServiceImageryProvider.fromUrl('https://r2dassonville.github.io/faa-geo/tiles/current/sectional/'),
+          ArcGisMapServerImageryProvider.fromUrl('https://tiles.arcgis.com/tiles/ssFJjBXIUyZDrSYZ/arcgis/rest/services/VFR_Sectional/MapServer', { enablePickFeatures: false }),
+        ],
+      }),
+    ];
+
+    viewer.baseLayerPicker.viewModel.terrainProviderViewModels = [];
+  }
 
   // Set canvas ref
   useEffect(() => {
@@ -187,28 +214,40 @@ type MapPanelProps = {
   onSelectAircraft: (aircraftCallsign: string | undefined) => void;
 }
 export default function MapPanel({ aircraft, radios, selectedAircraftCallsign, onSelectAircraft }: MapPanelProps) {
+  const ref = useRef<HTMLDivElement>(null);
+
   const startTime = useMemo(() => JulianDate.now(), []);
   const mapProjection = useMemo(() => new WebMercatorProjection(Ellipsoid.WGS84), []);
   const creditContainer = useMemo(() => new DocumentFragment() as any, []);
+  // const baseLayerPicker = useMemo(() => ref.current ? new BaseLayerPicker(ref.current, {}) : null, [ref]);
 
   return (
-    <Viewer
-      sceneMode={SceneMode.SCENE2D}
-      mapProjection={mapProjection}
-      fullscreenButton={false}
-      animation={false}
-      timeline={false}
-      infoBox={false}
-      selectionIndicator={false}
-      creditContainer={creditContainer}
-      creditDisplay={undefined}
-      msaaSamples={4}
-      style={{ height: '100%' }}
-    >
-      <Clock startTime={startTime} currentTime={JulianDate.now()} clockStep={ClockStep.SYSTEM_CLOCK_MULTIPLIER} shouldAnimate />
-      <ConfigureCesium />
+    <>
+      <div id="base-layer-picker" ref={ref}></div>
+      <Viewer
+        sceneMode={SceneMode.SCENE2D}
+        mapProjection={mapProjection}
+        fullscreenButton={false}
+        animation={false}
+        timeline={false}
+        infoBox={false}
+        selectionIndicator={false}
+        geocoder={false}
+        homeButton={false}
+        navigationHelpButton={false}
+        projectionPicker={false}
+        sceneModePicker={false}
+        // baseLayerPicker={false}
+        creditContainer={creditContainer}
+        creditDisplay={undefined}
+        msaaSamples={4}
+        style={{ height: '100%' }}
+      >
+        <Clock startTime={startTime} currentTime={JulianDate.now()} clockStep={ClockStep.SYSTEM_CLOCK_MULTIPLIER} shouldAnimate />
+        <ConfigureCesium />
 
-      <Entities aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={onSelectAircraft} />
-    </Viewer>
+        <Entities aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={onSelectAircraft} />
+      </Viewer>
+    </>
   )
 }

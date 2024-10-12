@@ -29,8 +29,11 @@ type RadioProps = {
   onSelect: () => void;
 }
 function Radio({ radio, selected, className, onSelect }: RadioProps) {
+  const monitoring = true;
+  const transmitting = false;
+
   return (
-    <div className={`w-full h-20 px-1 py-1.5 rounded border border-[#ababab] flex-col justify-between items-start inline-flex overflow-hidden ${className}`}>
+    <div className={`w-full h-20 px-1 py-1.5 rounded border ${selected ? 'border-fuchsia-400' : 'border-[#ababab]'} flex-col justify-between items-start inline-flex overflow-hidden ${className}`}>
       <div className="self-stretch px-0.5 justify-between items-center inline-flex">
         <div onClick={onSelect} className={`h-5 relative flex flex-row items-center gap-1 ${radio.aircraft ? 'cursor-pointer hover:brightness-75' : ''} ${selected ? 'text-fuchsia-400' : 'text-gray-200'}`}>
           {radio.aircraft ? (
@@ -38,14 +41,14 @@ function Radio({ radio, selected, className, onSelect }: RadioProps) {
               <Ownship width={16} height={16} />
               <div className="text-sm font-bold font-mono">{radio.aircraft}</div>
             </>
-          ) : <div className="text-xs italic font-bold">No Aircraft</div>}
+          ) : <div className="text-xs italic font-bold text-gray-400">No Aircraft</div>}
         </div>
         <MonitorIndicator receive={radio.receiving} className="w-3.5 h-3.5" />
       </div>
       <div className="flex self-stretch px-1 justify-between items-start gap-5">
         <div className="flex-col flex-shrink-0 gap-1.5 justify-between items-center flex">
-          <Monitor height={16} className="cursor-pointer text-teal-400 hover:brightness-75" />
-          <Transmit height={16} className="cursor-pointer text-teal-400 hover:brightness-75" />
+          <Monitor height={16} className={`cursor-pointer hover:brightness-75 ${monitoring ? 'text-teal-400' : 'text-gray-300'}`} />
+          <Transmit height={16} className={`cursor-pointer hover:brightness-75 ${transmitting ? 'text-teal-400' : 'text-gray-300'}`} />
         </div>
         <div className="flex flex-grow flex-col justify-between items-end h-full min-w-0">
           <div className="inline-flex justify-end items-center gap-1 cursor-pointer text-gray-200 hover:brightness-75">
