@@ -6,8 +6,8 @@ import { AircraftStateBoard } from './C2Panel';
 import { MonitorIndicator, RadioCommunicationBoard } from './RadioPanel';
 
 type TimelinePanelProps = {
-  aircraft: Array<AircraftStateBoard> | undefined,
-  radios: Array<RadioCommunicationBoard> | undefined;
+  aircraft: Record<string, AircraftStateBoard> | undefined,
+  radios: Record<string, RadioCommunicationBoard> | undefined;
   selectedAircraftCallsign: string | undefined;
   onSelectAircraft: (aircraftCallsign: string | undefined) => void;
 }
@@ -27,11 +27,11 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
   //   // { line: 7, start: timeStart, end: 2500, times: [130, 290, 1120, 2180] },
   // ];
 
-  const data = aircraft?.map((aircraftStateBoard, i) => ({
+  const data = Object.values(aircraft ?? {}).map((aircraftStateBoard, i) => ({
     line: i + 1,
     aircraft: aircraftStateBoard.callsign,
     selected: aircraftStateBoard.callsign === selectedAircraftCallsign,
-    receiving: radios?.find((radio) => radio.aircraft === aircraftStateBoard.callsign)?.receiving ?? false,
+    receiving: radios?.[aircraftStateBoard.callsign]?.receiving ?? false,
     start: 0,
     end: 2900,
     times: [0, 1300, 2600],
@@ -107,7 +107,7 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
         const anchorName = `--anchor-${i}-start`;
 
         container.append('img')
-          .attr('src', 'images/airport.svg')
+          .attr('src', 'images/airport_white.svg')
           .style('position', 'absolute')
           .style('left', `${xDom(d.start) - iconSize / 2}px`)  // Adjust to center the icon
           .style('top', `${yDom(d.line) - iconSize / 2}px`)
@@ -131,7 +131,7 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
         const anchorName = `--anchor-${i}-end`;
 
         container.append('img')
-          .attr('src', 'images/airport.svg')
+          .attr('src', 'images/airport_white.svg')
           .style('position', 'absolute')
           .style('left', `${x(d.end) - iconSize / 2 + margin.left}px`)  // Adjust to center the icon
           .style('top', `${y(d.line) - iconSize / 2 + margin.top}px`)

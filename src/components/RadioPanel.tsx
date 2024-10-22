@@ -4,6 +4,7 @@ import Ownship from '../../public/images/ownship.svg';
 import Transmit from '../../public/images/transmit.svg';
 
 export type RadioCommunicationBoard = {
+  id: string;
   aircraft: string | undefined;
   facility: string;
   frequency: string;
@@ -75,7 +76,7 @@ type RadioPanelProps = {
 export default function RadioPanel({ radios, selectedAircraftCallsign, onSelectAircraft }: RadioPanelProps) {
   return (
     <div className="grid grid-cols-4 gap-4 m-3">
-      {radios.map((radio) => (
+      {Object.values(radios).map((radio) => (
         <Radio key={radio.aircraft ?? 'wild'} radio={radio} selected={radio.aircraft ? radio.aircraft === selectedAircraftCallsign : false} onSelect={() => radio.aircraft ? onSelectAircraft(radio.aircraft) : null} className="last:col-start-4 justify-self-center" />
       ))}
     </div>
