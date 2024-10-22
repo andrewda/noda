@@ -70,7 +70,7 @@ function Radio({ radio, selected, className, onSelect }: RadioProps) {
 
 type RadioPanelProps = {
   selectedAircraftCallsign: string | undefined;
-  radios: Array<RadioCommunicationBoard>;
+  radios: Record<string, RadioCommunicationBoard>;
   onSelectAircraft: (aircraftCallsign: string | undefined) => void;
 }
 export default function RadioPanel({ radios, selectedAircraftCallsign, onSelectAircraft }: RadioPanelProps) {

@@ -205,8 +205,8 @@ export function Entities({ aircraft, radios, selectedAircraftCallsign, onSelectA
 }
 
 type MapPanelProps = {
-  aircraft: Array<AircraftStateBoard> | undefined,
-  radios: Array<RadioCommunicationBoard> | undefined;
+  aircraft: Record<string, AircraftStateBoard> | undefined,
+  radios: Record<string, RadioCommunicationBoard> | undefined;
   selectedAircraftCallsign: string | undefined;
   onSelectAircraft: ((aircraftCallsign: string | undefined) => void) | undefined;
 }
