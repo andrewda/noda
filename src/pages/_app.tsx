@@ -1,6 +1,6 @@
 import { ThemeProvider } from '@/components/ui/theme-provider';
-import './globals.css'
 import Head from 'next/head';
+import './globals.css';
 
 function MyApp({ Component, pageProps }) {
   return (

@@ -1,16 +1,14 @@
-import C2Panel, { AircraftStateBoard } from '@/components/C2Panel'
+import C2Panel from '@/components/C2Panel'
 import RadioPanel, { RadioCommunicationBoard } from '@/components/RadioPanel'
 import TimelinePanel from '@/components/TimelinePanel'
-import { ThemeProvider } from '@/components/ui/theme-provider'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
-import { use, useEffect, useReducer, useRef, useState } from 'react'
+import { useReducer, useState } from 'react'
 import { Toaster } from 'react-hot-toast'
-import { useResizeDetector } from 'react-resize-detector'
 import { Pane, ResizablePanes } from 'resizable-panes-react'
 
-import { socket, useSocketEvent } from '@/lib/socket';
 import { useSimulation } from '@/hooks/use-simulation'
+import { socket, useSocketEvent } from '@/lib/socket'
 
 const MapPanel = dynamic(
   () => import('../components/MapPanel'),

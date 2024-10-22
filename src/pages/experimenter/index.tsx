@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { socket, useSocketEvent } from '@/lib/socket';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { useSimulation } from '@/hooks/use-simulation';
 import MapPanel from '@/components/MapPanel';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useSimulation } from '@/hooks/use-simulation';
+import { socket, useSocketEvent } from '@/lib/socket';
 
 export default function ExperimenterPage() {
   const { register, handleSubmit, watch, getValues, resetField, setValue } = useForm();

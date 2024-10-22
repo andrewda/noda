@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react';
 
+import LaunchIcon from '@mui/icons-material/Launch';
 import Airport from '../../public/images/airport.svg';
 import FromTo from '../../public/images/from_to.svg';
 import Ownship from '../../public/images/ownship.svg';
-import LaunchIcon from '@mui/icons-material/Launch';
 import { MonitorIndicator, RadioCommunicationBoard } from './RadioPanel';
-import { Button } from './ui/button';
 import { ArmableInput } from './ui/armable-input';
+import { Button } from './ui/button';
 
 enum AircraftState {
   Ground,
