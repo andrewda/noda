@@ -7,6 +7,10 @@ import Ownship from '../../public/images/ownship.svg';
 import { MonitorIndicator, RadioCommunicationBoard } from './RadioPanel';
 import { ArmableInput } from './ui/armable-input';
 import { Button } from './ui/button';
+import { Popover, PopoverContent } from './ui/popover';
+import { PopoverTrigger } from '@radix-ui/react-popover';
+import { FlightPlanModal } from './modals/flight-plan';
+import { SelectApproachModal } from './modals/select-approach';
 
 enum AircraftState {
   Ground,
@@ -152,14 +156,30 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
           <ArmableInput value={heading ?? ''} placeholder={Math.round(aircraft.heading)?.toLocaleString()} labelText="Heading" armText={heading === undefined ? 'Arm' : `Heading ${heading}`} armDisabled={heading === undefined} type="number" unit="deg" onChange={(e: any) => setHeading(e.target.value !== '' ? clamp(Number(e.target.value), -360, 360) : undefined)} onArm={() => { setArmedCommand({ label: `Heading ${heading}`, payload: {}}); setHeading(undefined); }} />
           <ArmableInput value={altitude ?? ''} placeholder={(Math.round(aircraft.altitude / 10) * 10)?.toLocaleString()} labelText="Altitude" armText={altitude === undefined ? 'Arm' : `Altitude ${formatAltitude(altitude)}`} armDisabled={altitude === undefined} type="number" unit="ft" onChange={(e: any) => setAltitude(e.target.value !== '' ? clamp(Number(e.target.value), 0, 30000) : undefined)} onArm={() => { setArmedCommand({ label: `Altitude ${formatAltitude(altitude ?? 0)}`, payload: {}}); setAltitude(undefined); }} />
           <ArmableInput value={airspeed ?? ''} placeholder={Math.round(aircraft.tas)?.toLocaleString()} labelText="Airspeed" armText={airspeed === undefined ? 'Arm' : `Speed ${airspeed} kt`} armDisabled={airspeed === undefined} type="number" unit="kt" onChange={(e: any) => setAirspeed(e.target.value !== '' ? clamp(Number(e.target.value), 0, 180) : undefined)} onArm={() => { setArmedCommand({ label: `Speed ${airspeed} kt`, payload: {}}); setAirspeed(undefined); }} />
-          <Button className="relative w-full mt-4">
-            Modify Flight Plan
-            <LaunchIcon className="absolute right-4" fontSize="small" />
-          </Button>
-          <Button className="relative w-full mt-4">
-            Select Approach ({aircraft.arrivalAirport})
-            <LaunchIcon className="absolute right-4" fontSize="small" />
-          </Button>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button className="relative w-full mt-4">
+                Modify Flight Plan
+                <LaunchIcon className="absolute right-4" fontSize="small" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-72">
+              <FlightPlanModal departureAirport={aircraft.departureAirport} departureRunway={aircraft.departureRunway} arrivalAirport={aircraft.arrivalAirport} arrivalRunway={aircraft.arrivalRunway} flightPlan={aircraft.flightPlan} flightPlanIndex={aircraft.flightPlanIndex} />
+            </PopoverContent>
+          </Popover>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button className="relative w-full mt-4">
+                Select Approach ({aircraft.arrivalAirport})
+                <LaunchIcon className="absolute right-4" fontSize="small" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-72">
+              <SelectApproachModal arrivalAirport={aircraft.arrivalAirport} arrivalRunway={aircraft.arrivalRunway} approaches={['approach1', 'approach2']} />
+            </PopoverContent>
+          </Popover>
         </div>
         <hr className="w-full border-neutral-600 border-b-2" />
         <div className="w-[80%] flex flex-col gap-4">

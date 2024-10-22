@@ -2,6 +2,8 @@ import Flop from '../../public/images/flop.svg';
 import Monitor from '../../public/images/monitor.svg';
 import Ownship from '../../public/images/ownship.svg';
 import Transmit from '../../public/images/transmit.svg';
+import { SelectFrequencyModal } from './modals/select-frequency';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 
 export type RadioCommunicationBoard = {
   id: string;
@@ -53,11 +55,24 @@ function Radio({ radio, selected, className, onSelect }: RadioProps) {
         </div>
         <div className="flex flex-grow flex-col justify-between items-end h-full min-w-0">
           <div className="inline-flex justify-end items-center gap-1 cursor-pointer text-gray-200 hover:brightness-75">
-            <div className="text-sm font-semibold">{radio.frequency}</div>
+            <input type="text" className="w-full text-sm text-right select-all text-gray-200 bg-zinc-950 border-none focus:outline-none placeholder:text-gray-200" placeholder={radio.frequency} />
             <div className="flex-shrink-0">
               <Flop width={20} />
             </div>
           </div>
+          {/* <Popover>
+            <PopoverTrigger asChild>
+              <div className="inline-flex justify-end items-center gap-1 cursor-pointer text-gray-200 hover:brightness-75">
+                <div className="text-sm font-semibold">{radio.frequency}</div>
+                <div className="flex-shrink-0">
+                  <Flop width={20} />
+                </div>
+              </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-32" side="top">
+              <SelectFrequencyModal frequency={radio.frequency} />
+            </PopoverContent>
+          </Popover> */}
 
           {/* Use dir="rtl" so that the text is truncated from the left side. */}
           <div className="text-[#ababab] text-xs font-medium text-right w-full whitespace-nowrap text-ellipsis overflow-hidden" dir="rtl">{radio.facility}</div>
