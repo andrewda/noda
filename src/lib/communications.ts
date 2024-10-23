@@ -58,14 +58,13 @@ export const usePeerConnection = ({ streamCount }: { streamCount: number }) => {
 
   const peerConnection = useMemo(() => new RTCPeerConnection(), []);
   const remoteStream = useMemo(() => new MediaStream(), []);
+  const localStream = useLocalStream();
 
   const [connectionStatus, setConnectionStatus] = useState<RTCPeerConnection['connectionState']>('disconnected');
   const [remoteTracks, setRemoteTracks] = useState<Map<number, MediaStreamTrack>>(new Map());
   const [trackControls, setTrackControls] = useState<Map<number, { micGain: GainNode, audioContext: AudioContext, outputTrack: MediaStreamTrack }>>(new Map());
 
   const dataChannel = useMemo(() => peerConnection.createDataChannel('data', { negotiated: true, id: 0 }), [peerConnection]);
-
-  const localStream = useLocalStream();
 
   useEffect(() => {
     peerConnection.ontrack = (event) => {

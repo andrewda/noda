@@ -3,12 +3,13 @@ import RadioPanel, { RadioCommunicationBoard } from '@/components/RadioPanel'
 import TimelinePanel from '@/components/TimelinePanel'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
-import { useReducer, useState } from 'react'
+import { useEffect, useMemo, useReducer, useState } from 'react'
 import { Toaster } from 'react-hot-toast'
 import { Pane, ResizablePanes } from 'resizable-panes-react'
 
 import { useSimulation } from '@/hooks/use-simulation'
 import { useSocket, useSocketEvent } from '@/lib/socket'
+import { useAudioMonitor, usePeerConnection } from '@/lib/communications'
 
 const MapPanel = dynamic(
   () => import('../components/MapPanel'),
@@ -33,23 +34,27 @@ function radiosReducer(state: Record<string, RadioCommunicationBoard>, action: a
 export default function Home() {
   const socket = useSocket();
   const { aircraft } = useSimulation();
-  const [radios, dispatchRadios] = useReducer(radiosReducer, {
-    'wild': {
-      id: 'wild',
-      aircraft: undefined,
-      facility: 'KPDX ATIS',
-      frequency: '123.450',
-      receiving: false,
-      monitoring: true,
-      transmitting: false,
-    },
-  });
+  const [radios, setRadios] = useState<Partial<RadioCommunicationBoard>[]>([{}, {}, {}, {}, {}, {}, {}, {}]);
 
   const [connectionState, setConnectionState] = useState<'connected' | 'disconnected'>(socket?.connected ? 'connected' : 'disconnected');
   const [selectedAircraftCallsign, setSelectedAircraftCallsign] = useState<string | undefined>(undefined);
 
   useSocketEvent('connect', () => setConnectionState('connected'));
   useSocketEvent('disconnect', () => setConnectionState('disconnected'));
+
+  const { peerConnection, connectionStatus, dataChannel, tracks, trackControls, createOffer } = usePeerConnection({ streamCount: 8 });
+  const localTracks = useMemo(() => new Map(Array.from(trackControls?.entries() ?? []).map(([i, { outputTrack }]) => [i, outputTrack])), [trackControls]);
+
+  const remoteAudioMonitors = useAudioMonitor(tracks);
+  const localAudioMonitors = useAudioMonitor(localTracks);
+
+  useEffect(() => {
+    setRadios((radios) => radios.map((radio, idx) => ({
+      ...radio,
+      receiving: remoteAudioMonitors.get(idx) ?? false,
+      transmitting: localAudioMonitors.get(idx) ?? false,
+    })));
+  }, [remoteAudioMonitors, localAudioMonitors]);
 
   return (
     <>

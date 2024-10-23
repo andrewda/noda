@@ -10,8 +10,8 @@ export type RadioCommunicationBoard = {
   aircraft: string | undefined;
   facility: string;
   frequency: string;
-  receiving: boolean;
   monitoring: boolean;
+  receiving: boolean;
   transmitting: boolean;
 }
 
