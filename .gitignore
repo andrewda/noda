@@ -38,3 +38,5 @@ next-env.d.ts
 # TODO: setup git submodule
 AirTrafficSim
 aviation-data
+
+certificates

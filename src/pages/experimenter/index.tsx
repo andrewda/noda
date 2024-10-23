@@ -5,22 +5,23 @@ import MapPanel from '@/components/MapPanel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useSimulation } from '@/hooks/use-simulation';
-import { socket, useSocketEvent } from '@/lib/socket';
+import { useSocket, useSocketEvent } from '@/lib/socket';
 
 export default function ExperimenterPage() {
+  const socket = useSocket();
   const { register, handleSubmit, watch, getValues, resetField, setValue } = useForm();
 
-  const [connectionState, setConnectionState] = useState<'connected' | 'disconnected'>(socket.connected ? 'connected' : 'disconnected');
+  const [connectionState, setConnectionState] = useState<'connected' | 'disconnected'>(socket?.connected ? 'connected' : 'disconnected');
 
   const { lastMessageTime, aircraft } = useSimulation();
 
   const commandTakeoff = () => {
-    socket.emit('command', { aircraft: getValues('takeoffAircraft'), command: 'takeoff' });
+    socket?.emit('command', { aircraft: getValues('takeoffAircraft'), command: 'takeoff' });
     setValue('takeoffAircraft', '');
   };
 
   const startSimulation = () => {
-    socket.emit('runSimulation', getValues('simulationName'));
+    socket?.emit('runSimulation', getValues('simulationName'));
     setValue('simulationName', '');
   };
 

@@ -8,7 +8,7 @@ import { Toaster } from 'react-hot-toast'
 import { Pane, ResizablePanes } from 'resizable-panes-react'
 
 import { useSimulation } from '@/hooks/use-simulation'
-import { socket, useSocketEvent } from '@/lib/socket'
+import { useSocket, useSocketEvent } from '@/lib/socket'
 
 const MapPanel = dynamic(
   () => import('../components/MapPanel'),
@@ -31,6 +31,7 @@ function radiosReducer(state: Record<string, RadioCommunicationBoard>, action: a
 }
 
 export default function Home() {
+  const socket = useSocket();
   const { aircraft } = useSimulation();
   const [radios, dispatchRadios] = useReducer(radiosReducer, {
     'wild': {
@@ -44,7 +45,7 @@ export default function Home() {
     },
   });
 
-  const [connectionState, setConnectionState] = useState<'connected' | 'disconnected'>(socket.connected ? 'connected' : 'disconnected');
+  const [connectionState, setConnectionState] = useState<'connected' | 'disconnected'>(socket?.connected ? 'connected' : 'disconnected');
   const [selectedAircraftCallsign, setSelectedAircraftCallsign] = useState<string | undefined>(undefined);
 
   useSocketEvent('connect', () => setConnectionState('connected'));
