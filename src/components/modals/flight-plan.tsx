@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
+import { Combobox } from "../ui/combobox";
 
 export interface FlightPlanModalProps {
   departureAirport: string | undefined;
@@ -15,6 +16,7 @@ export interface FlightPlanModalProps {
 }
 
 export const FlightPlanModal = ({ departureAirport, departureRunway, arrivalAirport, arrivalRunway, flightPlan, flightPlanIndex, onModify }: FlightPlanModalProps) => {
+  // TODO: this should only accept the enroute flight plan, not the full flight plan
   const [flightPlanText, setFlightPlanText] = useState<string>((flightPlan ?? [])?.join(' ') ?? '');
 
   const compiledFlightPlan = useMemo(() => flightPlanText.split(' ').filter((item) => item !== ''), [flightPlanText]);
@@ -25,20 +27,16 @@ export const FlightPlanModal = ({ departureAirport, departureRunway, arrivalAirp
         <h4 className="font-medium leading-none">Modify Flight Plan</h4>
       </div>
       <div className="flex flex-col gap-2">
-        <Textarea className="resize-none" value={flightPlanText} onChange={(e) => setFlightPlanText(e.target.value)} />
-        <div className="flex flex-wrap gap-1 w-full rounded-md border border-input/70 bg-background px-2 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-          {([`${departureAirport} ${departureRunway}`, ...compiledFlightPlan, `${arrivalAirport} RW${arrivalRunway}`]).map((item, i) => (
-            <div key={i} className="flex gap-2">
-              <Badge className={`cursor-pointer ${flightPlanIndex === i - 1 ? 'bg-fuchsia-600 hover:bg-fuchsia-600/90 font-bold' : 'bg-primary/60 hover:bg-primary/50'}`}>{item}</Badge>
-            </div>
-          ))}
+        <Textarea className="resize-none" value={flightPlanText} rows={3} onChange={(e) => setFlightPlanText(e.target.value)} />
+        <div className="flex w-full">
+          <Combobox className="w-full" label="Select approach..." options={[{ label: 'Approach 1', value: 'approach1' }, { label: 'Approach 2', value: 'approach2' }]} />
         </div>
-        <div className="flex gap-2 w-full">
+        <div className="flex gap-2 w-full mt-4">
           <Close asChild>
             <Button className="w-full" variant="outline">Cancel</Button>
           </Close>
           <Close asChild>
-            <Button className="w-full" onClick={() => onModify}>Modify</Button>
+            <Button className="w-full" onClick={() => onModify(compiledFlightPlan)}>Modify</Button>
           </Close>
         </div>
       </div>

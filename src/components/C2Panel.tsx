@@ -8,7 +8,6 @@ import Airport from '../../public/images/airport.svg';
 import FromTo from '../../public/images/from_to.svg';
 import Ownship from '../../public/images/ownship.svg';
 import { FlightPlanModal } from './modals/flight-plan';
-import { SelectApproachModal } from './modals/select-approach';
 import { MonitorIndicator, RadioCommunicationBoard } from './RadioPanel';
 import { ArmableInput } from './ui/armable-input';
 import { Badge } from './ui/badge';
@@ -226,18 +225,6 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
               <FlightPlanModal departureAirport={aircraft.departureAirport} departureRunway={aircraft.departureRunway} arrivalAirport={aircraft.arrivalAirport} arrivalRunway={aircraft.arrivalRunway} flightPlan={aircraft.flightPlan} flightPlanIndex={aircraft.flightPlanIndex} />
             </PopoverContent>
           </Popover>
-
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button className="relative w-full mt-4">
-                Select Approach ({aircraft.arrivalAirport})
-                <LaunchIcon className="absolute right-4" fontSize="small" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-72">
-              <SelectApproachModal arrivalAirport={aircraft.arrivalAirport} arrivalRunway={aircraft.arrivalRunway} approaches={['approach1', 'approach2']} />
-            </PopoverContent>
-          </Popover>
         </div>
 
         <hr className="w-full border-neutral-600 border-b-2" />
@@ -248,12 +235,12 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
             {armedCommand?.label ?? '\u2013'}
           </div>
           <div className="flex items-center gap-2 self-stretch">
+            <Button className="flex-1" variant="outline" disabled={armedCommand?.status !== 'armed'} onClick={() => setArmedCommand(undefined)}>Disarm</Button>
             <Button variant={armedCommand?.status === 'success' ? 'positive' : 'accent'} className="flex-1 relative" disabled={armedCommand?.status !== 'armed'} onClick={executeArmedCommand}>
               Execute
               {armedCommand?.status === 'executing' && <Loader2 className="absolute right-4 h-4 w-4 animate-spin" />}
               {armedCommand?.status === 'success' && <Check className="absolute right-4 h-4 w-4" />}
             </Button>
-            <Button className="flex-1" variant="outline" disabled={armedCommand?.status !== 'armed'} onClick={() => setArmedCommand(undefined)}>Disarm</Button>
           </div>
         </div>
       </div>
