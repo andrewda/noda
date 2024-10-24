@@ -12,10 +12,11 @@ export interface FlightPlanModalProps {
   arrivalRunway: string | undefined;
   flightPlan: string[] | undefined;
   flightPlanIndex: number | undefined;
+  approach: string | undefined;
   onModify: (newFlightPlan: string[]) => void;
 }
 
-export const FlightPlanModal = ({ departureAirport, departureRunway, arrivalAirport, arrivalRunway, flightPlan, flightPlanIndex, onModify }: FlightPlanModalProps) => {
+export const FlightPlanModal = ({ departureAirport, departureRunway, arrivalAirport, arrivalRunway, flightPlan, flightPlanIndex, approach, onModify }: FlightPlanModalProps) => {
   // TODO: this should only accept the enroute flight plan, not the full flight plan
   const [flightPlanText, setFlightPlanText] = useState<string>((flightPlan ?? [])?.join(' ') ?? '');
 
@@ -29,7 +30,7 @@ export const FlightPlanModal = ({ departureAirport, departureRunway, arrivalAirp
       <div className="flex flex-col gap-2">
         <Textarea className="resize-none" value={flightPlanText} rows={3} onChange={(e) => setFlightPlanText(e.target.value)} />
         <div className="flex w-full">
-          <Combobox className="w-full" label="Select approach..." options={[{ label: 'Approach 1', value: 'approach1' }, { label: 'Approach 2', value: 'approach2' }]} />
+          <Combobox className="w-full" label="Select approach..." options={[{ label: 'Approach 1', value: 'approach1' }, { label: 'RNAV 13', value: 'R13' }, { label: 'Approach 2', value: 'approach2' }]} defaultValue={approach} />
         </div>
         <div className="flex gap-2 w-full mt-4">
           <Close asChild>

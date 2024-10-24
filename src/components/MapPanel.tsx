@@ -187,7 +187,7 @@ export function Entities({ aircraft, radios, selectedAircraftCallsign, onSelectA
           // billboard={{ image: 'images/ownship-map.svg', color: entityColor, alignedAxis: velocityVector, rotation }}
           // path={{ leadTime: -0.5, trailTime: 60, show: true, width: 10, material: new PolylineDashMaterialProperty({ color: entityColor, gapColor: Color.TRANSPARENT, dashLength: 10 }) }}
           point={{ pixelSize: 10, color: entityColor }}
-          path={{ leadTime: 0, trailTime: 30, show: true, width: 3 }}
+          path={{ leadTime: 0, trailTime: 60, show: true, width: 3 }}
           onClick={() => onSelectAircraft?.(aircraft.callsign)}
         />
         <LabelEntity position={position} aircraft={aircraft} receiving={radios?.[aircraft.callsign]?.receiving ?? false} selected={selected} onClick={() => onSelectAircraft?.(aircraft.callsign)} />
@@ -247,7 +247,7 @@ export default function MapPanel({ aircraft, radios, selectedAircraftCallsign, o
         //   accessToken: 'pk.eyJ1IjoiYW5kcmV3ZGEiLCJhIjoiY2p3dGpkbXF0M2VtazN6bjBndml6MDgxYyJ9.nBlrcPQG1vXt1Jo3etUaEw'
         // })), {})}
       >
-        <Scene debugShowFramesPerSecond={true} />
+        <Scene debugShowFramesPerSecond={false} />
         {/* <Globe baseColor={Color.fromCssColorString('#000000')} showGroundAtmosphere={false} /> */}
         <Camera />
 

@@ -7,12 +7,14 @@ import toast from 'react-hot-toast';
 import Airport from '../../public/images/airport.svg';
 import FromTo from '../../public/images/from_to.svg';
 import Ownship from '../../public/images/ownship.svg';
+import DirectTo from '../../public/images/direct_to.svg';
 import { FlightPlanModal } from './modals/flight-plan';
 import { MonitorIndicator, RadioCommunicationBoard } from './RadioPanel';
 import { ArmableInput } from './ui/armable-input';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Popover, PopoverContent } from './ui/popover';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu';
 
 enum AircraftState {
   Ground,
@@ -50,9 +52,11 @@ export type AircraftStateBoard = {
   aircraftType: string;
   flightPhase: number; // TODO: enum
   configuration: number; // TODO: enum
+  lateralMode: number; // TODO: enum
   verticalMode: number; // TODO: enum
 
   flightPlan: string[];
+  flightPlanEnroute: string[];
   flightPlanPos: [number, number][];
   flightPlanTargetSpeed: number[];
   flightPlanIndex: number;
@@ -138,21 +142,16 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
       console.log('setting reset timeout')
       const resetTimeout = setTimeout(() => setArmedCommand(undefined), 3000);
       setResetTimeout(resetTimeout);
-
-      // return () => {
-      //   console.log('clearing reset timeout')
-      //   clearTimeout(resetTimeout);
-      // }
     }
   }, [armedCommand]);
 
-  const armCommand = useCallback((command: ArmedCommand) => {
+  const armCommand = useCallback((command: Omit<ArmedCommand, 'status'>) => {
     if (armedCommand?.status === 'armed' || armedCommand?.status === 'executing') {
       toast.error(`Cannot arm command: Command already ${armedCommand?.status}!`);
       return;
     }
 
-    setArmedCommand(command);
+    setArmedCommand({ ...command, status: 'armed' });
   }, [armedCommand, setArmedCommand])
 
   const executeArmedCommand = useCallback(() => {
@@ -199,20 +198,32 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
             </div>
             <div>
               <div className="flex flex-wrap gap-1 w-full rounded-md border border-input/70 bg-background px-2 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                {([`${aircraft.departureAirport} ${aircraft.departureRunway}`, ...(aircraft.flightPlan?.toSpliced(-2) ?? []), `${aircraft.arrivalAirport} RW${aircraft.arrivalRunway}`]).map((item, i) => (
-                  <div key={i} className="flex gap-2">
-                    <Badge className={`cursor-pointer ${aircraft.flightPlanIndex === i - 1 ? 'bg-fuchsia-600 hover:bg-fuchsia-600/90 font-bold' : 'bg-primary/80 hover:bg-primary/70'}`}>{item}</Badge>
-                  </div>
-                ))}
+                {([`${aircraft.departureAirport} ${aircraft.departureRunway}`, ...(aircraft.flightPlan?.toSpliced(-2) ?? []), `${aircraft.arrivalAirport} RW${aircraft.arrivalRunway}`]).map((item, i) => {
+                  const isDirectTo = aircraft.lateralMode === 2 && aircraft.flightPlanIndex === i - 1;
+                  return (<div key={i} className="flex gap-2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger>
+                        <Badge className={`cursor-pointer select-none ${isDirectTo ? 'bg-fuchsia-600 hover:bg-fuchsia-600/90 font-bold' : 'bg-primary/80 hover:bg-primary/70'}`}>{item}</Badge>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuLabel className={isDirectTo ? 'text-fuchsia-400' : ''}>{item}</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className={`flex items-center [&>svg]:size-6 ${isDirectTo ? 'cursor-not-allowed' : 'cursor-pointer'}`} disabled={isDirectTo} onClick={() => armCommand({ label: `Direct To ${item}`, command: 'flight_plan', payload: { flight_plan_index: i - 1 } })}>
+                          <DirectTo /> Direct To
+                        </DropdownMenuItem>
+                     </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>)
+                })}
               </div>
             </div>
           </div>
         </div>
         <hr className="w-full border-neutral-600 border-b-2" />
         <div className="w-[70%] items-center flex flex-col gap-2 pb-4">
-          <ArmableInput value={heading ?? ''} placeholder={Math.round(aircraft.heading)?.toLocaleString()} labelText="Heading" armText={heading === undefined ? 'Arm' : `Heading ${heading}`} armDisabled={heading === undefined} type="number" unit="deg" onChange={(e: any) => setHeading(e.target.value !== '' ? clamp(Number(e.target.value), -360, 360) : undefined)} onArm={() => { armCommand({ label: `Heading ${heading}`, command: 'heading', payload: heading, status: 'armed' }); setHeading(undefined); }} />
-          <ArmableInput value={altitude ?? ''} placeholder={(Math.round(aircraft.altitude / 10) * 10)?.toLocaleString()} labelText="Altitude" armText={altitude === undefined ? 'Arm' : `Altitude ${formatAltitude(altitude)}`} armDisabled={altitude === undefined} type="number" unit="ft" onChange={(e: any) => setAltitude(e.target.value !== '' ? clamp(Number(e.target.value), 0, 30000) : undefined)} onArm={() => { armCommand({ label: `Altitude ${formatAltitude(altitude ?? 0)}`, command: 'altitude', payload: altitude, status: 'armed' }); setAltitude(undefined); }} />
-          <ArmableInput value={airspeed ?? ''} placeholder={Math.round(aircraft.tas)?.toLocaleString()} labelText="Airspeed" armText={airspeed === undefined ? 'Arm' : `Speed ${airspeed} kt`} armDisabled={airspeed === undefined} type="number" unit="kt" onChange={(e: any) => setAirspeed(e.target.value !== '' ? clamp(Number(e.target.value), 0, 180) : undefined)} onArm={() => { armCommand({ label: `Speed ${airspeed} kt`, command: 'airspeed', payload: airspeed, status: 'armed' }); setAirspeed(undefined); }} />
+          <ArmableInput value={heading ?? ''} placeholder={Math.round(aircraft.heading)?.toLocaleString()} labelText="Heading" armText={heading === undefined ? 'Arm' : `Heading ${heading}`} armDisabled={heading === undefined} type="number" unit="deg" onChange={(e: any) => setHeading(e.target.value !== '' ? clamp(Number(e.target.value), -360, 360) : undefined)} onArm={() => { armCommand({ label: `Heading ${heading}`, command: 'heading', payload: heading }); setHeading(undefined); }} />
+          <ArmableInput value={altitude ?? ''} placeholder={(Math.round(aircraft.altitude / 10) * 10)?.toLocaleString()} labelText="Altitude" armText={altitude === undefined ? 'Arm' : `Altitude ${formatAltitude(altitude)}`} armDisabled={altitude === undefined} type="number" unit="ft" onChange={(e: any) => setAltitude(e.target.value !== '' ? clamp(Number(e.target.value), 0, 30000) : undefined)} onArm={() => { armCommand({ label: `Altitude ${formatAltitude(altitude ?? 0)}`, command: 'altitude', payload: altitude }); setAltitude(undefined); }} />
+          <ArmableInput value={airspeed ?? ''} placeholder={Math.round(aircraft.tas)?.toLocaleString()} labelText="Airspeed" armText={airspeed === undefined ? 'Arm' : `Speed ${airspeed} kt`} armDisabled={airspeed === undefined} type="number" unit="kt" onChange={(e: any) => setAirspeed(e.target.value !== '' ? clamp(Number(e.target.value), 0, 180) : undefined)} onArm={() => { armCommand({ label: `Speed ${airspeed} kt`, command: 'airspeed', payload: airspeed }); setAirspeed(undefined); }} />
 
           <Popover>
             <PopoverTrigger asChild>
@@ -222,7 +233,7 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-72">
-              <FlightPlanModal departureAirport={aircraft.departureAirport} departureRunway={aircraft.departureRunway} arrivalAirport={aircraft.arrivalAirport} arrivalRunway={aircraft.arrivalRunway} flightPlan={aircraft.flightPlan} flightPlanIndex={aircraft.flightPlanIndex} />
+              <FlightPlanModal departureAirport={aircraft.departureAirport} departureRunway={aircraft.departureRunway} arrivalAirport={aircraft.arrivalAirport} arrivalRunway={aircraft.arrivalRunway} flightPlan={aircraft.flightPlanEnroute} flightPlanIndex={aircraft.flightPlanIndex} approach={aircraft.approach} />
             </PopoverContent>
           </Popover>
         </div>

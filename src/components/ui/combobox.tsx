@@ -22,11 +22,17 @@ import {
 export interface ComboboxProps extends React.HTMLAttributes<HTMLDivElement> {
   label: string;
   options: { label: string; value: string }[];
+  defaultValue?: string;
+  value?: string;
 }
 
-export function Combobox({ label, options, ...props }: ComboboxProps) {
+export function Combobox({ label, options, value, defaultValue, ...props }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
-  const [value, setValue] = React.useState("")
+  const [selectedValue, setSelectedValue] = React.useState("")
+
+  React.useEffect(() => {
+    setSelectedValue(value ?? defaultValue ?? '');
+  }, [value, defaultValue]);
 
   return (
     <Popover open={open} onOpenChange={setOpen} {...props}>
@@ -37,8 +43,8 @@ export function Combobox({ label, options, ...props }: ComboboxProps) {
           aria-expanded={open}
           className="w-full justify-between"
         >
-          {value
-            ? options.find((options) => options.value === value)?.label
+          {selectedValue
+            ? options.find((options) => options.value === selectedValue)?.label
             : label }
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -54,14 +60,14 @@ export function Combobox({ label, options, ...props }: ComboboxProps) {
                   key={options.value}
                   value={options.value}
                   onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue)
+                    setSelectedValue(currentValue === selectedValue ? "" : currentValue)
                     setOpen(false)
                   }}
                 >
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value === options.value ? "opacity-100" : "opacity-0"
+                      selectedValue === options.value ? "opacity-100" : "opacity-0"
                     )}
                   />
                   {options.label}
