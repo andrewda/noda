@@ -144,7 +144,7 @@ function LabelEntity({ aircraft, receiving, selected, ...props }: { aircraft: Ai
   }, [aircraft, receiving, selected]);
 
   // return <Entity {...props} billboard={{ image, pixelOffset: new Cartesian2(65, -25) }} />;
-  return <Entity {...props} billboard={{ image, pixelOffset: new Cartesian2(65, -10), eyeOffset: new Cartesian3(0, 0, -0.5) }} />;
+  return <Entity {...props} billboard={{ image, pixelOffset: new Cartesian2(65, -10), eyeOffset: new Cartesian3(0, 0, -6000) }} />;
 };
 
 
@@ -155,51 +155,53 @@ type EntitiesProps = {
   onSelectAircraft: ((aircraftCallsign: string | undefined) => void) | undefined;
 }
 export function Entities({ aircraft, radios, selectedAircraftCallsign, onSelectAircraft }: EntitiesProps) {
-  // TODO: it seems like this is getting wiped occasionally? something weird happens when selected aircraft changes
-  const [sampledPositionMap] = useState(new Map<string, SampledPositionProperty>());
+  const sampledPositionMap = useMemo(() => new Map<string, SampledPositionProperty>(), []);
 
-  const renderAircraft = (aircraft: AircraftStateBoard, selected: boolean = false) => {
+  useEffect(() => {
+    Object.values(aircraft ?? {}).forEach((aircraft) => {
+      const sampledPosition = sampledPositionMap.get(aircraft.callsign);
+
+      if (!sampledPosition) {
+        const sampledPositionProperty = new SampledPositionProperty(ReferenceFrame.FIXED, 0);
+        sampledPositionProperty.forwardExtrapolationDuration = 3000;
+        sampledPositionProperty.forwardExtrapolationType = ExtrapolationType.EXTRAPOLATE;
+
+        sampledPositionMap.set(aircraft.callsign, sampledPositionProperty);
+      }
+
+      const position = Cartesian3.fromDegrees(aircraft.position[1], aircraft.position[0], aircraft.altitude * kFeetToMeters);
+      sampledPosition?.addSample(JulianDate.now(), position);
+    });
+  }, [aircraft, sampledPositionMap]);
+
+  const renderAircraft = (aircraft: AircraftStateBoard, position: SampledPositionProperty | undefined, selected: boolean = false) => {
+    if (!position) return <></>;
+
     const entityColor = selected ? Color.MAGENTA : Color.WHITE;
-
-    if (!sampledPositionMap.has(aircraft.callsign)) {
-      const sampledPositionProperty = new SampledPositionProperty(ReferenceFrame.FIXED, 0);
-      sampledPositionProperty.forwardExtrapolationDuration = 3000;
-      sampledPositionProperty.forwardExtrapolationType = ExtrapolationType.EXTRAPOLATE;
-
-      sampledPositionMap.set(aircraft.callsign, sampledPositionProperty);
-    }
-
-    const sampledPosition = sampledPositionMap.get(aircraft.callsign);
-
-    const position = Cartesian3.fromDegrees(aircraft.position[1], aircraft.position[0], aircraft.altitude * kFeetToMeters);
-    sampledPosition?.addSample(JulianDate.now(), position);
 
     return (
       <Fragment key={aircraft.callsign}>
         <Entity
           name={aircraft.callsign}
-          position={sampledPosition}
+          position={position}
           // billboard={{ image: 'images/ownship-map.svg', color: entityColor, alignedAxis: velocityVector, rotation }}
           // path={{ leadTime: -0.5, trailTime: 60, show: true, width: 10, material: new PolylineDashMaterialProperty({ color: entityColor, gapColor: Color.TRANSPARENT, dashLength: 10 }) }}
           point={{ pixelSize: 10, color: entityColor }}
           path={{ leadTime: 0, trailTime: 30, show: true, width: 3 }}
           onClick={() => onSelectAircraft?.(aircraft.callsign)}
         />
-        <LabelEntity position={sampledPosition} aircraft={aircraft} receiving={radios?.[aircraft.callsign]?.receiving ?? false} selected={selected} onClick={() => onSelectAircraft?.(aircraft.callsign)} />
+        <LabelEntity position={position} aircraft={aircraft} receiving={radios?.[aircraft.callsign]?.receiving ?? false} selected={selected} onClick={() => onSelectAircraft?.(aircraft.callsign)} />
       </Fragment>
     )
   }
 
   const renderAllAircraft = () => {
-    return Object.values(aircraft ?? {}).map((aircraft) => renderAircraft(aircraft, aircraft.callsign === selectedAircraftCallsign))
+    return Object.values(aircraft ?? {}).map((aircraft) => renderAircraft(aircraft, sampledPositionMap.get(aircraft.callsign), aircraft.callsign === selectedAircraftCallsign))
   }
 
   return (
     <>
       {renderAllAircraft()}
-      {/* <Entity
-        polyline={{ positions: cartesians, width: 4, material: Color.RED }}
-      /> */}
     </>
   );
 }
