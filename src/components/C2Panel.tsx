@@ -132,6 +132,9 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
   const [altitude, setAltitude] = useState<number | undefined>();
   const [airspeed, setAirspeed] = useState<number | undefined>();
 
+  // Disarm command when switching aircraft
+  useEffect(() => setArmedCommand(undefined), [aircraft?.callsign]);
+
   useEffect(() => {
     // If new command is armed, clear timeout
     if (armedCommand?.status === 'armed') {

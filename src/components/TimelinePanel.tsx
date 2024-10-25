@@ -18,7 +18,7 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
   const timeStart = 0;
   const timeEnd = 3600 / 2;
 
-  const data = useMemo(() => {
+  const timelines = useMemo(() => {
     return Object.values(aircraft ?? {}).map((aircraftStateBoard, i) => {
       const position = aircraftStateBoard.position.toReversed();
       const waypointNames = aircraftStateBoard.flightPlan?.slice(Math.max(aircraftStateBoard.flightPlanIndex - 1, 0));
@@ -36,8 +36,7 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
         }
       }
 
-      const lineString = turf.lineString([...(aircraftStateBoard.flightPlanIndex === 0 ? [position] : []), ...waypointPositions]);
-
+      const lineString = turf.lineString(waypointPositions);
       const slicedLineString = turf.lineSlice(position, waypointPositions[waypointPositions.length - 1], lineString);
 
       const distance = turf.length(slicedLineString, { units: 'kilometers' });
@@ -75,11 +74,11 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
     .range([margin.left, containerWidth + margin.left]);
 
   const y = d3.scaleLinear()
-    .domain([0, data.length + 1])
+    .domain([0, timelines.length + 1])
     .range([0, containerHeight]);
 
   const yDom = d3.scaleLinear()
-    .domain([0, data.length + 1])
+    .domain([0, timelines.length + 1])
     .range([margin.top, containerHeight + margin.top]);
 
   useEffect(() => {
@@ -94,18 +93,31 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
       .style('transform', `translate(${margin.left}px,${margin.top}px)`);
 
     svg.append('g')
+      .attr('class', 'xAxis')
       .attr('transform', `translate(0,${containerHeight - margin.bottom})`)
       .call(d3.axisBottom(x).tickFormat((d: any) => d === 0 ? 'Now' : `+${Math.floor(d / 60)} min`).tickValues([0, 1, 2, 3, 4, 5, 6].map((d) => timeEnd * (d/6))));
 
-    data.forEach((d, i) => {
+    d3.selectAll('g.xAxis g.tick')
+      .append('line')
+      .attr('class', 'gridline')
+      .attr('x1', 0)
+      .attr('y1', -(containerHeight - margin.top - margin.bottom - 20))
+      .attr('x2', 0)
+      .attr('y2', 0)
+      .attr('stroke', '#525252')
+      .attr('stroke-dasharray','4');
+
+    timelines.forEach((d, i) => {
       svg.append('line')
         .attr('x1', x(d.start))
         .attr('y1', y(d.line))
-        .attr('x2', x(d.end))
+        .attr('x2', x(Math.min(d.end, timeEnd)))
         .attr('y2', y(d.line))
         .attr('class', `line ${d.aircraft === selectedAircraftCallsign ? 'selected' : ''}`);
 
       d.times.forEach(({ label, time }, i2) => {
+        if (time > timeEnd) return;
+
         const anchorName = `--anchor-${i}-${i2}`;
 
         container.append('img')
@@ -179,18 +191,18 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
       container.selectAll('*').remove();
       d3.selectAll('.tooltip').remove();
     };
-  }, [data, selectedAircraftCallsign, width, height]);
+  }, [timelines, selectedAircraftCallsign, width, height]);
 
-  return <div className='w-full h-full flex flex-row bg-neutral-900'>
+  return <div className="w-full h-full flex flex-row bg-neutral-900">
     <div className="relative w-full basis-32 flex-shrink-0">
-      {data.map((d, i) =>
-        <div key={i} className={`h-6 flex items-center gap-2 self-stretch absolute cursor-pointer hover:brightness-75 ${d.aircraft === selectedAircraftCallsign ? 'text-fuchsia-400' : 'text-gray-200'}`} style={{top: yDom(i + 1) - 12, right: 0}} onClick={() => onSelectAircraft(d.aircraft)}>
+      {timelines.map((d, i) =>
+        <div key={i} className={`h-6 flex items-center gap-2 self-stretch absolute cursor-pointer hover:brightness-75 ${d.aircraft === selectedAircraftCallsign ? "text-fuchsia-400" : "text-gray-200"}`} style={{top: yDom(i + 1) - 12, right: 0}} onClick={() => onSelectAircraft(d.aircraft)}>
           <Ownship width={18} height={18} />
           <div className="font-mono text-sm">{d.aircraft}</div>
           <MonitorIndicator receive={false} className="w-3.5 h-3.5" />
         </div>
       )}
     </div>
-    <div id='timeline-container' className="relative w-full min-w-0 flex-shrink flex-grow" ref={ref}></div>
+    <div id="timeline-container" className="relative w-full min-w-0 flex-shrink flex-grow" ref={ref}></div>
   </div>;
 }
