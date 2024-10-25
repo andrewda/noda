@@ -42,7 +42,7 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
 
       const distance = turf.length(slicedLineString, { units: 'kilometers' });
       // const airspeedKph = aircraftStateBoard.tas * 1.852;
-      const airspeedKph = 138 * 1.852;
+      const airspeedKph = Math.max(aircraftStateBoard.tas, 130) * 1.852;
       const endTimeSeconds = (distance / airspeedKph) * 3600;
 
       const waypointTimes = waypointPositions.slice(0, -2).map((pos, i) => {
@@ -149,7 +149,6 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
           .on('mouseout', () => {
             d3.selectAll('.tooltip').remove();
           });
-
       }
 
       if (d.end < timeEnd) {
@@ -174,13 +173,13 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
             d3.selectAll('.tooltip').remove();
           });
       }
-
     });
 
     return () => {
       container.selectAll('*').remove();
+      d3.selectAll('.tooltip').remove();
     };
-  }, [data, width, height]);
+  }, [data, selectedAircraftCallsign, width, height]);
 
   return <div className='w-full h-full flex flex-row bg-neutral-900'>
     <div className="relative w-full basis-32 flex-shrink-0">
