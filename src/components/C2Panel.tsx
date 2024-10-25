@@ -171,7 +171,7 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
   if (!aircraft) return <></>
 
   return (
-    <div className="flex flex-col w-full h-full pl-3 pr-3 pt-4 pb-4 items-center gap-4 flex-grow self-stretch min-w-0 bg-zinc-900">
+    <div className="flex flex-col w-full h-full pl-3 pr-3 pt-4 pb-4 items-center gap-4 flex-grow self-stretch min-w-0 bg-neutral-900 border-r-2 border-neutral-950">
       <div className="flex flex-col items-center gap-4 self-stretch">
         <div className="flex flex-col pt-2 pb-2 items-start gap-2 self-stretch">
           <div className="flex items-center gap-2 self-stretch text-fuchsia-400">
@@ -181,16 +181,13 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
           </div>
           <div className="flex pl-1 pr-1 justify-start items-center gap-3 w-full">
             <div className="flex flex-1 pl-1 pr-1 justify-start items-center gap-2 w-full">
-              {/* <Image src={fromTo} alt="" width={20} height={35} /> */}
               <FromTo width={30} height={50} className="text-fuchsia-500 grow-0 shrink-0 basis-[30px]" />
               <div className="flex flex-col items-center gap-2 min-w-0">
                 {[aircraft.departureAirport, aircraft.arrivalAirport].map((icao) => (
                   <div className="flex items-center gap-2 self-stretch" key={icao}>
-                    {/* <Image src={airport} alt="" width={16} height={16} /> */}
                     <Airport width={24} height={24} className="text-fuchsia-500 grow-0 shrink-0 basis-[24px]" />
                     <div className="flex flex-col text-gray-200 min-w-0">
                       <div className="font-mono text-sm pl-[1px]">{icao}</div>
-                      {/* <div className="font-normal text-xs whitespace-nowrap text-ellipsis overflow-hidden">{name}</div> */}
                     </div>
                   </div>
                 ))}

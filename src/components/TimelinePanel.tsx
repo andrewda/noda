@@ -182,7 +182,7 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
     };
   }, [data, width, height]);
 
-  return <div className='w-full h-full flex flex-row bg-zinc-900'>
+  return <div className='w-full h-full flex flex-row bg-neutral-900'>
     <div className="relative w-full basis-32 flex-shrink-0">
       {data.map((d, i) =>
         <div key={i} className={`h-6 flex items-center gap-2 self-stretch absolute cursor-pointer hover:brightness-75 ${d.aircraft === selectedAircraftCallsign ? 'text-fuchsia-400' : 'text-gray-200'}`} style={{top: yDom(i + 1) - 12, right: 0}} onClick={() => onSelectAircraft(d.aircraft)}>

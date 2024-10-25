@@ -55,7 +55,7 @@ function Radio({ radio, selected, className, onSelect }: RadioProps) {
         </div>
         <div className="flex flex-grow flex-col justify-between items-end h-full min-w-0">
           <div className="inline-flex justify-end items-center gap-1 cursor-pointer text-gray-200 hover:brightness-75">
-            <input type="text" className="w-full text-sm text-right select-all text-gray-200 bg-zinc-950 border-none focus:outline-none placeholder:text-gray-200" placeholder={radio.frequency} />
+            <input type="text" className="w-full text-sm text-right select-all text-gray-200 bg-neutral-950 border-none focus:outline-none placeholder:text-gray-200" placeholder={radio.frequency} />
             <div className="flex-shrink-0">
               <Flop width={20} />
             </div>
