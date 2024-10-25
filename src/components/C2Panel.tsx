@@ -114,7 +114,7 @@ function AircraftListGutter({ aircraft, selectedAircraftCallsign, onSelectAircra
 type ArmedCommand = {
   label: string,
   command: string,
-  payload: any,
+  payload?: any,
   status: 'armed' | 'executing' | 'success' | 'failure',
 }
 
@@ -198,8 +198,8 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
             </div>
             <div>
               <div className="flex flex-wrap gap-1 w-full rounded-md border border-input/70 bg-background px-2 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                {([`${aircraft.departureAirport} ${aircraft.departureRunway}`, ...(aircraft.flightPlan?.toSpliced(-2) ?? []), `${aircraft.arrivalAirport} RW${aircraft.arrivalRunway}`]).map((item, i) => {
-                  const isDirectTo = aircraft.lateralMode === 2 && aircraft.flightPlanIndex === i - 1;
+                {([...(aircraft.flightPlan?.toSpliced(-2) ?? []), `${aircraft.arrivalAirport} ${aircraft.arrivalRunway}`]).map((item, i) => {
+                  const isDirectTo = aircraft.lateralMode === 2 && aircraft.flightPlanIndex === i;
                   return (<div key={i} className="flex gap-2">
                     <DropdownMenu>
                       <DropdownMenuTrigger>
@@ -208,7 +208,7 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
                       <DropdownMenuContent>
                         <DropdownMenuLabel className={isDirectTo ? 'text-fuchsia-400' : ''}>{item}</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className={`flex items-center [&>svg]:size-6 ${isDirectTo ? 'cursor-not-allowed' : 'cursor-pointer'}`} disabled={isDirectTo} onClick={() => armCommand({ label: `Direct To ${item}`, command: 'flight_plan', payload: { flight_plan_index: i - 1 } })}>
+                        <DropdownMenuItem className={`flex items-center [&>svg]:size-6 ${isDirectTo ? 'cursor-not-allowed' : 'cursor-pointer'}`} disabled={isDirectTo} onClick={() => armCommand({ label: `Direct To ${item}`, command: 'flight_plan', payload: { flight_plan_index: i } })}>
                           <DirectTo /> Direct To
                         </DropdownMenuItem>
                      </DropdownMenuContent>
@@ -225,6 +225,8 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
           <ArmableInput value={altitude ?? ''} placeholder={(Math.round(aircraft.altitude / 10) * 10)?.toLocaleString()} labelText="Altitude" armText={altitude === undefined ? 'Arm' : `Altitude ${formatAltitude(altitude)}`} armDisabled={altitude === undefined} type="number" unit="ft" onChange={(e: any) => setAltitude(e.target.value !== '' ? clamp(Number(e.target.value), 0, 30000) : undefined)} onArm={() => { armCommand({ label: `Altitude ${formatAltitude(altitude ?? 0)}`, command: 'altitude', payload: altitude }); setAltitude(undefined); }} />
           <ArmableInput value={airspeed ?? ''} placeholder={Math.round(aircraft.tas)?.toLocaleString()} labelText="Airspeed" armText={airspeed === undefined ? 'Arm' : `Speed ${airspeed} kt`} armDisabled={airspeed === undefined} type="number" unit="kt" onChange={(e: any) => setAirspeed(e.target.value !== '' ? clamp(Number(e.target.value), 0, 180) : undefined)} onArm={() => { armCommand({ label: `Speed ${airspeed} kt`, command: 'airspeed', payload: airspeed }); setAirspeed(undefined); }} />
 
+          {aircraft.flightPhase === 2 && <Button className="relative w-full mt-4" onClick={() => armCommand({ label: 'Takeoff', command: 'takeoff' })}>Takeoff</Button>}
+
           <Popover>
             <PopoverTrigger asChild>
               <Button className="relative w-full mt-4">
@@ -233,7 +235,7 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-72">
-              <FlightPlanModal departureAirport={aircraft.departureAirport} departureRunway={aircraft.departureRunway} arrivalAirport={aircraft.arrivalAirport} arrivalRunway={aircraft.arrivalRunway} flightPlan={aircraft.flightPlanEnroute} flightPlanIndex={aircraft.flightPlanIndex} approach={aircraft.approach} />
+              <FlightPlanModal departureAirport={aircraft.departureAirport} departureRunway={aircraft.departureRunway} arrivalAirport={aircraft.arrivalAirport} arrivalRunway={aircraft.arrivalRunway} flightPlan={aircraft.flightPlanEnroute} flightPlanIndex={aircraft.flightPlanIndex} approach={aircraft.approach} onModify={() => {}} />
             </PopoverContent>
           </Popover>
         </div>

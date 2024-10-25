@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useResizeDetector } from 'react-resize-detector';
+import * as turf from '@turf/turf';
 import Ownship from '../../public/images/ownship.svg';
 import { AircraftStateBoard } from './C2Panel';
 import { MonitorIndicator, RadioCommunicationBoard } from './RadioPanel';
@@ -15,27 +16,51 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
   const { width, height, ref } = useResizeDetector();
 
   const timeStart = 0;
-  const timeEnd = 3600;
+  const timeEnd = 3600 / 2;
 
-  // const data = [
-  //   { line: 1, aircraft: 'N71346', start: timeStart, end: timeEnd, times: [0, 1300, 2600] },
-  //   { line: 2, aircraft: 'N71346', start: timeStart, end: timeEnd, times: [215, 345, 490, 1400, 2450] },
-  //   { line: 3, aircraft: 'N71346', start: 500, end: timeEnd, times: [1125, 1250, 2375, 2500] },
-  //   { line: 4, aircraft: 'N71346', start: timeStart, end: 2500, times: [130, 290, 1120, 2180] },
-  //   // { line: 5, start: timeStart, end: 2500, times: [130, 290, 1120, 2180] },
-  //   // { line: 6, start: timeStart, end: 2500, times: [130, 290, 1120, 2180] },
-  //   // { line: 7, start: timeStart, end: 2500, times: [130, 290, 1120, 2180] },
-  // ];
+  const data = useMemo(() => {
+    return Object.values(aircraft ?? {}).map((aircraftStateBoard, i) => {
+      const position = aircraftStateBoard.position.toReversed();
+      const waypointNames = aircraftStateBoard.flightPlan?.slice(Math.max(aircraftStateBoard.flightPlanIndex - 1, 0));
+      const waypointPositions = aircraftStateBoard.flightPlanPos?.slice(Math.max(aircraftStateBoard.flightPlanIndex - 1, 0)).map((pos) => pos.toReversed());
 
-  const data = Object.values(aircraft ?? {}).map((aircraftStateBoard, i) => ({
-    line: i + 1,
-    aircraft: aircraftStateBoard.callsign,
-    selected: aircraftStateBoard.callsign === selectedAircraftCallsign,
-    receiving: radios?.[aircraftStateBoard.callsign]?.receiving ?? false,
-    start: 0,
-    end: 2900,
-    times: [0, 1300, 2600],
-  })) ?? [];
+      if (waypointPositions.length < 2) {
+        return {
+          line: i + 1,
+          aircraft: aircraftStateBoard.callsign,
+          start: 0,
+          end: 0,
+          times: [],
+          departureAirport: aircraftStateBoard.departureAirport,
+          arrivalAirport: aircraftStateBoard.arrivalAirport,
+        }
+      }
+
+      const lineString = turf.lineString([...(aircraftStateBoard.flightPlanIndex === 0 ? [position] : []), ...waypointPositions]);
+
+      const slicedLineString = turf.lineSlice(position, waypointPositions[waypointPositions.length - 1], lineString);
+
+      const distance = turf.length(slicedLineString, { units: 'kilometers' });
+      // const airspeedKph = aircraftStateBoard.tas * 1.852;
+      const airspeedKph = 138 * 1.852;
+      const endTimeSeconds = (distance / airspeedKph) * 3600;
+
+      const waypointTimes = waypointPositions.slice(0, -2).map((pos, i) => {
+        const nearestPoint = turf.nearestPointOnLine(slicedLineString, pos, { units: 'kilometers' });
+        return { label: waypointNames[i], time: (nearestPoint.properties.location / airspeedKph) * 3600 };
+      }).filter(({time}) => time > 0);
+
+      return {
+        line: i + 1,
+        aircraft: aircraftStateBoard.callsign,
+        start: 0,
+        end: endTimeSeconds,
+        times: waypointTimes,
+        departureAirport: aircraftStateBoard.departureAirport,
+        arrivalAirport: aircraftStateBoard.arrivalAirport,
+      }
+    });
+  }, [aircraft]);
 
   const margin = { top: 0, right: 24, bottom: 16, left: 24 };
   const containerWidth = (width ?? 0) - margin.left - margin.right;
@@ -78,9 +103,9 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
         .attr('y1', y(d.line))
         .attr('x2', x(d.end))
         .attr('y2', y(d.line))
-        .attr('class', `line ${d.selected ? 'selected' : ''}`);
+        .attr('class', `line ${d.aircraft === selectedAircraftCallsign ? 'selected' : ''}`);
 
-      d.times.forEach((time, i2) => {
+      d.times.forEach(({ label, time }, i2) => {
         const anchorName = `--anchor-${i}-${i2}`;
 
         container.append('img')
@@ -96,7 +121,7 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
               .attr('class', 'tooltip')
               .style('visibility', 'visible')
               .style('position-anchor', anchorName)
-              .text('SHEDD');
+              .text(label);
           })
           .on('mouseout', () => {
             d3.selectAll('.tooltip').remove();
@@ -119,7 +144,7 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
               .attr('class', 'tooltip')
               .style('visibility', 'visible')
               .style('position-anchor', anchorName)
-              .text(`Origin Airport!`);
+              .text(d.departureAirport);
           })
           .on('mouseout', () => {
             d3.selectAll('.tooltip').remove();
@@ -143,7 +168,7 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
               .attr('class', 'tooltip')
               .style('visibility', 'visible')
               .style('position-anchor', anchorName)
-              .text(`Arrival Airport!`);
+              .text(d.arrivalAirport);
           })
           .on('mouseout', () => {
             d3.selectAll('.tooltip').remove();
@@ -160,10 +185,10 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
   return <div className='w-full h-full flex flex-row bg-zinc-900'>
     <div className="relative w-full basis-32 flex-shrink-0">
       {data.map((d, i) =>
-        <div key={i} className={`h-6 flex items-center gap-2 self-stretch absolute cursor-pointer hover:brightness-75 ${d.selected ? 'text-fuchsia-400' : 'text-gray-200'}`} style={{top: yDom(i + 1) - 12, right: 0}} onClick={() => onSelectAircraft(d.aircraft)}>
+        <div key={i} className={`h-6 flex items-center gap-2 self-stretch absolute cursor-pointer hover:brightness-75 ${d.aircraft === selectedAircraftCallsign ? 'text-fuchsia-400' : 'text-gray-200'}`} style={{top: yDom(i + 1) - 12, right: 0}} onClick={() => onSelectAircraft(d.aircraft)}>
           <Ownship width={18} height={18} />
           <div className="font-mono text-sm">{d.aircraft}</div>
-          <MonitorIndicator receive={d.receiving} className="w-3.5 h-3.5" />
+          <MonitorIndicator receive={false} className="w-3.5 h-3.5" />
         </div>
       )}
     </div>

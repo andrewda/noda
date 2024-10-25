@@ -1,7 +1,7 @@
 import { ComponentProps, Fragment, useEffect, useMemo, useRef, useState } from 'react';
 
-import { buildModuleUrl, Cartesian2, Cartesian3, ClockStep, Color, ExtrapolationType, Ion, IonImageryProvider, IonWorldImageryStyle, JulianDate, MapboxStyleImageryProvider, ProviderViewModel, ReferenceFrame, SampledPositionProperty, SceneMode, TileMapServiceImageryProvider } from 'cesium';
-import { Camera, Clock, Entity, Scene, useCesium, Viewer } from 'resium';
+import { buildModuleUrl, Cartesian2, Cartesian3, ClockStep, Color, ExtrapolationType, Ion, IonImageryProvider, IonWorldImageryStyle, JulianDate, MapboxStyleImageryProvider, Material, PolylineDashMaterialProperty, ProviderViewModel, ReferenceFrame, SampledPositionProperty, SceneMode, TileMapServiceImageryProvider } from 'cesium';
+import { Camera, Clock, Entity, Polyline, PolylineCollection, Scene, useCesium, Viewer } from 'resium';
 
 import { useResizeDetector } from 'react-resize-detector';
 
@@ -143,8 +143,7 @@ function LabelEntity({ aircraft, receiving, selected, ...props }: { aircraft: Ai
     setImage(c);
   }, [aircraft, receiving, selected]);
 
-  // return <Entity {...props} billboard={{ image, pixelOffset: new Cartesian2(65, -25) }} />;
-  return <Entity {...props} billboard={{ image, pixelOffset: new Cartesian2(65, -10), eyeOffset: new Cartesian3(0, 0, -6000) }} />;
+  return <Entity {...props} billboard={{ image, pixelOffset: new Cartesian2(65, -10), eyeOffset: new Cartesian3(0, 0, -3000) }} />;
 };
 
 
@@ -155,6 +154,7 @@ type EntitiesProps = {
   onSelectAircraft: ((aircraftCallsign: string | undefined) => void) | undefined;
 }
 export function Entities({ aircraft, radios, selectedAircraftCallsign, onSelectAircraft }: EntitiesProps) {
+  const polylinePositionsMap = useMemo(() => new Map<string, Cartesian3[]>(), []);
   const sampledPositionMap = useMemo(() => new Map<string, SampledPositionProperty>(), []);
 
   useEffect(() => {
@@ -171,6 +171,9 @@ export function Entities({ aircraft, radios, selectedAircraftCallsign, onSelectA
 
       const position = Cartesian3.fromDegrees(aircraft.position[1], aircraft.position[0], aircraft.altitude * kFeetToMeters);
       sampledPosition?.addSample(JulianDate.now(), position);
+
+      const polylinePositions = aircraft.flightPlanPos.map(([lat, lon]) => Cartesian3.fromDegrees(lon, lat, 100));
+      polylinePositionsMap.set(aircraft.callsign, polylinePositions);
     });
   }, [aircraft, sampledPositionMap]);
 
@@ -191,6 +194,14 @@ export function Entities({ aircraft, radios, selectedAircraftCallsign, onSelectA
           onClick={() => onSelectAircraft?.(aircraft.callsign)}
         />
         <LabelEntity position={position} aircraft={aircraft} receiving={radios?.[aircraft.callsign]?.receiving ?? false} selected={selected} onClick={() => onSelectAircraft?.(aircraft.callsign)} />
+
+        {/* <Entity
+          polyline={{ positions: polylinePositionsMap.get(aircraft.callsign), width: 3 }}
+        /> */}
+
+        {/* <PolylineCollection>
+          <Polyline positions={polylinePositionsMap.get(aircraft.callsign)} width={3} material={Material.fromType(Material.PolylineDashType)} />
+        </PolylineCollection> */}
       </Fragment>
     )
   }

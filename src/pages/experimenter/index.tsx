@@ -15,6 +15,24 @@ export default function ExperimenterPage() {
 
   const { lastMessageTime, aircraft } = useSimulation();
 
+  const commandInit = () => {
+    socket?.emit('runSimulation', 'StudyFullFlight');
+
+    // TODO: this is a little hacky, but it works for now
+    setTimeout(() => {
+      socket?.emit('command', {
+        aircraft: null,
+        command: 'init',
+        payload: [
+          { callsign: 'HMT 110', departure_airport: 'KPDX', departure_runway: 'RW28L', arrival_airport: 'KCVO', arrival_runway: 'RW17', approach: 'R17', flight_plan: ['YIBPU', 'ADLOW'] },
+          { callsign: 'HMT 120', departure_airport: 'KPDX', departure_runway: 'RW28L', arrival_airport: 'KSLE', arrival_runway: 'RW13', approach: 'R13', flight_plan: ['YIBPU', 'UBG'] },
+          { callsign: 'HMT 130', departure_airport: 'KPDX', departure_runway: 'RW28L', arrival_airport: 'KMMV', arrival_runway: 'RW22', approach: 'R22', flight_plan: ['YIBPU', 'MULES', 'OSWEG', 'OZIER'] },
+          { callsign: 'HMT 140', departure_airport: 'KPDX', departure_runway: 'RW28L', arrival_airport: 'KRDM', arrival_runway: 'RW11', approach: 'R11', flight_plan: ['YIBPU', 'CUKIS', 'JJACE', 'JJETT', 'YONKU'] },
+        ]
+      });
+    }, 2000);
+  };
+
   const commandTakeoff = () => {
     socket?.emit('command', { aircraft: getValues('takeoffAircraft'), command: 'takeoff' });
     setValue('takeoffAircraft', '');
@@ -38,8 +56,8 @@ export default function ExperimenterPage() {
 
         <div className="w-96 flex flex-col gap-4">
           <div className="flex gap-4">
-            <Input className="flex-1" type="text" placeholder="Simulation Name" {...register('simulationName')} />
-            <Button className="w-36" disabled={watch('simulationName') === ''} onClick={startSimulation}>Start Simulation</Button>
+            {/* <Input className="flex-1" type="text" placeholder="Simulation Name" {...register('simulationName')} /> */}
+            <Button className="w-36" onClick={commandInit}>Start Simulation</Button>
           </div>
 
           <div className="flex gap-4">
