@@ -91,8 +91,8 @@ type RadioPanelProps = {
 export default function RadioPanel({ radios, selectedAircraftCallsign, onSelectAircraft }: RadioPanelProps) {
   return (
     <div className="grid grid-cols-4 gap-4 m-3">
-      {Object.values(radios).map((radio) => (
-        <Radio key={radio.aircraft ?? 'wild'} radio={radio} selected={radio.aircraft ? radio.aircraft === selectedAircraftCallsign : false} onSelect={() => radio.aircraft ? onSelectAircraft(radio.aircraft) : null} className="last:col-start-4 justify-self-center" />
+      {Object.values(radios).map((radio, i) => (
+        <Radio key={i} radio={radio} selected={radio.aircraft ? radio.aircraft === selectedAircraftCallsign : false} onSelect={() => radio.aircraft ? onSelectAircraft(radio.aircraft) : null} className="last:col-start-4 justify-self-center" />
       ))}
     </div>
   );

@@ -178,7 +178,7 @@ export function Entities({ aircraft, radios, selectedAircraftCallsign, onSelectA
   }, [aircraft, sampledPositionMap]);
 
   const renderAircraft = (aircraft: AircraftStateBoard, position: SampledPositionProperty | undefined, selected: boolean = false) => {
-    if (!position) return <></>;
+    if (!position) return <Fragment key={aircraft.callsign}></Fragment>;
 
     const entityColor = selected ? Color.MAGENTA : Color.WHITE;
 
