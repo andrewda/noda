@@ -1,7 +1,7 @@
-import { ComponentProps, Fragment, useEffect, useMemo, useRef, useState } from 'react';
+import { ComponentProps, Fragment, use, useEffect, useMemo, useRef, useState } from 'react';
 
-import { buildModuleUrl, Cartesian2, Cartesian3, ClockStep, Color, ExtrapolationType, Ion, IonImageryProvider, IonWorldImageryStyle, JulianDate, MapboxStyleImageryProvider, Material, PolylineDashMaterialProperty, ProviderViewModel, ReferenceFrame, SampledPositionProperty, SceneMode, TileMapServiceImageryProvider } from 'cesium';
-import { Camera, Clock, Entity, Polyline, PolylineCollection, Scene, useCesium, Viewer } from 'resium';
+import { buildModuleUrl, Cartesian2, Cartesian3, ClockStep, Color, Ellipsoid, ExtrapolationType, Ion, IonImageryProvider, IonWorldImageryStyle, JulianDate, LabelStyle, MapboxStyleImageryProvider, Material, MaterialProperty, NearFarScalar, PolylineDashMaterialProperty, ProviderViewModel, Rectangle, ReferenceFrame, SampledPositionProperty, SceneMode, SingleTileImageryProvider, TileMapServiceImageryProvider, WebMapServiceImageryProvider, WebMercatorProjection, WebMercatorTilingScheme } from 'cesium';
+import { Camera, Clock, Entity, ImageryLayer, Polyline, PolylineCollection, Scene, useCesium, Viewer } from 'resium';
 
 import { useResizeDetector } from 'react-resize-detector';
 
@@ -12,9 +12,9 @@ Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3MjBkY
 
 const kFeetToMeters = 0.3048;
 
-function ConfigureCesium() {
-  const { scene, viewer } = useCesium();
-  const { width, height, ref } = useResizeDetector();
+const ConfigureCesium = () => {
+  const { viewer } = useCesium();
+  const { ref } = useResizeDetector();
 
   // TODO: fix this hack
   if (viewer?.baseLayerPicker && viewer.baseLayerPicker.viewModel.imageryProviderViewModels.length !== 3) {
@@ -60,16 +60,6 @@ function ConfigureCesium() {
       ref.current = undefined;
     }
   }, [ref, viewer]);
-
-  // On cesium resize, update canvas size
-  useEffect(() => {
-    if (scene) {
-      // // @ts-expect-error
-      // scene.pixelRatio = window.devicePixelRatio;
-      // scene.canvas.width = window.innerWidth * window.devicePixelRatio;
-      // scene.canvas.height = window.innerHeight * window.devicePixelRatio;
-    }
-  }, [scene, width, height]);
 
   return <></>;
 }
@@ -147,6 +137,87 @@ function LabelEntity({ aircraft, receiving, selected, ...props }: { aircraft: Ai
 };
 
 
+const Rings = ({ position, show }: { position: SampledPositionProperty, show: boolean }) => {
+  if (!position.getValue(JulianDate.now())) return <></>;
+
+  return (
+    <>
+      <Entity
+        position={position}
+        ellipse={{
+          semiMajorAxis: (10 * 1852),
+          semiMinorAxis: (10 * 1852),
+          material: Color.RED.withAlpha(0.2),
+          outline: true,
+          outlineColor: Color.RED,
+          outlineWidth: 3,
+          numberOfVerticalLines: 0,
+          fill: false,
+        }}
+        show={show}
+      />
+
+      <Entity
+        position={position}
+        ellipse={{
+          semiMajorAxis: (20 * 1852),
+          semiMinorAxis: (20 * 1852),
+          material: Color.BLUE.withAlpha(0.2),
+          outline: true,
+          outlineColor: Color.BLUE,
+          outlineWidth: 3,
+          numberOfVerticalLines: 0,
+          fill: false,
+        }}
+        show={show}
+      />
+    </>
+  );
+}
+
+const FlightPlan = ({ polylinePositions, waypointNames, show }: { polylinePositions: Cartesian3[] | undefined, waypointNames: string[], show: boolean }) => {
+  const polylineMaterial = useMemo(() => new PolylineDashMaterialProperty(), []);
+  const polylineGraphics = useMemo(() => ({ positions: polylinePositions, width: 3, material: polylineMaterial }), [polylinePositions]);
+
+  if (!polylinePositions) return <></>;
+
+  return (
+    <>
+      <Entity polyline={polylineGraphics} show={show} />
+      {waypointNames.slice(0, -1).map((waypointName, i) => <Entity key={waypointName}
+        show={show}
+        position={polylinePositions[i]}
+        label={{ text: waypointName.replace(/_/g, ' '), font: 'bold 16px monospace', fillColor: Color.BLACK, showBackground: true, backgroundColor: Color.LIGHTGRAY, backgroundPadding: new Cartesian2(4, 4), style: LabelStyle.FILL, scaleByDistance: new NearFarScalar(10000, 1, 500000, 0.3) }}
+      />)}
+    </>
+  );
+}
+
+const Aircraft = ({ aircraft, position, polylinePositions, selected, onSelectAircraft }: { aircraft: AircraftStateBoard, position: SampledPositionProperty | undefined, polylinePositions: Cartesian3[] | undefined, selected: boolean, onSelectAircraft: ((aircraftCallsign: string | undefined) => void) | undefined }) => {
+  if (!position) return <></>;
+
+  const entityColor = selected ? Color.MAGENTA : Color.WHITE;
+
+  return (
+    <>
+      <Entity
+        name={aircraft.callsign}
+        position={position}
+        // billboard={{ image: 'images/ownship-map.svg', color: entityColor, alignedAxis: velocityVector, rotation }}
+        // path={{ leadTime: -0.5, trailTime: 60, show: true, width: 10, material: new PolylineDashMaterialProperty({ color: entityColor, gapColor: Color.TRANSPARENT, dashLength: 10 }) }}
+        point={{ pixelSize: 10, color: entityColor }}
+        path={{ leadTime: 0, trailTime: 60, show: true, width: 3 }}
+        onClick={() => onSelectAircraft?.(aircraft.callsign)}
+      >
+        <LabelEntity position={position} aircraft={aircraft} receiving={/*radios?.[aircraft.callsign]?.receiving ??*/ false} selected={selected} onClick={() => onSelectAircraft?.(aircraft.callsign)} />
+
+        <Rings position={position} show={selected} />
+        <FlightPlan polylinePositions={polylinePositions} waypointNames={aircraft.flightPlan} show={selected} />
+      </Entity>
+    </>
+  )
+}
+
 type EntitiesProps = {
   aircraft: Record<string, AircraftStateBoard> | undefined,
   radios: Record<string, RadioCommunicationBoard> | undefined;
@@ -177,44 +248,7 @@ export function Entities({ aircraft, radios, selectedAircraftCallsign, onSelectA
     });
   }, [aircraft, sampledPositionMap]);
 
-  const renderAircraft = (aircraft: AircraftStateBoard, position: SampledPositionProperty | undefined, selected: boolean = false) => {
-    if (!position) return <Fragment key={aircraft.callsign}></Fragment>;
-
-    const entityColor = selected ? Color.MAGENTA : Color.WHITE;
-
-    return (
-      <Fragment key={aircraft.callsign}>
-        <Entity
-          name={aircraft.callsign}
-          position={position}
-          // billboard={{ image: 'images/ownship-map.svg', color: entityColor, alignedAxis: velocityVector, rotation }}
-          // path={{ leadTime: -0.5, trailTime: 60, show: true, width: 10, material: new PolylineDashMaterialProperty({ color: entityColor, gapColor: Color.TRANSPARENT, dashLength: 10 }) }}
-          point={{ pixelSize: 10, color: entityColor }}
-          path={{ leadTime: 0, trailTime: 60, show: true, width: 3 }}
-          onClick={() => onSelectAircraft?.(aircraft.callsign)}
-        />
-        <LabelEntity position={position} aircraft={aircraft} receiving={radios?.[aircraft.callsign]?.receiving ?? false} selected={selected} onClick={() => onSelectAircraft?.(aircraft.callsign)} />
-
-        {/* <Entity
-          polyline={{ positions: polylinePositionsMap.get(aircraft.callsign), width: 3 }}
-        /> */}
-
-        {/* <PolylineCollection>
-          <Polyline positions={polylinePositionsMap.get(aircraft.callsign)} width={3} material={Material.fromType(Material.PolylineDashType)} />
-        </PolylineCollection> */}
-      </Fragment>
-    )
-  }
-
-  const renderAllAircraft = () => {
-    return Object.values(aircraft ?? {}).map((aircraft) => renderAircraft(aircraft, sampledPositionMap.get(aircraft.callsign), aircraft.callsign === selectedAircraftCallsign))
-  }
-
-  return (
-    <>
-      {renderAllAircraft()}
-    </>
-  );
+  return Object.values(aircraft ?? {}).map((aircraft) => <Aircraft key={aircraft.callsign} aircraft={aircraft} position={sampledPositionMap.get(aircraft.callsign)} polylinePositions={polylinePositionsMap.get(aircraft.callsign)} selected={aircraft.callsign === selectedAircraftCallsign} onSelectAircraft={onSelectAircraft} />);
 }
 
 type MapPanelProps = {
@@ -227,17 +261,42 @@ export default function MapPanel({ aircraft, radios, selectedAircraftCallsign, o
   const ref = useRef<HTMLDivElement>(null);
 
   const startTime = useMemo(() => JulianDate.now(), []);
-  // const mapProjection = useMemo(() => new WebMercatorProjection(Ellipsoid.WGS84), []);
+  const mapProjection = useMemo(() => new WebMercatorProjection(Ellipsoid.WGS84), []);
   const creditContainer = useMemo(() => typeof DocumentFragment !== 'undefined' ? new DocumentFragment() as any : undefined, []);
-  // const baseLayerPicker = useMemo(() => ref.current ? new BaseLayerPicker(ref.current, {}) : null, [ref]);
+
+  // const weatherLayer = useMemo(() => SingleTileImageryProvider.fromUrl(
+  //   '/weather/radar1.png',
+  //   {
+  //     rectangle: Rectangle.fromDegrees(
+  //       -129.45,
+  //       40.22,
+  //       -109.25,
+  //       49.93,
+  //     ),
+  //   }
+  // ), []);
+
+  // Live weather layer
+  const weatherLayer = useMemo(() => new WebMapServiceImageryProvider({
+    url: 'https://opengeo.ncep.noaa.gov/geoserver/conus/conus_bref_qcd/ows?',
+    layers: 'conus_bref_qcd',
+    parameters: {
+      format: 'image/png',
+      transparent: true,
+      time: new Date().toISOString(),
+    },
+    tileWidth: 512,
+    tileHeight: 512,
+    tilingScheme: new WebMercatorTilingScheme(),
+  }), []);
 
   return (
     <>
       <div id="base-layer-picker" ref={ref}></div>
       <Viewer
-        sceneMode={SceneMode.SCENE3D}
-        // sceneMode={SceneMode.SCENE2D}
-        // mapProjection={mapProjection}
+        // sceneMode={SceneMode.SCENE3D}
+        sceneMode={SceneMode.SCENE2D}
+        mapProjection={mapProjection}
         fullscreenButton={false}
         animation={false}
         timeline={false}
@@ -248,15 +307,10 @@ export default function MapPanel({ aircraft, radios, selectedAircraftCallsign, o
         navigationHelpButton={false}
         projectionPicker={false}
         sceneModePicker={false}
-        // baseLayerPicker={false}
         creditContainer={creditContainer}
         creditDisplay={undefined}
         // msaaSamples={4}
         style={{ height: '100%' }}
-        // baseLayer={ImageryLayer.fromProviderAsync(Promise.resolve(new MapboxStyleImageryProvider({
-        //   styleId: 'dark-v10',
-        //   accessToken: 'pk.eyJ1IjoiYW5kcmV3ZGEiLCJhIjoiY2p3dGpkbXF0M2VtazN6bjBndml6MDgxYyJ9.nBlrcPQG1vXt1Jo3etUaEw'
-        // })), {})}
       >
         <Scene debugShowFramesPerSecond={false} />
         {/* <Globe baseColor={Color.fromCssColorString('#000000')} showGroundAtmosphere={false} /> */}
@@ -266,6 +320,8 @@ export default function MapPanel({ aircraft, radios, selectedAircraftCallsign, o
         <ConfigureCesium />
 
         <Entities aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={onSelectAircraft} />
+
+        <ImageryLayer imageryProvider={weatherLayer} alpha={0.5} />
       </Viewer>
     </>
   )

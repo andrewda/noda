@@ -51,10 +51,11 @@ export default function Home() {
   useEffect(() => {
     setRadios((radios) => radios.map((radio, idx) => ({
       ...radio,
+      aircraft: Object.keys(aircraft)[idx],
       receiving: remoteAudioMonitors.get(idx) ?? false,
       transmitting: localAudioMonitors.get(idx) ?? false,
     })));
-  }, [remoteAudioMonitors, localAudioMonitors]);
+  }, [aircraft, remoteAudioMonitors, localAudioMonitors]);
 
   return (
     <>

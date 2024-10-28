@@ -46,7 +46,7 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
 
       const waypointTimes = waypointPositions.slice(0, -2).map((pos, i) => {
         const nearestPoint = turf.nearestPointOnLine(slicedLineString, pos, { units: 'kilometers' });
-        return { label: waypointNames[i], time: (nearestPoint.properties.location / airspeedKph) * 3600 };
+        return { label: waypointNames[i].replace(/_/g, ' '), time: (nearestPoint.properties.location / airspeedKph) * 3600 };
       }).filter(({time}) => time > 0);
 
       return {

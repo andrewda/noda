@@ -21,7 +21,7 @@ type ReceiveIndicatorProps = {
 }
 export function MonitorIndicator({ receive, className }: ReceiveIndicatorProps) {
   return (
-    <div className={`rounded-full border-slate-400 border-2 border-solid ${receive ? 'bg-[#00d30a]' : 'bg-none'} ${className}`}></div>
+    <div className={`rounded-full border-slate-400 border-2 border-solid ${receive ? 'bg-[#00d30a] shadow-[#00d30a] shadow-[0_0_6px_1px]' : 'bg-none'} ${className}`}></div>
   );
 }
 
@@ -35,8 +35,22 @@ function Radio({ radio, selected, className, onSelect }: RadioProps) {
   const monitoring = true;
   const transmitting = false;
 
+  const handleBlur = (event: any) => {
+    let value = parseFloat(event.target.value);
+
+    if (value < 100) {
+      value += 100;
+    }
+
+    if (value < 118.900 || value > 136.000) {
+      value = Math.max(118.900, Math.min(136.000, value));
+    }
+
+    event.target.value = value.toFixed(3);
+  }
+
   return (
-    <div className={`w-full h-20 px-1 py-1.5 rounded border ${selected ? 'border-fuchsia-400' : 'border-[#ababab]'} flex-col justify-between items-start inline-flex overflow-hidden ${className}`}>
+    <div className={`w-full h-20 px-1 py-1.5 rounded border ${selected ? 'border-fuchsia-400 bg-fuchsia-950/30' : 'border-[#ababab]'} flex-col justify-between items-start inline-flex overflow-hidden ${className}`}>
       <div className="self-stretch px-0.5 justify-between items-center inline-flex">
         <div onClick={onSelect} className={`h-5 relative flex flex-row items-center gap-1 ${radio.aircraft ? 'cursor-pointer hover:brightness-75' : ''} ${selected ? 'text-fuchsia-400' : 'text-gray-200'}`}>
           {radio.aircraft ? (
@@ -55,7 +69,16 @@ function Radio({ radio, selected, className, onSelect }: RadioProps) {
         </div>
         <div className="flex flex-grow flex-col justify-between items-end h-full min-w-0">
           <div className="inline-flex justify-end items-center gap-1 cursor-pointer text-gray-200 hover:brightness-75">
-            <input type="text" className="w-full text-sm text-right select-all text-gray-200 bg-neutral-950 border-none focus:outline-none placeholder:text-gray-200" placeholder={radio.frequency} />
+            <input
+              type="number"
+              className="w-full text-sm text-right select-all text-gray-200 bg-transparent border-none focus:outline-none placeholder:text-gray-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              min={118.900}
+              max={136.000}
+              step={0.025}
+              placeholder={radio.frequency}
+              onClick={(e) => (e.target as any).select()}
+              onBlur={handleBlur}
+            />
             <div className="flex-shrink-0">
               <Flop width={20} />
             </div>
@@ -82,7 +105,6 @@ function Radio({ radio, selected, className, onSelect }: RadioProps) {
   )
 }
 
-
 type RadioPanelProps = {
   selectedAircraftCallsign: string | undefined;
   radios: Record<string, RadioCommunicationBoard>;
@@ -91,7 +113,7 @@ type RadioPanelProps = {
 export default function RadioPanel({ radios, selectedAircraftCallsign, onSelectAircraft }: RadioPanelProps) {
   return (
     <div className="grid grid-cols-4 gap-4 m-3">
-      {Object.values(radios).map((radio, i) => (
+      {Object.values(radios).filter((radio, idx) => radio.aircraft || (idx === (Object.keys(radios).length ?? 0) - 1)).map((radio, i) => (
         <Radio key={i} radio={radio} selected={radio.aircraft ? radio.aircraft === selectedAircraftCallsign : false} onSelect={() => radio.aircraft ? onSelectAircraft(radio.aircraft) : null} className="last:col-start-4 justify-self-center" />
       ))}
     </div>

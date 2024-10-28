@@ -28,6 +28,10 @@ export default function ExperimenterPage() {
           { callsign: 'HMT 120', departure_airport: 'KPDX', departure_runway: 'RW28L', arrival_airport: 'KSLE', arrival_runway: 'RW13', approach: 'R13', flight_plan: ['YIBPU', 'UBG'] },
           { callsign: 'HMT 130', departure_airport: 'KPDX', departure_runway: 'RW28L', arrival_airport: 'KMMV', arrival_runway: 'RW22', approach: 'R22', flight_plan: ['YIBPU', 'MULES', 'OSWEG', 'OZIER'] },
           { callsign: 'HMT 140', departure_airport: 'KPDX', departure_runway: 'RW28L', arrival_airport: 'KRDM', arrival_runway: 'RW11', approach: 'R11', flight_plan: ['YIBPU', 'CUKIS', 'JJACE', 'JJETT', 'YONKU'] },
+
+          { callsign: 'HMT 150', departure_airport: 'KPDX', departure_runway: 'RW28R', arrival_airport: 'KEUG', arrival_runway: 'RW16R', approach: 'R16R-Y', flight_plan: ['JALAG', 'OSWEG', 'MAGOT', 'SHEDD'] },
+          { callsign: 'HMT 160', departure_airport: 'KPDX', departure_runway: 'RW28R', arrival_airport: 'KHIO', arrival_runway: 'RW13R', approach: 'R13R', flight_plan: ['JALAG', 'DUCKA'] },
+          { callsign: 'HMT 170', departure_airport: 'KPDX', departure_runway: 'RW28R', arrival_airport: 'KKLS', arrival_runway: 'RW12', approach: 'R12', flight_plan: ['JALAG', 'LOATH', 'AMAVE'] },
         ]
       });
     }, 2000);

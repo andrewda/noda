@@ -84,25 +84,81 @@ function formatAltitude(altitude: number) {
   return altitude.toLocaleString();
 }
 
+function formatAltitudeString(altitude: number, vs: number) {
+  let vsString = '0';
+  if (vs > 0) {
+    vsString = `+${Math.abs(Math.round(vs)).toLocaleString()}`;
+  } else if (vs < 0) {
+    vsString = `-${Math.abs(Math.round(vs)).toLocaleString()}`;
+  }
+
+  return `${(Math.round(altitude / 10) * 10).toLocaleString()} (${vsString} fpm)`;
+}
+
+function getFlightPhaseString(flightPhase: number) {
+  // AT_GATE_ORIGIN = 1,
+  // TAXI_ORIGIN = 2,
+  // TAKEOFF = 3,
+  // INITIAL_CLIMB = 4,
+  // CLIMB = 5,
+  // CRUISE = 6,
+  // DESCENT = 7,
+  // APPROACH = 8,
+  // LANDING = 9,
+  // TAXI_DEST = 10,
+  // AT_GATE_DEST = 11
+
+  switch (flightPhase) {
+    case 1:
+      return 'Gate';
+    case 2:
+      return 'Taxi';
+    case 3:
+      return 'Takeoff';
+    case 4:
+      return 'Initial Climb';
+    case 5:
+      return 'Climb';
+    case 6:
+      return 'Cruise';
+    case 7:
+      return 'Descent';
+    case 8:
+      return 'Approach';
+    case 9:
+      return 'Landing';
+    case 10:
+      return 'Taxi';
+    case 11:
+      return 'Gate';
+    default:
+      return 'Unknown';
+  }
+}
+
 type AircraftListProps = {
   aircraft: Record<string, AircraftStateBoard>,
+  radios: Record<string, RadioCommunicationBoard> | undefined;
   selectedAircraftCallsign: string | undefined,
   onSelectAircraft: (aircraftCallsign: string) => void
 }
-function AircraftListGutter({ aircraft, selectedAircraftCallsign, onSelectAircraft }: AircraftListProps) {
+function AircraftListGutter({ aircraft, radios, selectedAircraftCallsign, onSelectAircraft }: AircraftListProps) {
   return (
     <div className="flex flex-col w-32 min-w-32 items-center self-stretch">
       {Object.values(aircraft).map((aircraftStateBoard) => (
         <div
           key={aircraftStateBoard.callsign}
-          className={`flex flex-col items-start self-stretch pl-3 pr-4 pt-3 pb-3 cursor-pointer border-gray-400 border-b-2 hover:brightness-125 ${aircraftStateBoard.callsign === selectedAircraftCallsign ? 'text-fuchsia-400' : 'text-gray-400'}`}
+          className={`flex flex-col items-start self-stretch pl-3 pr-2 pt-3 pb-3 cursor-pointer border-gray-400 border-b-2 hover:brightness-125 ${aircraftStateBoard.callsign === selectedAircraftCallsign ? 'text-fuchsia-400 bg-fuchsia-950/30' : 'text-gray-400'}`}
           onClick={() => onSelectAircraft(aircraftStateBoard.callsign)}
         >
-          <div className="flex gap-2 items-center">
+          <div className="flex gap-2 items-center w-full">
             <Ownship width={20} height={20} />
-            <div className="flex flex-col justify-center items-start">
-              <div className="font-mono text-sm pl-[1px]">{aircraftStateBoard.callsign}</div>
-              <div className="font-normal text-xs">Enroute</div>
+            <div className="flex flex-col justify-center items-start w-full">
+              <div className="flex items-center justify-between font-mono text-sm pl-[1px] w-full">
+                {aircraftStateBoard.callsign}
+                <MonitorIndicator receive={radios?.[aircraftStateBoard.callsign]?.receiving ?? false} className="w-3 h-3" />
+              </div>
+              <div className="font-normal text-xs">{getFlightPhaseString(aircraftStateBoard.flightPhase)}</div>
             </div>
           </div>
         </div>
@@ -180,7 +236,7 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
           <div className="flex items-center gap-2 self-stretch text-fuchsia-400">
             <Ownship width={24} height={24} />
             <div className="font-mono text-xl">{aircraft?.callsign}</div>
-            <MonitorIndicator receive={radio?.receiving ?? false} className="w-4 h-4" />
+            <MonitorIndicator receive={radio?.receiving ?? false} className="w-3.5 h-3.5" />
           </div>
           <div className="flex pl-1 pr-1 justify-start items-center gap-3 w-full">
             <div className="flex flex-1 pl-1 pr-1 justify-start items-center gap-2 w-full">
@@ -222,7 +278,7 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
         <hr className="w-full border-neutral-600 border-b-2" />
         <div className="w-[70%] items-center flex flex-col gap-2 pb-4">
           <ArmableInput value={heading ?? ''} placeholder={Math.round(aircraft.heading)?.toLocaleString()} labelText="Heading" armText={heading === undefined ? 'Arm' : `Heading ${heading}`} armDisabled={heading === undefined} type="number" unit="deg" onChange={(e: any) => setHeading(e.target.value !== '' ? clamp(Number(e.target.value), -360, 360) : undefined)} onArm={() => { armCommand({ label: `Heading ${heading}`, command: 'heading', payload: heading }); setHeading(undefined); }} />
-          <ArmableInput value={altitude ?? ''} placeholder={(Math.round(aircraft.altitude / 10) * 10)?.toLocaleString()} labelText="Altitude" armText={altitude === undefined ? 'Arm' : `Altitude ${formatAltitude(altitude)}`} armDisabled={altitude === undefined} type="number" unit="ft" onChange={(e: any) => setAltitude(e.target.value !== '' ? clamp(Number(e.target.value), 0, 30000) : undefined)} onArm={() => { armCommand({ label: `Altitude ${formatAltitude(altitude ?? 0)}`, command: 'altitude', payload: altitude }); setAltitude(undefined); }} />
+          <ArmableInput value={altitude ?? ''} placeholder={formatAltitudeString(aircraft.altitude, aircraft.vs)} labelText="Altitude" armText={altitude === undefined ? 'Arm' : `Altitude ${formatAltitude(altitude)}`} armDisabled={altitude === undefined} type="number" unit="ft" onChange={(e: any) => setAltitude(e.target.value !== '' ? clamp(Number(e.target.value), 0, 30000) : undefined)} onArm={() => { armCommand({ label: `Altitude ${formatAltitude(altitude ?? 0)}`, command: 'altitude', payload: altitude }); setAltitude(undefined); }} />
           <ArmableInput value={airspeed ?? ''} placeholder={Math.round(aircraft.tas)?.toLocaleString()} labelText="Airspeed" armText={airspeed === undefined ? 'Arm' : `Speed ${airspeed} kt`} armDisabled={airspeed === undefined} type="number" unit="kt" onChange={(e: any) => setAirspeed(e.target.value !== '' ? clamp(Number(e.target.value), 0, 180) : undefined)} onArm={() => { armCommand({ label: `Speed ${airspeed} kt`, command: 'airspeed', payload: airspeed }); setAirspeed(undefined); }} />
 
           {aircraft.flightPhase === 2 && <Button className="relative w-full mt-4" onClick={() => armCommand({ label: 'Takeoff', command: 'takeoff' })}>Takeoff</Button>}
@@ -273,7 +329,7 @@ export default function C2Panel({ aircraft, radios, selectedAircraftCallsign, on
 
   return (
     <div className="flex flex-row flex-grow">
-      <AircraftListGutter aircraft={aircraft} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={onSelectAircraft} />
+      <AircraftListGutter aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={onSelectAircraft} />
       <AircraftCommandPanel aircraft={selectedAircraft} radio={selectedRadio} />
     </div>
   )

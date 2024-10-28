@@ -21,6 +21,7 @@ export const FlightPlanModal = ({ departureAirport, departureRunway, arrivalAirp
   const [flightPlanText, setFlightPlanText] = useState<string>((flightPlan ?? [])?.join(' ') ?? '');
 
   const compiledFlightPlan = useMemo(() => flightPlanText.split(' ').filter((item) => item !== ''), [flightPlanText]);
+  const runwayNumber = useMemo(() => arrivalRunway?.slice(2), [arrivalRunway]);
 
   return (
     <div className="grid gap-4">
@@ -30,7 +31,7 @@ export const FlightPlanModal = ({ departureAirport, departureRunway, arrivalAirp
       <div className="flex flex-col gap-2">
         <Textarea className="resize-none" value={flightPlanText} rows={3} onChange={(e) => setFlightPlanText(e.target.value)} />
         <div className="flex w-full">
-          <Combobox className="w-full" label="Select approach..." options={[{ label: 'Approach 1', value: 'approach1' }, { label: 'RNAV 13', value: 'R13' }, { label: 'Approach 2', value: 'approach2' }]} defaultValue={approach} />
+          <Combobox className="w-full" label="Select approach..." options={[{ label: `ILS ${runwayNumber}`, value: `I${runwayNumber}` }, { label: `RNAV ${runwayNumber}`, value: `R${runwayNumber}` }]} defaultValue={approach} />
         </div>
         <div className="flex gap-2 w-full mt-4">
           <Close asChild>
