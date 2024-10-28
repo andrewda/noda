@@ -40,5 +40,5 @@ export const useSocketEvent = (eventName: string, callback: (data: any) => void,
     return () => {
       socket?.off(eventName, callback);
     };
-  }, [eventName, callback]);
+  }, [socket, eventName, callback]);
 }

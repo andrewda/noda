@@ -50,27 +50,25 @@ export const useLocalStream = () => {
 }
 
 export const usePeerConnection = ({ streamCount }: { streamCount: number }) => {
-  if (typeof RTCPeerConnection === 'undefined') {
-    return {};
-  }
-
   const socket = useSocket();
 
-  const peerConnection = useMemo(() => new RTCPeerConnection(), []);
-  const remoteStream = useMemo(() => new MediaStream(), []);
+  const peerConnection = useMemo(() => typeof RTCPeerConnection === 'undefined' ? undefined : new RTCPeerConnection(), []);
+  const remoteStream = useMemo(() => typeof MediaStream === 'undefined' ? undefined : new MediaStream(), []);
   const localStream = useLocalStream();
 
   const [connectionStatus, setConnectionStatus] = useState<RTCPeerConnection['connectionState']>('disconnected');
   const [remoteTracks, setRemoteTracks] = useState<Map<number, MediaStreamTrack>>(new Map());
   const [trackControls, setTrackControls] = useState<Map<number, { micGain: GainNode, audioContext: AudioContext, outputTrack: MediaStreamTrack }>>(new Map());
 
-  const dataChannel = useMemo(() => peerConnection.createDataChannel('data', { negotiated: true, id: 0 }), [peerConnection]);
+  const dataChannel = useMemo(() => peerConnection?.createDataChannel('data', { negotiated: true, id: 0 }), [peerConnection]);
 
   useEffect(() => {
+    if (!peerConnection) return;
+
     peerConnection.ontrack = (event) => {
       const { track } = event;
 
-      remoteStream.addTrack(track);
+      remoteStream?.addTrack(track);
 
       // Create an audio element for this track
       const remoteAudio = new Audio();
@@ -78,7 +76,7 @@ export const usePeerConnection = ({ streamCount }: { streamCount: number }) => {
       remoteAudio.play();
 
       // Match incoming tracks to the correct index
-      const trackIndex = remoteStream.getTracks().length - 1;
+      const trackIndex = (remoteStream?.getTracks().length ?? 0) - 1;
 
       setRemoteTracks((tracks) => new Map(tracks.set(trackIndex, track)));
     };
@@ -92,9 +90,11 @@ export const usePeerConnection = ({ streamCount }: { streamCount: number }) => {
     peerConnection.onconnectionstatechange = () => {
       setConnectionStatus(peerConnection.connectionState);
     };
-  }, [peerConnection]);
+  }, [socket, remoteStream, peerConnection]);
 
   const webrtcCallback = useCallback(({ event, data }: any) => {
+    if (!peerConnection) return;
+
     switch (event) {
       case 'offer':
         if (!localStream) throw new Error('Local stream unavailable, user has not interacted with the page yet.');
@@ -128,29 +128,26 @@ export const useAudioMonitor = (tracks: Map<number, MediaStreamTrack> | undefine
 
   const audioContext = useMemo(() => typeof AudioContext !== 'undefined' ? new AudioContext() : undefined, [tracks]);
 
-  if (!audioContext) {
-    return audioMonitors;
-  }
-
   const analysers = useMemo(() => {
-    console.log('tracks useMemo', tracks);
-
     return Array.from(tracks?.values() ?? []).map((track) => {
-      const source = audioContext.createMediaStreamSource(new MediaStream([track]));
-      const analyser = audioContext.createAnalyser();
+      const source = audioContext?.createMediaStreamSource(new MediaStream([track]));
+      const analyser = audioContext?.createAnalyser();
+
+      if (!source || !analyser) return;
+
       source.connect(analyser);
 
       return analyser;
     });
   }, [tracks, audioContext]);
 
-  const dataArrays = useMemo(() => analysers.map((analyser) => new Uint8Array(analyser.frequencyBinCount)), [analysers]);
+  const dataArrays = useMemo(() => analysers.map((analyser) => new Uint8Array(analyser?.frequencyBinCount ?? 0)), [analysers]);
 
   useEffect(() => {
     const updateDataArrays = () => {
       analysers.forEach((analyser, i) => {
         const dataArray = dataArrays[i];
-        analyser.getByteFrequencyData(dataArray);
+        analyser?.getByteFrequencyData(dataArray);
         const sum = dataArray.reduce((a, b) => a + b, 0);
         const average = sum / dataArray.length;
 
@@ -162,7 +159,7 @@ export const useAudioMonitor = (tracks: Map<number, MediaStreamTrack> | undefine
     const interval = setInterval(updateDataArrays, 100);
 
     return () => {
-      analysers.forEach((analyser) => analyser.disconnect());
+      analysers.forEach((analyser) => analyser?.disconnect());
       clearInterval(interval);
     };
   }, [analysers, dataArrays, tracks]);

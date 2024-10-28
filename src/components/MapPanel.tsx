@@ -1,6 +1,6 @@
 import { ComponentProps, Fragment, use, useEffect, useMemo, useRef, useState } from 'react';
 
-import { buildModuleUrl, Cartesian2, Cartesian3, ClockStep, Color, Ellipsoid, ExtrapolationType, Ion, IonImageryProvider, IonWorldImageryStyle, JulianDate, LabelStyle, MapboxStyleImageryProvider, Material, MaterialProperty, NearFarScalar, PolylineDashMaterialProperty, ProviderViewModel, Rectangle, ReferenceFrame, SampledPositionProperty, SceneMode, SingleTileImageryProvider, TileMapServiceImageryProvider, WebMapServiceImageryProvider, WebMercatorProjection, WebMercatorTilingScheme } from 'cesium';
+import { buildModuleUrl, Cartesian2, Cartesian3, ClockStep, Color, Ellipsoid, ExtrapolationType, Ion, IonImageryProvider, IonWorldImageryStyle, JulianDate, LabelStyle, MapboxStyleImageryProvider, Material, MaterialProperty, NearFarScalar, PolylineDashMaterialProperty, ProviderViewModel, Rectangle, ReferenceFrame, SampledPositionProperty, SceneMode, SingleTileImageryProvider, TextureMagnificationFilter, TextureMinificationFilter, TileMapServiceImageryProvider, WebMapServiceImageryProvider, WebMercatorProjection, WebMercatorTilingScheme } from 'cesium';
 import { Camera, Clock, Entity, ImageryLayer, Polyline, PolylineCollection, Scene, useCesium, Viewer } from 'resium';
 
 import { useResizeDetector } from 'react-resize-detector';
@@ -252,43 +252,55 @@ export function Entities({ aircraft, radios, selectedAircraftCallsign, onSelectA
 }
 
 type MapPanelProps = {
+  weather: string | undefined;
   aircraft: Record<string, AircraftStateBoard> | undefined,
   radios: Record<string, RadioCommunicationBoard> | undefined;
   selectedAircraftCallsign: string | undefined;
   onSelectAircraft: ((aircraftCallsign: string | undefined) => void) | undefined;
 }
-export default function MapPanel({ aircraft, radios, selectedAircraftCallsign, onSelectAircraft }: MapPanelProps) {
+export default function MapPanel({ aircraft, weather, radios, selectedAircraftCallsign, onSelectAircraft }: MapPanelProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   const startTime = useMemo(() => JulianDate.now(), []);
   const mapProjection = useMemo(() => new WebMercatorProjection(Ellipsoid.WGS84), []);
   const creditContainer = useMemo(() => typeof DocumentFragment !== 'undefined' ? new DocumentFragment() as any : undefined, []);
 
-  // const weatherLayer = useMemo(() => SingleTileImageryProvider.fromUrl(
-  //   '/weather/radar1.png',
-  //   {
-  //     rectangle: Rectangle.fromDegrees(
-  //       -129.45,
-  //       40.22,
-  //       -109.25,
-  //       49.93,
-  //     ),
-  //   }
-  // ), []);
+  const weatherLayer = useMemo(() => {
+    if (!weather) return undefined;
+
+    return SingleTileImageryProvider.fromUrl(
+      // '/weather/radar_nominal.png',
+      `/weather/radar_${weather}.png`,
+      {
+        // rectangle: Rectangle.fromDegrees(
+        //   -129.45,
+        //   40.22,
+        //   -109.25,
+        //   49.93,
+        // ),
+        rectangle: Rectangle.fromDegrees(
+          -127.85,
+          40.85,
+          -107.67,
+          50.5,
+        ),
+      }
+    )
+  }, [weather]);
 
   // Live weather layer
-  const weatherLayer = useMemo(() => new WebMapServiceImageryProvider({
-    url: 'https://opengeo.ncep.noaa.gov/geoserver/conus/conus_bref_qcd/ows?',
-    layers: 'conus_bref_qcd',
-    parameters: {
-      format: 'image/png',
-      transparent: true,
-      time: new Date().toISOString(),
-    },
-    tileWidth: 512,
-    tileHeight: 512,
-    tilingScheme: new WebMercatorTilingScheme(),
-  }), []);
+  // const weatherLayer = useMemo(() => new WebMapServiceImageryProvider({
+  //   url: 'https://opengeo.ncep.noaa.gov/geoserver/conus/conus_bref_qcd/ows?',
+  //   layers: 'conus_bref_qcd',
+  //   parameters: {
+  //     format: 'image/png',
+  //     transparent: true,
+  //     time: new Date().toISOString(),
+  //   },
+  //   tileWidth: 512,
+  //   tileHeight: 512,
+  //   tilingScheme: new WebMercatorTilingScheme(),
+  // }), []);
 
   return (
     <>
@@ -321,7 +333,7 @@ export default function MapPanel({ aircraft, radios, selectedAircraftCallsign, o
 
         <Entities aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={onSelectAircraft} />
 
-        <ImageryLayer imageryProvider={weatherLayer} alpha={0.5} />
+        {weatherLayer && <ImageryLayer imageryProvider={weatherLayer} alpha={0.5} minificationFilter={TextureMinificationFilter.NEAREST} magnificationFilter={TextureMagnificationFilter.NEAREST}  />}
       </Viewer>
     </>
   )

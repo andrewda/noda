@@ -199,8 +199,8 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
 
     if (armedCommand?.status === 'success') {
       console.log('setting reset timeout')
-      const resetTimeout = setTimeout(() => setArmedCommand(undefined), 3000);
-      setResetTimeout(resetTimeout);
+      const newResetTimeout = setTimeout(() => setArmedCommand(undefined), 3000);
+      setResetTimeout(newResetTimeout);
     }
   }, [armedCommand]);
 

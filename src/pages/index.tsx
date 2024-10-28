@@ -33,8 +33,9 @@ function radiosReducer(state: Record<string, RadioCommunicationBoard>, action: a
 
 export default function Home() {
   const socket = useSocket();
-  const { aircraft } = useSimulation();
-  const [radios, setRadios] = useState<Partial<RadioCommunicationBoard>[]>([{}, {}, {}, {}, {}, {}, {}, {}]);
+  const { aircraft, weather } = useSimulation();
+  // const [radios, setRadios] = useState<Partial<RadioCommunicationBoard>[]>([{}, {}, {}, {}, {}, {}, {}, {}]);
+  const [radios, setRadios] = useState<Record<string, RadioCommunicationBoard>>({});
 
   const [connectionState, setConnectionState] = useState<'connected' | 'disconnected'>(socket?.connected ? 'connected' : 'disconnected');
   const [selectedAircraftCallsign, setSelectedAircraftCallsign] = useState<string | undefined>(undefined);
@@ -49,12 +50,12 @@ export default function Home() {
   const localAudioMonitors = useAudioMonitor(localTracks);
 
   useEffect(() => {
-    setRadios((radios) => radios.map((radio, idx) => ({
+    setRadios((radios) => Object.fromEntries(Object.entries(radios).map(([id, radio], idx) => ([id, {
       ...radio,
-      aircraft: Object.keys(aircraft)[idx],
+      aircraft: id,
       receiving: remoteAudioMonitors.get(idx) ?? false,
       transmitting: localAudioMonitors.get(idx) ?? false,
-    })));
+    }]))));
   }, [aircraft, remoteAudioMonitors, localAudioMonitors]);
 
   return (
@@ -72,7 +73,7 @@ export default function Home() {
         <ResizablePanes uniqueId="one" className="flex-1">
           <Pane id="P0" size={3}>
             <Toaster position="top-left" containerStyle={{ position: 'relative' }} />
-            <MapPanel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
+            <MapPanel weather={weather} aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
           </Pane>
           <Pane id="P1" size={1} minSize={1}>
             <TimelinePanel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />

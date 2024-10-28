@@ -6,6 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useSimulation } from '@/hooks/use-simulation';
 import { useSocket, useSocketEvent } from '@/lib/socket';
+import { Combobox } from '@/components/ui/combobox';
+
+import configs from './configs.json';
 
 export default function ExperimenterPage() {
   const socket = useSocket();
@@ -13,26 +16,30 @@ export default function ExperimenterPage() {
 
   const [connectionState, setConnectionState] = useState<'connected' | 'disconnected'>(socket?.connected ? 'connected' : 'disconnected');
 
-  const { lastMessageTime, aircraft } = useSimulation();
+  const { lastMessageTime, aircraft, weather } = useSimulation();
 
   const commandInit = () => {
     socket?.emit('runSimulation', 'StudyFullFlight');
 
     // TODO: this is a little hacky, but it works for now
+    // TODO: get value from config (combobox selection), and send weather. weather will be stored in AirTrafficSim and sent to the client
     setTimeout(() => {
       socket?.emit('command', {
         aircraft: null,
         command: 'init',
-        payload: [
-          { callsign: 'HMT 110', departure_airport: 'KPDX', departure_runway: 'RW28L', arrival_airport: 'KCVO', arrival_runway: 'RW17', approach: 'R17', flight_plan: ['YIBPU', 'ADLOW'] },
-          { callsign: 'HMT 120', departure_airport: 'KPDX', departure_runway: 'RW28L', arrival_airport: 'KSLE', arrival_runway: 'RW13', approach: 'R13', flight_plan: ['YIBPU', 'UBG'] },
-          { callsign: 'HMT 130', departure_airport: 'KPDX', departure_runway: 'RW28L', arrival_airport: 'KMMV', arrival_runway: 'RW22', approach: 'R22', flight_plan: ['YIBPU', 'MULES', 'OSWEG', 'OZIER'] },
-          { callsign: 'HMT 140', departure_airport: 'KPDX', departure_runway: 'RW28L', arrival_airport: 'KRDM', arrival_runway: 'RW11', approach: 'R11', flight_plan: ['YIBPU', 'CUKIS', 'JJACE', 'JJETT', 'YONKU'] },
+        payload: {
+          weather: 'heavy',
+          aircraft: [
+            { callsign: 'HMT 110', departure_airport: 'KPDX', departure_runway: 'RW28L', arrival_airport: 'KCVO', arrival_runway: 'RW17', approach: 'R17', flight_plan: ['YIBPU', 'ADLOW'] },
+            { callsign: 'HMT 120', departure_airport: 'KPDX', departure_runway: 'RW28L', arrival_airport: 'KSLE', arrival_runway: 'RW13', approach: 'R13', flight_plan: ['YIBPU', 'UBG'] },
+            { callsign: 'HMT 130', departure_airport: 'KPDX', departure_runway: 'RW28L', arrival_airport: 'KMMV', arrival_runway: 'RW22', approach: 'R22', flight_plan: ['YIBPU', 'MULES', 'OSWEG', 'OZIER'] },
+            { callsign: 'HMT 140', departure_airport: 'KPDX', departure_runway: 'RW28L', arrival_airport: 'KRDM', arrival_runway: 'RW11', approach: 'R11', flight_plan: ['YIBPU', 'CUKIS', 'JJACE', 'JJETT', 'YONKU'] },
 
-          { callsign: 'HMT 150', departure_airport: 'KPDX', departure_runway: 'RW28R', arrival_airport: 'KEUG', arrival_runway: 'RW16R', approach: 'R16R-Y', flight_plan: ['JALAG', 'OSWEG', 'MAGOT', 'SHEDD'] },
-          { callsign: 'HMT 160', departure_airport: 'KPDX', departure_runway: 'RW28R', arrival_airport: 'KHIO', arrival_runway: 'RW13R', approach: 'R13R', flight_plan: ['JALAG', 'DUCKA'] },
-          { callsign: 'HMT 170', departure_airport: 'KPDX', departure_runway: 'RW28R', arrival_airport: 'KKLS', arrival_runway: 'RW12', approach: 'R12', flight_plan: ['JALAG', 'LOATH', 'AMAVE'] },
-        ]
+            { callsign: 'HMT 150', departure_airport: 'KPDX', departure_runway: 'RW28R', arrival_airport: 'KEUG', arrival_runway: 'RW16R', approach: 'R16R-Y', flight_plan: ['JALAG', 'OSWEG', 'MAGOT', 'SHEDD'] },
+            { callsign: 'HMT 160', departure_airport: 'KPDX', departure_runway: 'RW28R', arrival_airport: 'KHIO', arrival_runway: 'RW13R', approach: 'R13R', flight_plan: ['JALAG', 'DUCKA'] },
+            { callsign: 'HMT 170', departure_airport: 'KPDX', departure_runway: 'RW28R', arrival_airport: 'KKLS', arrival_runway: 'RW12', approach: 'R12', flight_plan: ['JALAG', 'LOATH', 'AMAVE'] },
+          ]
+        }
       });
     }, 2000);
   };
@@ -42,10 +49,17 @@ export default function ExperimenterPage() {
     setValue('takeoffAircraft', '');
   };
 
-  const startSimulation = () => {
-    socket?.emit('runSimulation', getValues('simulationName'));
-    setValue('simulationName', '');
-  };
+  const commandRemove = () => {
+    const callsign = getValues('removeAircraft');
+
+    if (aircraft[callsign].flightPhase < 10) {
+      const confirmation = confirm(`Aircraft ${callsign} has not yet landed. Are you sure you want to delete it?`);
+      if (!confirmation) return;
+    }
+
+    socket?.emit('command', { aircraft: callsign, command: 'delete' });
+    setValue('removeAircraft', '');
+  }
 
   useSocketEvent('connect', () => setConnectionState('connected'));
   useSocketEvent('disconnect', () => setConnectionState('disconnected'));
@@ -61,6 +75,7 @@ export default function ExperimenterPage() {
         <div className="w-96 flex flex-col gap-4">
           <div className="flex gap-4">
             {/* <Input className="flex-1" type="text" placeholder="Simulation Name" {...register('simulationName')} /> */}
+            <Combobox className="w-full" label="Simulation Name" options={configs.groups.map(({ name }, index) => ({ label: name, value: index.toString() }))} />
             <Button className="w-36" onClick={commandInit}>Start Simulation</Button>
           </div>
 
@@ -70,8 +85,8 @@ export default function ExperimenterPage() {
           </div>
 
           <div className="flex gap-4">
-            <Input className="flex-1" type="text" placeholder="Weather Event" {...register('weatherEvent')} />
-            <Button className="w-36" disabled={watch('weatherEvent') === ''} onClick={commandTakeoff}>Begin Weather</Button>
+            <Input className="flex-1" type="text" placeholder="Aircraft Callsign" {...register('removeAircraft')} />
+            <Button className="w-36" disabled={watch('removeAircraft') === ''} onClick={commandRemove}>Remove</Button>
           </div>
         </div>
 
@@ -91,7 +106,7 @@ export default function ExperimenterPage() {
       </div>
 
       <div className="w-full h-full flex-1">
-        <MapPanel aircraft={aircraft} radios={{}} selectedAircraftCallsign={undefined} onSelectAircraft={undefined} />
+        <MapPanel weather={weather} aircraft={aircraft} radios={{}} selectedAircraftCallsign={undefined} onSelectAircraft={undefined} />
       </div>
     </div>
   )
