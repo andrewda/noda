@@ -3,6 +3,21 @@
 import { useSocket, useSocketEvent } from '@/lib/socket';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Socket } from 'socket.io-client';
+import * as Tone from 'tone';
+
+import { polarDegToXyz } from './spatial';
+
+const polarPositions: [number, number, number][] = [
+  [-110, -60, 3],
+  [-20, -60, 3],
+  [20, -60, 3],
+  [110, -60, 3],
+
+  [-110, 60, 3],
+  [-20, 60, 3],
+  [20, 60, 3],
+  [110, 60, 3],
+];
 
 export const useLocalStream = () => {
   const [stream, setStream] = useState<MediaStream | undefined>();
@@ -16,6 +31,7 @@ export const useLocalStream = () => {
 
       navigator.mediaDevices.getUserMedia({ audio: true })
         .then((mediaStream) => {
+          Tone.start().then(() => console.log('Tone started'));
           setStream(mediaStream);
         })
         .catch((err) => {
@@ -65,18 +81,76 @@ export const usePeerConnection = ({ streamCount }: { streamCount: number }) => {
   useEffect(() => {
     if (!peerConnection) return;
 
-    peerConnection.ontrack = (event) => {
+    const audioContext = new AudioContext();
+
+    peerConnection.ontrack = async (event) => {
       const { track } = event;
+
+      await audioContext.resume();
 
       remoteStream?.addTrack(track);
 
-      // Create an audio element for this track
-      const remoteAudio = new Audio();
-      remoteAudio.srcObject = new MediaStream([track]);
-      remoteAudio.play();
-
       // Match incoming tracks to the correct index
       const trackIndex = (remoteStream?.getTracks().length ?? 0) - 1;
+
+      const mediaStream = new MediaStream([track]);
+
+      // Fixes audio rendering on Chrome: https://issues.chromium.org/issues/40184923#comment128
+      const audioElement = new Audio();
+      audioElement.muted = true;
+      audioElement.srcObject = mediaStream;
+
+      const mediaStreamSource = Tone.getContext().createMediaStreamSource(mediaStream);
+      const gainNode = new Tone.Gain(1.0);
+      Tone.connect(mediaStreamSource, gainNode);
+
+      const distortion = new Tone.Distortion(0.1);
+
+      const highpass = new Tone.Filter({
+        type: 'highpass',
+        frequency: 300,
+        rolloff: -48,
+      });
+
+      const lowpass = new Tone.Filter({
+        type: 'lowpass',
+        frequency: 2700,
+        rolloff: -48,
+      });
+
+      const noise = new Tone.Noise('pink').start();
+      const noiseGain = new Tone.Gain(0.02);
+      noise.connect(noiseGain);
+
+      const follower = new Tone.Follower(0.1);
+      gainNode.connect(follower);
+
+      const threshold = new Tone.GreaterThan(0.001); // Adjust the threshold as needed
+      follower.connect(threshold);
+
+      // Multiply the threshold output to scale the gain
+      const scaler = new Tone.Multiply(0.05);
+      threshold.connect(scaler);
+
+      // Use the scaler output to control the gain of the noiseGain node
+      scaler.connect(noiseGain.gain);
+
+      noiseGain.connect(highpass);
+      gainNode.connect(distortion).connect(highpass)
+      highpass.connect(lowpass);
+
+      const position = polarDegToXyz(...polarPositions[trackIndex]);
+      const panner = new Tone.Panner3D({
+        panningModel: 'HRTF',
+        rolloffFactor: 1,
+        ...position,
+      });
+
+      // Only use distorted audio for participant
+      const audioNode = window.location.pathname === '/webrtc' ? lowpass : gainNode;
+
+      audioNode.connect(new Tone.Gain(3.0)).connect(panner);
+      panner.toDestination();
 
       setRemoteTracks((tracks) => new Map(tracks.set(trackIndex, track)));
     };
@@ -171,6 +245,36 @@ const loadAudioBuffer = async (audioContext: AudioContext, url: string) => fetch
     .then(response => response.arrayBuffer())
     .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer));
 
+const createMicrophoneStream = (micTrack: MediaStreamTrack, audioClip?: string, applyEffects?: boolean) => {
+  const audioContext = new AudioContext();
+  const destination = audioContext.createMediaStreamDestination();
+
+  // Microphone source
+  const micSource = audioContext.createMediaStreamSource(new MediaStream([micTrack]));
+
+  // Mic GainNode
+  const micGain = audioContext.createGain();
+  micGain.gain.value = 0; // Initially muted
+
+  // Connect mic to micGain
+  micSource.connect(micGain);
+
+  // Pre-recorded audio source
+  // const clipBuffer = await loadAudioBuffer(audioContext, '/clips/clip1.wav');
+  // const clipGain = audioContext.createGain();
+  // clipGain.gain.value = 0; // Initially muted
+
+  // Connect gains to destination
+  micGain.connect(destination);
+  // clipGain.connect(destination);
+
+  // Create MediaStreamTrack from destination
+  const outputStream = destination.stream;
+  const outputTrack = outputStream.getAudioTracks()[0];
+
+  return { audioContext, micGain, outputStream, outputTrack };
+}
+
 /**
  * Create an offer as the Experimenter.
  * @returns
@@ -183,39 +287,16 @@ const createOffer = async ({ socket, localStream, peerConnection, streamCount }:
   const micTrack = localStream.getAudioTracks()[0];
 
   for (let i = 0; i < streamCount; i++) {
-    const audioContext = new AudioContext();
-    const destination = audioContext.createMediaStreamDestination();
-
-    // Microphone source
-    const micSource = audioContext.createMediaStreamSource(new MediaStream([micTrack]));
-
-    // Mic GainNode
-    const micGain = audioContext.createGain();
-    micGain.gain.value = 0; // Initially muted
-
-    // Connect mic to micGain
-    micSource.connect(micGain);
-
-    // Pre-recorded audio source
-    // const clipBuffer = await loadAudioBuffer(audioContext, '/clips/clip1.wav');
-    // const clipGain = audioContext.createGain();
-    // clipGain.gain.value = 0; // Initially muted
-
-    // Connect gains to destination
-    micGain.connect(destination);
-    // clipGain.connect(destination);
-
-    // Create MediaStreamTrack from destination
-    const outputStream = destination.stream;
-    const outputTrack = outputStream.getAudioTracks()[0];
+    const { audioContext, micGain, outputStream, outputTrack } = createMicrophoneStream(micTrack);
 
     // trackControls.set(i, { micGain, clipGain, audioContext, clipBuffer, outputTrack });
     trackControls.set(i, { micGain, audioContext, outputTrack });
-
     peerConnection.addTrack(outputTrack, outputStream);
   }
 
   const offer = await peerConnection.createOffer();
+  offer.sdp = offer.sdp?.replace('useinbandfec=1', 'useinbandfec=1;usedtx=1;stereo=0;maxaveragebitrate=510000');
+
   await peerConnection.setLocalDescription(offer);
   socket?.emit('webrtc', { event: 'offer', data: peerConnection.localDescription });
 
@@ -234,28 +315,9 @@ const acceptOffer = async ({ socket, localStream, peerConnection, remoteDescript
   const micTrack = localStream.getAudioTracks()[0];
 
   for (let i = 0; i < streamCount; i++) {
-    const audioContext = new AudioContext();
-    const destination = audioContext.createMediaStreamDestination();
-
-    // Microphone source
-    const micSource = audioContext.createMediaStreamSource(new MediaStream([micTrack]));
-
-    // Mic GainNode
-    const micGain = audioContext.createGain();
-    micGain.gain.value = 0; // Initially muted
-
-    // Connect mic to micGain
-    micSource.connect(micGain);
-
-    // Connect gains to destination
-    micGain.connect(destination);
-
-    // Create MediaStreamTrack from destination
-    const outputStream = destination.stream;
-    const outputTrack = outputStream.getAudioTracks()[0];
+    const { audioContext, micGain, outputStream, outputTrack } = createMicrophoneStream(micTrack);
 
     trackControls.set(i, { micGain, audioContext, outputTrack });
-
     peerConnection.addTrack(outputTrack, outputStream);
   }
 

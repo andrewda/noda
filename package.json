@@ -37,7 +37,8 @@
     "resizable-panes-react": "^6.0.25",
     "socket.io-client": "^4.8.0",
     "tailwind-merge": "^2.5.3",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "tone": "^15.0.4"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
