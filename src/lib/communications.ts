@@ -147,7 +147,7 @@ export const usePeerConnection = ({ streamCount }: { streamCount: number }) => {
       });
 
       // Only use distorted audio for participant
-      const audioNode = window.location.pathname === '/webrtc' ? lowpass : gainNode;
+      const audioNode = window.location.pathname === '/' ? lowpass : gainNode;
 
       audioNode.connect(new Tone.Gain(3.0)).connect(panner);
       panner.toDestination();
