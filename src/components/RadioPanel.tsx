@@ -64,8 +64,8 @@ function Radio({ radio, selected, className, onSelect, setMonitoring, setTransmi
       </div>
       <div className="flex self-stretch px-1 justify-between items-start gap-5">
         <div className="flex-col flex-shrink-0 gap-1.5 justify-between items-center flex">
-          <Monitor height={16} className={`cursor-pointer hover:brightness-75 ${radio.monitoring ? 'text-teal-400' : 'text-gray-300'}`} onClick={() => setMonitoring(!radio.monitoring)} />
-          <Transmit height={16} className={`cursor-pointer hover:brightness-75 ${radio.transmitting ? 'text-teal-400' : 'text-gray-300'}`} onMouseDown={() => setTransmitting(true)} onMouseUp={() => setTransmitting(false)} />
+          <Monitor height={16} className={`cursor-pointer hover:brightness-75 ${radio.monitoring ? 'text-teal-400 drop-shadow-[0_0_4px]' : 'text-gray-300/60'}`} onClick={() => setMonitoring(!radio.monitoring)} />
+          <Transmit height={16} className={`cursor-pointer hover:brightness-75 ${radio.transmitting ? 'text-teal-400 drop-shadow-[0_0_4px]' : 'text-gray-300/60'}`} onMouseDown={() => setTransmitting(true)} onMouseUp={() => setTransmitting(false)} />
         </div>
         <div className="flex flex-grow flex-col justify-between items-end h-full min-w-0">
           <div className="inline-flex justify-end items-center gap-1 cursor-pointer text-gray-200 hover:brightness-75">

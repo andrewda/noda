@@ -10,6 +10,7 @@ import { Pane, ResizablePanes } from 'resizable-panes-react'
 import { useSimulation } from '@/hooks/use-simulation'
 import { useSocket, useSocketEvent } from '@/lib/socket'
 import { useAudioMonitor, usePeerConnection } from '@/lib/communications'
+import { useButtonPanels } from '@/hooks/use-button-panel'
 
 const MapPanel = dynamic(
   () => import('../components/MapPanel'),
@@ -66,9 +67,14 @@ export default function Home() {
     }]))));
   }, [aircraft, remoteAudioMonitors, localAudioMonitors]);
 
+  const onToggleMonitoring = useCallback((radioIdx: number) => {
+    console.log('toggling radio idx ', radioIdx);
+    setRadios((radios) => Object.fromEntries(Object.entries(radios).map(([id, radio], idx) => ([id, { ...radio, monitoring: (idx === radioIdx ? !radio.monitoring : radio.monitoring) }]))));
+  }, []);
+
   const onMonitoringChange = useCallback((radioIdx: number, monitoring: boolean) => {
     setRadios((radios) => Object.fromEntries(Object.entries(radios).map(([id, radio], idx) => ([id, { ...radio, monitoring: (idx === radioIdx ? monitoring : radio.monitoring) }]))));
-  }, [trackControls]);
+  }, []);
 
   const onTransmittingChange = useCallback((radioIdx: number, transmitting: boolean) => {
     setRadios((radios) => Object.fromEntries(Object.entries(radios).map(([id, radio], idx) => ([id, { ...radio, transmitting: (idx === radioIdx ? transmitting : radio.transmitting) }]))));
@@ -78,6 +84,25 @@ export default function Home() {
       micGain.gain.value = transmitting ? 1 : 0;
     }
   }, [trackControls]);
+
+  // useEffect(() => {
+  //   Object.values(radios).forEach((radio, idx) => {
+  //     const { micGain, outputTrack } = trackControls.get(idx) ?? {};
+
+  //     // console.log(radio, idx, micGain, outputTrack);
+  //     // console.log(idx, radio.transmitting, radio.receiving);
+
+  //     if (micGain) {
+  //       micGain.gain.value = radio.transmitting ? 1 : 0;
+  //     }
+
+  //     if (outputTrack) {
+  //       outputTrack.enabled = radio.receiving;
+  //     }
+  //   });
+  // }, [radios, trackControls]);
+
+  useButtonPanels({ onTransmitting: onTransmittingChange, onToggleMonitoring: onToggleMonitoring, radios });
 
   return (
     <>
