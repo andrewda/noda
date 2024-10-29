@@ -193,7 +193,7 @@ const FlightPlan = ({ polylinePositions, waypointNames, show }: { polylinePositi
   );
 }
 
-const Aircraft = ({ aircraft, position, polylinePositions, selected, onSelectAircraft }: { aircraft: AircraftStateBoard, position: SampledPositionProperty | undefined, polylinePositions: Cartesian3[] | undefined, selected: boolean, onSelectAircraft: ((aircraftCallsign: string | undefined) => void) | undefined }) => {
+const Aircraft = ({ aircraft, position, polylinePositions, receiving, selected, onSelectAircraft }: { aircraft: AircraftStateBoard, position: SampledPositionProperty | undefined, polylinePositions: Cartesian3[] | undefined, receiving: boolean, selected: boolean, onSelectAircraft: ((aircraftCallsign: string | undefined) => void) | undefined }) => {
   if (!position) return <></>;
 
   const entityColor = selected ? Color.MAGENTA : Color.WHITE;
@@ -209,7 +209,7 @@ const Aircraft = ({ aircraft, position, polylinePositions, selected, onSelectAir
         path={{ leadTime: 0, trailTime: 60, show: true, width: 3 }}
         onClick={() => onSelectAircraft?.(aircraft.callsign)}
       >
-        <LabelEntity position={position} aircraft={aircraft} receiving={/*radios?.[aircraft.callsign]?.receiving ??*/ false} selected={selected} onClick={() => onSelectAircraft?.(aircraft.callsign)} />
+        <LabelEntity position={position} aircraft={aircraft} receiving={receiving} selected={selected} onClick={() => onSelectAircraft?.(aircraft.callsign)} />
 
         <Rings position={position} show={selected} />
         <FlightPlan polylinePositions={polylinePositions} waypointNames={aircraft.flightPlan} show={selected} />
@@ -248,7 +248,7 @@ export function Entities({ aircraft, radios, selectedAircraftCallsign, onSelectA
     });
   }, [aircraft, sampledPositionMap]);
 
-  return Object.values(aircraft ?? {}).map((aircraft) => <Aircraft key={aircraft.callsign} aircraft={aircraft} position={sampledPositionMap.get(aircraft.callsign)} polylinePositions={polylinePositionsMap.get(aircraft.callsign)} selected={aircraft.callsign === selectedAircraftCallsign} onSelectAircraft={onSelectAircraft} />);
+  return Object.values(aircraft ?? {}).map((aircraft, idx) => <Aircraft key={aircraft.callsign} aircraft={aircraft} position={sampledPositionMap.get(aircraft.callsign)} polylinePositions={polylinePositionsMap.get(aircraft.callsign)} receiving={radios?.[idx]?.receiving ?? false} selected={aircraft.callsign === selectedAircraftCallsign} onSelectAircraft={onSelectAircraft} />);
 }
 
 type MapPanelProps = {
@@ -269,15 +269,8 @@ export default function MapPanel({ aircraft, weather, radios, selectedAircraftCa
     if (!weather) return undefined;
 
     return SingleTileImageryProvider.fromUrl(
-      // '/weather/radar_nominal.png',
       `/weather/radar_${weather}.png`,
       {
-        // rectangle: Rectangle.fromDegrees(
-        //   -129.45,
-        //   40.22,
-        //   -109.25,
-        //   49.93,
-        // ),
         rectangle: Rectangle.fromDegrees(
           -127.85,
           40.85,

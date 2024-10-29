@@ -145,7 +145,7 @@ type AircraftListProps = {
 function AircraftListGutter({ aircraft, radios, selectedAircraftCallsign, onSelectAircraft }: AircraftListProps) {
   return (
     <div className="flex flex-col w-32 min-w-32 items-center self-stretch">
-      {Object.values(aircraft).map((aircraftStateBoard) => (
+      {Object.values(aircraft).map((aircraftStateBoard, idx) => (
         <div
           key={aircraftStateBoard.callsign}
           className={`flex flex-col items-start self-stretch pl-3 pr-2 pt-3 pb-3 cursor-pointer border-gray-400 border-b-2 hover:brightness-125 ${aircraftStateBoard.callsign === selectedAircraftCallsign ? 'text-fuchsia-400 bg-fuchsia-950/30' : 'text-gray-400'}`}
@@ -156,7 +156,7 @@ function AircraftListGutter({ aircraft, radios, selectedAircraftCallsign, onSele
             <div className="flex flex-col justify-center items-start w-full">
               <div className="flex items-center justify-between font-mono text-sm pl-[1px] w-full">
                 {aircraftStateBoard.callsign}
-                <MonitorIndicator receive={radios?.[aircraftStateBoard.callsign]?.receiving ?? false} className="w-3 h-3" />
+                <MonitorIndicator receive={radios?.[idx]?.receiving ?? false} className="w-3 h-3" />
               </div>
               <div className="font-normal text-xs">{getFlightPhaseString(aircraftStateBoard.flightPhase)}</div>
             </div>
@@ -325,7 +325,7 @@ type C2PanelProps = {
 }
 export default function C2Panel({ aircraft, radios, selectedAircraftCallsign, onSelectAircraft }: C2PanelProps) {
   const selectedAircraft = useMemo(() => selectedAircraftCallsign !== undefined ? aircraft[selectedAircraftCallsign] : undefined, [aircraft, selectedAircraftCallsign]);
-  const selectedRadio = useMemo(() => selectedAircraftCallsign !== undefined ? radios?.[selectedAircraftCallsign] : undefined, [radios, selectedAircraftCallsign]);
+  const selectedRadio = useMemo(() => selectedAircraftCallsign !== undefined ? Object.values(radios ?? {}).find((radio) => radio.aircraft === selectedAircraftCallsign) : undefined, [radios, selectedAircraftCallsign]);
 
   return (
     <div className="flex flex-row flex-grow">

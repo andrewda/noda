@@ -30,10 +30,10 @@ type RadioProps = {
   selected: boolean;
   className?: string;
   onSelect: () => void;
+  setMonitoring: (monitoring: boolean) => void;
+  setTransmitting: (transmitting: boolean) => void;
 }
-function Radio({ radio, selected, className, onSelect }: RadioProps) {
-  const monitoring = true;
-  const transmitting = false;
+function Radio({ radio, selected, className, onSelect, setMonitoring, setTransmitting }: RadioProps) {
 
   const handleBlur = (event: any) => {
     let value = parseFloat(event.target.value);
@@ -64,8 +64,8 @@ function Radio({ radio, selected, className, onSelect }: RadioProps) {
       </div>
       <div className="flex self-stretch px-1 justify-between items-start gap-5">
         <div className="flex-col flex-shrink-0 gap-1.5 justify-between items-center flex">
-          <Monitor height={16} className={`cursor-pointer hover:brightness-75 ${monitoring ? 'text-teal-400' : 'text-gray-300'}`} />
-          <Transmit height={16} className={`cursor-pointer hover:brightness-75 ${transmitting ? 'text-teal-400' : 'text-gray-300'}`} />
+          <Monitor height={16} className={`cursor-pointer hover:brightness-75 ${radio.monitoring ? 'text-teal-400' : 'text-gray-300'}`} onClick={() => setMonitoring(!radio.monitoring)} />
+          <Transmit height={16} className={`cursor-pointer hover:brightness-75 ${radio.transmitting ? 'text-teal-400' : 'text-gray-300'}`} onMouseDown={() => setTransmitting(true)} onMouseUp={() => setTransmitting(false)} />
         </div>
         <div className="flex flex-grow flex-col justify-between items-end h-full min-w-0">
           <div className="inline-flex justify-end items-center gap-1 cursor-pointer text-gray-200 hover:brightness-75">
@@ -109,12 +109,21 @@ type RadioPanelProps = {
   selectedAircraftCallsign: string | undefined;
   radios: Record<string, RadioCommunicationBoard>;
   onSelectAircraft: (aircraftCallsign: string | undefined) => void;
+  onMonitoringChange: (radio: number, monitoring: boolean) => void;
+  onTransmittingChange: (radio: number, transmitting: boolean) => void;
 }
-export default function RadioPanel({ radios, selectedAircraftCallsign, onSelectAircraft }: RadioPanelProps) {
+export default function RadioPanel({ radios, selectedAircraftCallsign, onSelectAircraft, onMonitoringChange, onTransmittingChange }: RadioPanelProps) {
   return (
     <div className="grid grid-cols-4 gap-4 m-3">
       {Object.values(radios).filter((radio, idx) => radio.aircraft || (idx === (Object.keys(radios).length ?? 0) - 1)).map((radio, i) => (
-        <Radio key={i} radio={radio} selected={radio.aircraft ? radio.aircraft === selectedAircraftCallsign : false} onSelect={() => radio.aircraft ? onSelectAircraft(radio.aircraft) : null} className="last:col-start-4 justify-self-center" />
+        <Radio
+          key={i}
+          radio={radio}
+          selected={radio.aircraft ? radio.aircraft === selectedAircraftCallsign : false}
+          onSelect={() => radio.aircraft ? onSelectAircraft(radio.aircraft) : null}
+          setMonitoring={(monitoring) => onMonitoringChange(i, monitoring)}
+          setTransmitting={(transmitting) => onTransmittingChange(i, transmitting)}
+          className="last:col-start-4 justify-self-center" />
       ))}
     </div>
   );

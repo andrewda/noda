@@ -199,7 +199,7 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
         <div key={i} className={`h-6 flex items-center gap-2 self-stretch absolute cursor-pointer hover:brightness-75 ${d.aircraft === selectedAircraftCallsign ? "text-fuchsia-400" : "text-gray-200"}`} style={{top: yDom(i + 1) - 12, right: 0}} onClick={() => onSelectAircraft(d.aircraft)}>
           <Ownship width={18} height={18} />
           <div className="font-mono text-sm">{d.aircraft}</div>
-          <MonitorIndicator receive={false} className="w-3.5 h-3.5" />
+          <MonitorIndicator receive={radios?.[i]?.receiving ?? false} className="w-3.5 h-3.5" />
         </div>
       )}
     </div>

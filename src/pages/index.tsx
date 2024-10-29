@@ -3,7 +3,7 @@ import RadioPanel, { RadioCommunicationBoard } from '@/components/RadioPanel'
 import TimelinePanel from '@/components/TimelinePanel'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
-import { useEffect, useMemo, useReducer, useState } from 'react'
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import { Toaster } from 'react-hot-toast'
 import { Pane, ResizablePanes } from 'resizable-panes-react'
 
@@ -31,11 +31,20 @@ function radiosReducer(state: Record<string, RadioCommunicationBoard>, action: a
   }
 }
 
+const makeRadio = (id: string) => ({
+  id,
+  aircraft: undefined,
+  facility: 'KPDX TWR',
+  frequency: '123.450',
+  receiving: false,
+  monitoring: true,
+  transmitting: false,
+} as RadioCommunicationBoard)
+
 export default function Home() {
   const socket = useSocket();
   const { aircraft, weather } = useSimulation();
-  // const [radios, setRadios] = useState<Partial<RadioCommunicationBoard>[]>([{}, {}, {}, {}, {}, {}, {}, {}]);
-  const [radios, setRadios] = useState<Record<string, RadioCommunicationBoard>>({});
+  const [radios, setRadios] = useState<Record<string, RadioCommunicationBoard>>(Object.fromEntries(Array.from(Array(8).keys()).map((i) => [i.toString(), makeRadio(i.toString())])));
 
   const [connectionState, setConnectionState] = useState<'connected' | 'disconnected'>(socket?.connected ? 'connected' : 'disconnected');
   const [selectedAircraftCallsign, setSelectedAircraftCallsign] = useState<string | undefined>(undefined);
@@ -52,11 +61,23 @@ export default function Home() {
   useEffect(() => {
     setRadios((radios) => Object.fromEntries(Object.entries(radios).map(([id, radio], idx) => ([id, {
       ...radio,
-      aircraft: id,
+      aircraft: Object.keys(aircraft)[idx],
       receiving: remoteAudioMonitors.get(idx) ?? false,
-      transmitting: localAudioMonitors.get(idx) ?? false,
     }]))));
   }, [aircraft, remoteAudioMonitors, localAudioMonitors]);
+
+  const onMonitoringChange = useCallback((radioIdx: number, monitoring: boolean) => {
+    setRadios((radios) => Object.fromEntries(Object.entries(radios).map(([id, radio], idx) => ([id, { ...radio, monitoring: (idx === radioIdx ? monitoring : radio.monitoring) }]))));
+  }, [trackControls]);
+
+  const onTransmittingChange = useCallback((radioIdx: number, transmitting: boolean) => {
+    setRadios((radios) => Object.fromEntries(Object.entries(radios).map(([id, radio], idx) => ([id, { ...radio, transmitting: (idx === radioIdx ? transmitting : radio.transmitting) }]))));
+
+    const micGain = trackControls.get(radioIdx)?.micGain;
+    if (micGain) {
+      micGain.gain.value = transmitting ? 1 : 0;
+    }
+  }, [trackControls]);
 
   return (
     <>
@@ -68,7 +89,7 @@ export default function Home() {
       <div className="flex relative h-[100vh] w-[100vw]">
         <div className="flex flex-col w-[620px]">
           <C2Panel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
-          <RadioPanel radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
+          <RadioPanel radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} onMonitoringChange={onMonitoringChange} onTransmittingChange={onTransmittingChange} />
         </div>
         <ResizablePanes uniqueId="one" className="flex-1">
           <Pane id="P0" size={3}>
