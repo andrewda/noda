@@ -1,4 +1,4 @@
-import { ComponentProps, Fragment, use, useEffect, useMemo, useRef, useState } from 'react';
+import { ComponentProps, Fragment, use, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { buildModuleUrl, Cartesian2, Cartesian3, ClockStep, Color, Ellipsoid, ExtrapolationType, Ion, IonImageryProvider, IonWorldImageryStyle, JulianDate, LabelStyle, MapboxStyleImageryProvider, Material, MaterialProperty, NearFarScalar, PolylineDashMaterialProperty, ProviderViewModel, Rectangle, ReferenceFrame, SampledPositionProperty, SceneMode, SingleTileImageryProvider, TextureMagnificationFilter, TextureMinificationFilter, TileMapServiceImageryProvider, WebMapServiceImageryProvider, WebMercatorProjection, WebMercatorTilingScheme } from 'cesium';
 import { Camera, Clock, Entity, ImageryLayer, Polyline, PolylineCollection, Scene, useCesium, Viewer } from 'resium';
@@ -143,42 +143,48 @@ const LabelEntity = ({ aircraft, receiving, selected, ...props }: { aircraft: Ai
     setImage(c);
   }, [aircraft, receiving, selected]);
 
-  return <Entity {...props} billboard={{ image, pixelOffset: new Cartesian2(65, -10), eyeOffset: new Cartesian3(0, 0, -3000) }} />;
+  const billboardProperties = useMemo(() => ({ image, pixelOffset: new Cartesian2(65, -10), eyeOffset: new Cartesian3(0, 0, -3000) }), [image]);
+
+  return <Entity {...props} billboard={billboardProperties} />;
 };
 
 
 const Rings = ({ position, show }: { position: SampledPositionProperty, show: boolean }) => {
+  const innerEllipseProperties = useMemo(() => ({
+    semiMajorAxis: (10 * 1852),
+    semiMinorAxis: (10 * 1852),
+    material: Color.RED.withAlpha(0.2),
+    outline: true,
+    outlineColor: Color.RED,
+    outlineWidth: 3,
+    numberOfVerticalLines: 0,
+    fill: false,
+  }), []);
+
+  const outerEllipseProperties = useMemo(() => ({
+    semiMajorAxis: (20 * 1852),
+    semiMinorAxis: (20 * 1852),
+    material: Color.BLUE.withAlpha(0.2),
+    outline: true,
+    outlineColor: Color.BLUE,
+    outlineWidth: 3,
+    numberOfVerticalLines: 0,
+    fill: false,
+  }), []);
+
   if (!position.getValue(JulianDate.now())) return <></>;
 
   return (
     <>
       <Entity
         position={position}
-        ellipse={{
-          semiMajorAxis: (10 * 1852),
-          semiMinorAxis: (10 * 1852),
-          material: Color.RED.withAlpha(0.2),
-          outline: true,
-          outlineColor: Color.RED,
-          outlineWidth: 3,
-          numberOfVerticalLines: 0,
-          fill: false,
-        }}
+        ellipse={innerEllipseProperties}
         show={show}
       />
 
       <Entity
         position={position}
-        ellipse={{
-          semiMajorAxis: (20 * 1852),
-          semiMinorAxis: (20 * 1852),
-          material: Color.BLUE.withAlpha(0.2),
-          outline: true,
-          outlineColor: Color.BLUE,
-          outlineWidth: 3,
-          numberOfVerticalLines: 0,
-          fill: false,
-        }}
+        ellipse={outerEllipseProperties}
         show={show}
       />
     </>
@@ -189,24 +195,37 @@ const FlightPlan = ({ polylinePositions, waypointNames, show }: { polylinePositi
   const polylineMaterial = useMemo(() => new PolylineDashMaterialProperty(), []);
   const polylineGraphics = useMemo(() => ({ positions: polylinePositions, width: 3, material: polylineMaterial }), [polylinePositions]);
 
+  const waypointDetails = useMemo(() => waypointNames.slice(0, -1).map((waypointName, i) => ({
+    waypointName,
+    position: polylinePositions?.[i],
+    label: { text: waypointName.replace(/_/g, ' '), font: 'bold 16px monospace', fillColor: Color.BLACK, showBackground: true, backgroundColor: Color.LIGHTGRAY, backgroundPadding: new Cartesian2(4, 4), style: LabelStyle.FILL, scaleByDistance: new NearFarScalar(10000, 1, 500000, 0.3) },
+  })), [polylinePositions, waypointNames]);
+
   if (!polylinePositions) return <></>;
 
   return (
     <>
       <Entity polyline={polylineGraphics} show={show} />
-      {waypointNames.slice(0, -1).map((waypointName, i) => <Entity key={waypointName}
-        show={show}
-        position={polylinePositions[i]}
-        label={{ text: waypointName.replace(/_/g, ' '), font: 'bold 16px monospace', fillColor: Color.BLACK, showBackground: true, backgroundColor: Color.LIGHTGRAY, backgroundPadding: new Cartesian2(4, 4), style: LabelStyle.FILL, scaleByDistance: new NearFarScalar(10000, 1, 500000, 0.3) }}
-      />)}
+      {waypointDetails.map(({ waypointName, position, label }) =>
+        <Entity
+          key={waypointName}
+          show={show}
+          position={position}
+          label={label}
+        />
+      )}
     </>
   );
 }
 
 const Aircraft = ({ aircraft, position, polylinePositions, receiving, selected, onSelectAircraft }: { aircraft: AircraftStateBoard, position: SampledPositionProperty | undefined, polylinePositions: Cartesian3[] | undefined, receiving: boolean, selected: boolean, onSelectAircraft: ((aircraftCallsign: string | undefined) => void) | undefined }) => {
-  if (!position) return <></>;
+  const pointProperties = useMemo(() => ({ pixelSize: 10, color: selected ? Color.MAGENTA : Color.WHITE }), [selected]);
+  const pathProperties = useMemo(() => ({ leadTime: 0, trailTime: 60, show: true, width: 3 }), []);
 
-  const entityColor = selected ? Color.MAGENTA : Color.WHITE;
+  const onClickHandler = useCallback(() => onSelectAircraft?.(aircraft.callsign), [aircraft, onSelectAircraft]);
+
+
+  if (!position) return <></>;
 
   return (
     <>
@@ -215,11 +234,11 @@ const Aircraft = ({ aircraft, position, polylinePositions, receiving, selected, 
         position={position}
         // billboard={{ image: 'images/ownship-map.svg', color: entityColor, alignedAxis: velocityVector, rotation }}
         // path={{ leadTime: -0.5, trailTime: 60, show: true, width: 10, material: new PolylineDashMaterialProperty({ color: entityColor, gapColor: Color.TRANSPARENT, dashLength: 10 }) }}
-        point={{ pixelSize: 10, color: entityColor }}
-        path={{ leadTime: 0, trailTime: 60, show: true, width: 3 }}
-        onClick={() => onSelectAircraft?.(aircraft.callsign)}
+        point={pointProperties}
+        path={pathProperties}
+        onClick={onClickHandler}
       >
-        <LabelEntity position={position} aircraft={aircraft} receiving={receiving} selected={selected} onClick={() => onSelectAircraft?.(aircraft.callsign)} />
+        <LabelEntity position={position} aircraft={aircraft} receiving={receiving} selected={selected} onClick={onClickHandler} />
 
         <Rings position={position} show={selected} />
         <FlightPlan polylinePositions={polylinePositions} waypointNames={aircraft.flightPlan} show={selected} />

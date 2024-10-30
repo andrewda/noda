@@ -172,10 +172,13 @@ export const usePeerConnection = ({ streamCount }: { streamCount: number }) => {
     switch (event) {
       case 'offer':
         if (!localStream) throw new Error('Local stream unavailable, user has not interacted with the page yet.');
+        // @ts-ignore
         acceptOffer({ socket, localStream, peerConnection, remoteDescription: data, streamCount }).then((trackControls) => setTrackControls(trackControls));
         break;
       case 'answer':
         if (data) {
+          console.log('in webrtcCallback - answer', peerConnection.connectionState, peerConnection.signalingState, peerConnection.remoteDescription, Date.now());
+          if (peerConnection.signalingState === 'stable') return;
           peerConnection.setRemoteDescription(data);
         }
         break;
@@ -308,6 +311,9 @@ const createOffer = async ({ socket, localStream, peerConnection, streamCount }:
  */
 const acceptOffer = async ({ socket, localStream, peerConnection, remoteDescription, streamCount }: { socket: Socket | undefined, localStream: MediaStream, peerConnection: RTCPeerConnection, remoteDescription: RTCSessionDescriptionInit, streamCount: number }) => {
   const trackControls = new Map<number, { micGain: GainNode, audioContext: AudioContext, outputTrack: MediaStreamTrack }>();
+
+  console.log('in acceptOffer', peerConnection.connectionState, peerConnection.signalingState, peerConnection.remoteDescription, peerConnection.localDescription);
+  if (peerConnection.signalingState !== 'stable') return;
 
   await peerConnection.setRemoteDescription(remoteDescription);
 
