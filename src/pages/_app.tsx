@@ -11,7 +11,7 @@ function MyApp({ Component, pageProps }: any) {
         <link rel="stylesheet" href="cesium/Widgets/widgets.css" />
       </Head>
       <SocketProvider>
-        <ThemeProvider attribute="class" defaultTheme="dark">
+        <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" enableSystem={false}>
           <Component {...pageProps} />
         </ThemeProvider>
       </SocketProvider>

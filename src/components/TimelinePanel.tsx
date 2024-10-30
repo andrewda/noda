@@ -28,6 +28,7 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
         return {
           line: i + 1,
           aircraft: aircraftStateBoard.callsign,
+          flightPhase: aircraftStateBoard.flightPhase,
           start: 0,
           end: 0,
           times: [],
@@ -52,6 +53,7 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
       return {
         line: i + 1,
         aircraft: aircraftStateBoard.callsign,
+        flightPhase: aircraftStateBoard.flightPhase,
         start: 0,
         end: endTimeSeconds,
         times: waypointTimes,
@@ -195,13 +197,22 @@ export default function TimelinePanel({ aircraft, radios, selectedAircraftCallsi
 
   return <div className="w-full h-full flex flex-row bg-neutral-900">
     <div className="relative w-full basis-32 flex-shrink-0">
-      {timelines.map((d, i) =>
-        <div key={i} className={`h-6 flex items-center gap-2 self-stretch absolute cursor-pointer hover:brightness-75 ${d.aircraft === selectedAircraftCallsign ? "text-fuchsia-400" : "text-gray-200"}`} style={{top: yDom(i + 1) - 12, right: 0}} onClick={() => onSelectAircraft(d.aircraft)}>
+      {timelines.map(({ aircraft, flightPhase }, i) => {
+        let aircraftColor = 'text-gray-200';
+        if (flightPhase <= 2 || flightPhase >= 10) {
+          // Aircraft on the ground
+          aircraftColor = 'text-gray-400/60';
+        }
+        if (aircraft === selectedAircraftCallsign) {
+          aircraftColor = 'text-fuchsia-400';
+        }
+
+        return <div key={i} className={`h-6 flex items-center gap-2 self-stretch absolute cursor-pointer hover:brightness-75 ${aircraftColor}`} style={{top: yDom(i + 1) - 12, right: 0}} onClick={() => onSelectAircraft(aircraft)}>
           <Ownship width={18} height={18} />
-          <div className="font-mono text-sm">{d.aircraft}</div>
+          <div className="font-mono text-sm">{aircraft}</div>
           <MonitorIndicator receive={radios?.[i]?.receiving ?? false} className="w-3.5 h-3.5" />
         </div>
-      )}
+      })}
     </div>
     <div id="timeline-container" className="relative w-full min-w-0 flex-shrink flex-grow" ref={ref}></div>
   </div>;

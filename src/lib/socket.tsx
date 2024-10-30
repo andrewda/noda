@@ -3,13 +3,15 @@ import { io, Socket } from 'socket.io-client';
 
 const getSocketUrl = () => {
   if (typeof window === 'undefined') {
-    console.log('Not in browser');
     return 'https://localhost:6111';
   }
 
+  // TODO: allow this to be a query param
   const url = new URL(window.location.href);
   url.pathname = '/';
-  url.port = '6111';
+  if (url.port === '3000') {
+    url.port = '6111';
+  }
 
   return url.toString();
 }

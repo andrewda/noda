@@ -60,6 +60,12 @@ export default function Home() {
   const localAudioMonitors = useAudioMonitor(localTracks);
 
   useEffect(() => {
+    if (!selectedAircraftCallsign && Object.keys(aircraft).length > 0) {
+      setSelectedAircraftCallsign(Object.keys(aircraft)[0]);
+    };
+  }, [aircraft, selectedAircraftCallsign])
+
+  useEffect(() => {
     setRadios((radios) => Object.fromEntries(Object.entries(radios).map(([id, radio], idx) => ([id, {
       ...radio,
       aircraft: Object.keys(aircraft)[idx],
@@ -68,7 +74,6 @@ export default function Home() {
   }, [aircraft, remoteAudioMonitors, localAudioMonitors]);
 
   const onToggleMonitoring = useCallback((radioIdx: number) => {
-    console.log('toggling radio idx ', radioIdx);
     setRadios((radios) => Object.fromEntries(Object.entries(radios).map(([id, radio], idx) => ([id, { ...radio, monitoring: (idx === radioIdx ? !radio.monitoring : radio.monitoring) }]))));
   }, []);
 
@@ -84,6 +89,10 @@ export default function Home() {
       micGain.gain.value = transmitting ? 1 : 0;
     }
   }, [trackControls]);
+
+  const onSetFrequency = useCallback((radioIdx: number, frequency: string, facility: string) => {
+    setRadios((radios) => Object.fromEntries(Object.entries(radios).map(([id, radio], idx) => ([id, { ...radio, frequency: (idx === radioIdx ? frequency : radio.frequency), facility: (idx === radioIdx ? facility : radio.facility) }]))));
+  }, []);
 
   // useEffect(() => {
   //   Object.values(radios).forEach((radio, idx) => {
@@ -105,27 +114,20 @@ export default function Home() {
   useButtonPanels({ onTransmitting: onTransmittingChange, onToggleMonitoring: onToggleMonitoring, radios });
 
   return (
-    <>
-      <Head>
-        {/* eslint-disable-next-line @next/next/no-css-tags */}
-        <link rel="stylesheet" href="cesium/Widgets/widgets.css" />
-      </Head>
-
-      <div className="flex relative h-[100vh] w-[100vw]">
-        <div className="flex flex-col w-[620px]">
-          <C2Panel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
-          <RadioPanel radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} onMonitoringChange={onMonitoringChange} onTransmittingChange={onTransmittingChange} />
-        </div>
-        <ResizablePanes uniqueId="one" className="flex-1">
-          <Pane id="P0" size={3}>
-            <Toaster position="top-left" containerStyle={{ position: 'relative' }} />
-            <MapPanel weather={weather} aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
-          </Pane>
-          <Pane id="P1" size={1} minSize={1}>
-            <TimelinePanel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
-          </Pane>
-        </ResizablePanes>
+    <div className="flex relative h-[100vh] w-[100vw]">
+      <div className="flex flex-col w-[620px]">
+        <C2Panel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
+        <RadioPanel radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} onMonitoringChange={onMonitoringChange} onTransmittingChange={onTransmittingChange} onSetFrequency={onSetFrequency} />
       </div>
-    </>
+      <ResizablePanes uniqueId="one" className="flex-1">
+        <Pane id="P0" size={3}>
+          <Toaster position="top-left" containerStyle={{ position: 'relative' }} />
+          <MapPanel weather={weather} aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
+        </Pane>
+        <Pane id="P1" size={1} minSize={1}>
+          <TimelinePanel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
+        </Pane>
+      </ResizablePanes>
+    </div>
   )
 }

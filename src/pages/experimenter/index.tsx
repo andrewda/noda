@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import MapPanel from '@/components/MapPanel';
@@ -9,47 +9,45 @@ import { useSocket, useSocketEvent } from '@/lib/socket';
 import { Combobox } from '@/components/ui/combobox';
 
 import configs from './configs.json';
+import { Pane, ResizablePanes } from 'resizable-panes-react';
+import TimelinePanel from '@/components/TimelinePanel';
 
 export default function ExperimenterPage() {
   const socket = useSocket();
   const { register, handleSubmit, watch, getValues, resetField, setValue } = useForm();
 
+  const [configIndex, setConfigIndex] = useState<string | undefined>(undefined);
+  const [selectedAircraftCallsign, setSelectedAircraftCallsign] = useState<string | undefined>(undefined);
+
   const [connectionState, setConnectionState] = useState<'connected' | 'disconnected'>(socket?.connected ? 'connected' : 'disconnected');
 
   const { lastMessageTime, aircraft, weather } = useSimulation();
 
-  const commandInit = () => {
+  const commandInit = useCallback(() => {
     socket?.emit('runSimulation', 'StudyFullFlight');
 
     // TODO: this is a little hacky, but it works for now
-    // TODO: get value from config (combobox selection), and send weather. weather will be stored in AirTrafficSim and sent to the client
     setTimeout(() => {
+      const config = configs['groups'][Number(configIndex)];
+
       socket?.emit('command', {
         aircraft: null,
         command: 'init',
         payload: {
-          weather: 'heavy',
-          aircraft: [
-            { callsign: 'HMT 110', departure_airport: 'KPDX', departure_runway: 'RW28L', arrival_airport: 'KCVO', arrival_runway: 'RW17', approach: 'R17', flight_plan: ['YIBPU', 'ADLOW'] },
-            { callsign: 'HMT 120', departure_airport: 'KPDX', departure_runway: 'RW28L', arrival_airport: 'KSLE', arrival_runway: 'RW13', approach: 'R13', flight_plan: ['YIBPU', 'UBG'] },
-            { callsign: 'HMT 130', departure_airport: 'KPDX', departure_runway: 'RW28L', arrival_airport: 'KMMV', arrival_runway: 'RW22', approach: 'R22', flight_plan: ['YIBPU', 'MULES', 'OSWEG', 'OZIER'] },
-            { callsign: 'HMT 140', departure_airport: 'KPDX', departure_runway: 'RW28L', arrival_airport: 'KRDM', arrival_runway: 'RW11', approach: 'R11', flight_plan: ['YIBPU', 'CUKIS', 'JJACE', 'JJETT', 'YONKU'] },
-
-            { callsign: 'HMT 150', departure_airport: 'KPDX', departure_runway: 'RW28R', arrival_airport: 'KEUG', arrival_runway: 'RW16R', approach: 'R16R-Y', flight_plan: ['JALAG', 'OSWEG', 'MAGOT', 'SHEDD'] },
-            { callsign: 'HMT 160', departure_airport: 'KPDX', departure_runway: 'RW28R', arrival_airport: 'KHIO', arrival_runway: 'RW13R', approach: 'R13R', flight_plan: ['JALAG', 'DUCKA'] },
-            { callsign: 'HMT 170', departure_airport: 'KPDX', departure_runway: 'RW28R', arrival_airport: 'KKLS', arrival_runway: 'RW12', approach: 'R12', flight_plan: ['JALAG', 'LOATH', 'AMAVE'] },
-          ]
+          paused: true,
+          weather: config.weather,
+          aircraft: config.initial_aircraft,
         }
       });
     }, 2000);
-  };
+  }, [socket, configIndex]);
 
-  const commandTakeoff = () => {
+  const commandTakeoff = useCallback(() => {
     socket?.emit('command', { aircraft: getValues('takeoffAircraft'), command: 'takeoff' });
     setValue('takeoffAircraft', '');
-  };
+  }, [socket, getValues, setValue]);
 
-  const commandRemove = () => {
+  const commandRemove = useCallback(() => {
     const callsign = getValues('removeAircraft');
 
     if (aircraft[callsign].flightPhase < 10) {
@@ -59,7 +57,11 @@ export default function ExperimenterPage() {
 
     socket?.emit('command', { aircraft: callsign, command: 'delete' });
     setValue('removeAircraft', '');
-  }
+  }, [aircraft, socket, getValues, setValue]);
+
+  const commandPaused = useCallback((paused: boolean) => {
+    socket?.emit('command', { aircraft: null, command: 'paused', payload: paused });
+  }, [socket]);
 
   useSocketEvent('connect', () => setConnectionState('connected'));
   useSocketEvent('disconnect', () => setConnectionState('disconnected'));
@@ -75,8 +77,13 @@ export default function ExperimenterPage() {
         <div className="w-96 flex flex-col gap-4">
           <div className="flex gap-4">
             {/* <Input className="flex-1" type="text" placeholder="Simulation Name" {...register('simulationName')} /> */}
-            <Combobox className="w-full" label="Simulation Name" options={configs.groups.map(({ name }, index) => ({ label: name, value: index.toString() }))} />
+            <Combobox className="w-full" label="Simulation Name" options={configs.groups.map(({ name }, index) => ({ label: name, value: index.toString() }))} value={configIndex} onValueChange={setConfigIndex} />
             <Button className="w-36" onClick={commandInit}>Start Simulation</Button>
+          </div>
+
+          <div className="flex gap-4">
+            <Button className="w-36" onClick={() => commandPaused(true)}>Pause</Button>
+            <Button className="w-36" onClick={() => commandPaused(false)}>Resume</Button>
           </div>
 
           <div className="flex gap-4">
@@ -105,9 +112,39 @@ export default function ExperimenterPage() {
         </div>
       </div>
 
-      <div className="w-full h-full flex-1">
-        <MapPanel weather={weather} aircraft={aircraft} radios={{}} selectedAircraftCallsign={undefined} onSelectAircraft={undefined} />
-      </div>
+      {/* <div className="w-full h-full flex-1">
+        <MapPanel weather={weather} aircraft={aircraft} radios={undefined} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
+      </div> */}
+
+      <ResizablePanes uniqueId="one" className="flex-1">
+        <Pane id="P0" size={3}>
+          <MapPanel weather={weather} aircraft={aircraft} radios={undefined} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
+        </Pane>
+        <Pane id="P1" size={1} minSize={1}>
+          <TimelinePanel aircraft={aircraft} radios={undefined} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
+        </Pane>
+      </ResizablePanes>
+
     </div>
   )
+
+  // return (
+  //   <>
+  //     <div className="flex relative h-[100vh] w-[100vw]">
+  //       <div className="flex flex-col w-[620px]">
+  //         <C2Panel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
+  //         <RadioPanel radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} onMonitoringChange={onMonitoringChange} onTransmittingChange={onTransmittingChange} />
+  //       </div>
+  //       <ResizablePanes uniqueId="one" className="flex-1">
+  //         <Pane id="P0" size={3}>
+  //           <Toaster position="top-left" containerStyle={{ position: 'relative' }} />
+  //           <MapPanel weather={weather} aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
+  //         </Pane>
+  //         <Pane id="P1" size={1} minSize={1}>
+  //           <TimelinePanel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
+  //         </Pane>
+  //       </ResizablePanes>
+  //     </div>
+  //   </>
+  // )
 }

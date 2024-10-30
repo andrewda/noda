@@ -7,10 +7,20 @@ import { useResizeDetector } from 'react-resize-detector';
 
 import { AircraftStateBoard } from './C2Panel';
 import { RadioCommunicationBoard } from './RadioPanel';
+import { Slider } from './ui/slider';
 
 Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3MjBkYTg4OC1hNTkwLTRkZTgtOGFiOS01MGJmMmIzYmE1MTMiLCJpZCI6MjI3NTE3LCJpYXQiOjE3MjA1ODQxOTV9.LxcjcFed2nuTnsX5wBV7B6NH_ks1Wjg__3EBWBaQnas';
 
 const kFeetToMeters = 0.3048;
+
+const OpacitySlider = (props: any) => {
+  return (
+    <div className="absolute top-4 left-4 flex flex-col gap-2 w-36 z-10 bg-neutral-800 p-2 pb-4 rounded-md">
+      <span>Radar Opacity</span>
+      <Slider {...props} />
+    </div>
+  );
+};
 
 const ConfigureCesium = () => {
   const { viewer } = useCesium();
@@ -124,7 +134,7 @@ const renderCanvas = (canvas: HTMLCanvasElement, aircraft: AircraftStateBoard, r
   }
 };
 
-function LabelEntity({ aircraft, receiving, selected, ...props }: { aircraft: AircraftStateBoard, receiving: boolean, selected: boolean } & ComponentProps<typeof Entity>) {
+const LabelEntity = ({ aircraft, receiving, selected, ...props }: { aircraft: AircraftStateBoard, receiving: boolean, selected: boolean } & ComponentProps<typeof Entity>) => {
   const [image, setImage] = useState<HTMLCanvasElement>();
 
   useEffect(() => {
@@ -229,6 +239,11 @@ export function Entities({ aircraft, radios, selectedAircraftCallsign, onSelectA
   const sampledPositionMap = useMemo(() => new Map<string, SampledPositionProperty>(), []);
 
   useEffect(() => {
+    if (Object.values(aircraft ?? {}).length === 0) {
+      polylinePositionsMap.clear();
+      sampledPositionMap.clear();
+    }
+
     Object.values(aircraft ?? {}).forEach((aircraft) => {
       const sampledPosition = sampledPositionMap.get(aircraft.callsign);
 
@@ -246,7 +261,7 @@ export function Entities({ aircraft, radios, selectedAircraftCallsign, onSelectA
       const polylinePositions = aircraft.flightPlanPos.map(([lat, lon]) => Cartesian3.fromDegrees(lon, lat, 100));
       polylinePositionsMap.set(aircraft.callsign, polylinePositions);
     });
-  }, [aircraft, sampledPositionMap]);
+  }, [aircraft, sampledPositionMap, polylinePositionsMap]);
 
   return Object.values(aircraft ?? {}).map((aircraft, idx) => <Aircraft key={aircraft.callsign} aircraft={aircraft} position={sampledPositionMap.get(aircraft.callsign)} polylinePositions={polylinePositionsMap.get(aircraft.callsign)} receiving={radios?.[idx]?.receiving ?? false} selected={aircraft.callsign === selectedAircraftCallsign} onSelectAircraft={onSelectAircraft} />);
 }
@@ -260,6 +275,7 @@ type MapPanelProps = {
 }
 export default function MapPanel({ aircraft, weather, radios, selectedAircraftCallsign, onSelectAircraft }: MapPanelProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const [opacity, setOpacity] = useState(0.25);
 
   const startTime = useMemo(() => JulianDate.now(), []);
   const mapProjection = useMemo(() => new WebMercatorProjection(Ellipsoid.WGS84), []);
@@ -296,8 +312,10 @@ export default function MapPanel({ aircraft, weather, radios, selectedAircraftCa
   // }), []);
 
   return (
-    <>
+    <div className="relative h-full">
       <div id="base-layer-picker" ref={ref}></div>
+      <OpacitySlider defaultValue={[opacity * 100]} onValueChange={([value]: number[]) => setOpacity(value / 100)} />
+
       <Viewer
         // sceneMode={SceneMode.SCENE3D}
         sceneMode={SceneMode.SCENE2D}
@@ -319,15 +337,15 @@ export default function MapPanel({ aircraft, weather, radios, selectedAircraftCa
       >
         <Scene debugShowFramesPerSecond={false} />
         {/* <Globe baseColor={Color.fromCssColorString('#000000')} showGroundAtmosphere={false} /> */}
-        <Camera />
+        <Camera defaultZoomAmount={0} />
 
         <Clock startTime={startTime} currentTime={JulianDate.now()} clockStep={ClockStep.SYSTEM_CLOCK_MULTIPLIER} shouldAnimate />
         <ConfigureCesium />
 
         <Entities aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={onSelectAircraft} />
 
-        {weatherLayer && <ImageryLayer imageryProvider={weatherLayer} alpha={0.5} minificationFilter={TextureMinificationFilter.NEAREST} magnificationFilter={TextureMagnificationFilter.NEAREST}  />}
+        {weatherLayer && <ImageryLayer imageryProvider={weatherLayer} alpha={0.8 * opacity} minificationFilter={TextureMinificationFilter.NEAREST} magnificationFilter={TextureMagnificationFilter.NEAREST}  />}
       </Viewer>
-    </>
+    </div>
   )
 }

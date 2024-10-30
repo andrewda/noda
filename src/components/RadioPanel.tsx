@@ -2,8 +2,6 @@ import Flop from '../../public/images/flop.svg';
 import Monitor from '../../public/images/monitor.svg';
 import Ownship from '../../public/images/ownship.svg';
 import Transmit from '../../public/images/transmit.svg';
-import { SelectFrequencyModal } from './modals/select-frequency';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 
 export type RadioCommunicationBoard = {
   id: string;
@@ -13,6 +11,18 @@ export type RadioCommunicationBoard = {
   monitoring: boolean;
   receiving: boolean;
   transmitting: boolean;
+}
+
+const frequencyToFacility: Record<string, string> = {
+  '123.000': 'CTAF',
+  '123.450': 'KPDX TWR',
+  '118.100': 'KPDX APP',
+  '125.800': 'SEA CTR',
+  '126.150': 'SEA CTR',
+  '120.350': 'KUAO TWR',
+  '119.100': 'KSLE TWR',
+  '120.900': 'KTTD TWR',
+  '124.500': 'KRDM TWR',
 }
 
 type ReceiveIndicatorProps = {
@@ -32,21 +42,26 @@ type RadioProps = {
   onSelect: () => void;
   setMonitoring: (monitoring: boolean) => void;
   setTransmitting: (transmitting: boolean) => void;
+  setFrequency: (frequency: string, facility: string) => void;
 }
-function Radio({ radio, selected, className, onSelect, setMonitoring, setTransmitting }: RadioProps) {
+function Radio({ radio, selected, className, onSelect, setMonitoring, setTransmitting, setFrequency }: RadioProps) {
 
   const handleBlur = (event: any) => {
     let value = parseFloat(event.target.value);
+
+    if (!value) return;
 
     if (value < 100) {
       value += 100;
     }
 
-    if (value < 118.900 || value > 136.000) {
-      value = Math.max(118.900, Math.min(136.000, value));
+    if (value < 108.000 || value > 137.000) {
+      value = Math.max(108.000, Math.min(137.000, value));
     }
 
-    event.target.value = value.toFixed(3);
+    const freq = value.toFixed(3);
+    setFrequency(freq, frequencyToFacility[freq] ?? '');
+    event.target.value = '';
   }
 
   return (
@@ -83,22 +98,9 @@ function Radio({ radio, selected, className, onSelect, setMonitoring, setTransmi
               <Flop width={20} />
             </div>
           </div>
-          {/* <Popover>
-            <PopoverTrigger asChild>
-              <div className="inline-flex justify-end items-center gap-1 cursor-pointer text-gray-200 hover:brightness-75">
-                <div className="text-sm font-semibold">{radio.frequency}</div>
-                <div className="flex-shrink-0">
-                  <Flop width={20} />
-                </div>
-              </div>
-            </PopoverTrigger>
-            <PopoverContent className="w-32" side="top">
-              <SelectFrequencyModal frequency={radio.frequency} />
-            </PopoverContent>
-          </Popover> */}
 
           {/* Use dir="rtl" so that the text is truncated from the left side. */}
-          <div className="text-[#ababab] text-xs font-medium text-right w-full whitespace-nowrap text-ellipsis overflow-hidden" dir="rtl">{radio.facility}</div>
+          <div className="text-[#ababab] text-xs font-medium text-right w-full whitespace-nowrap text-ellipsis overflow-hidden" dir="rtl">{frequencyToFacility[radio.frequency] ?? ''}</div>
         </div>
       </div>
     </div>
@@ -111,8 +113,9 @@ type RadioPanelProps = {
   onSelectAircraft: (aircraftCallsign: string | undefined) => void;
   onMonitoringChange: (radio: number, monitoring: boolean) => void;
   onTransmittingChange: (radio: number, transmitting: boolean) => void;
+  onSetFrequency: (radio: number, frequency: string, facility: string) => void;
 }
-export default function RadioPanel({ radios, selectedAircraftCallsign, onSelectAircraft, onMonitoringChange, onTransmittingChange }: RadioPanelProps) {
+export default function RadioPanel({ radios, selectedAircraftCallsign, onSelectAircraft, onMonitoringChange, onTransmittingChange, onSetFrequency }: RadioPanelProps) {
   return (
     <div className="grid grid-cols-4 gap-4 m-3">
       {Object.values(radios).filter((radio, idx) => radio.aircraft || (idx === (Object.keys(radios).length ?? 0) - 1)).map((radio, i) => (
@@ -123,6 +126,7 @@ export default function RadioPanel({ radios, selectedAircraftCallsign, onSelectA
           onSelect={() => radio.aircraft ? onSelectAircraft(radio.aircraft) : null}
           setMonitoring={(monitoring) => onMonitoringChange(i, monitoring)}
           setTransmitting={(transmitting) => onTransmittingChange(i, transmitting)}
+          setFrequency={(frequency, facility) => onSetFrequency(i, frequency, facility)}
           className="last:col-start-4 justify-self-center" />
       ))}
     </div>
