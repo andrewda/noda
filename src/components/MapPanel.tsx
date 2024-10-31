@@ -1,7 +1,7 @@
-import { ComponentProps, Fragment, use, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { buildModuleUrl, Cartesian2, Cartesian3, ClockStep, Color, Ellipsoid, ExtrapolationType, Ion, IonImageryProvider, IonWorldImageryStyle, JulianDate, LabelStyle, MapboxStyleImageryProvider, Material, MaterialProperty, NearFarScalar, PolylineDashMaterialProperty, ProviderViewModel, Rectangle, ReferenceFrame, SampledPositionProperty, SceneMode, SingleTileImageryProvider, TextureMagnificationFilter, TextureMinificationFilter, TileMapServiceImageryProvider, WebMapServiceImageryProvider, WebMercatorProjection, WebMercatorTilingScheme } from 'cesium';
-import { Camera, Clock, Entity, ImageryLayer, Polyline, PolylineCollection, Scene, useCesium, Viewer } from 'resium';
+import { buildModuleUrl, Cartesian2, Cartesian3, ClockStep, Color, Ellipsoid, ExtrapolationType, Ion, IonImageryProvider, IonWorldImageryStyle, JulianDate, LabelStyle, MapboxStyleImageryProvider, NearFarScalar, PolylineDashMaterialProperty, ProviderViewModel, Rectangle, ReferenceFrame, SampledPositionProperty, SceneMode, SingleTileImageryProvider, TextureMagnificationFilter, TextureMinificationFilter, TileMapServiceImageryProvider, WebMercatorProjection } from 'cesium';
+import { Camera, Clock, Entity, ImageryLayer, Scene, useCesium, Viewer } from 'resium';
 
 import { useResizeDetector } from 'react-resize-detector';
 
