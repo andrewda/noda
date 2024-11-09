@@ -1,12 +1,17 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap');
 
 /* @import url('/cesium/Widgets/widgets.css'); */
 @import url('components.css');
 @import url('TimelinePanel.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.font-mono {
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 500;
+}
 
 @layer utilities {
   .text-balance {

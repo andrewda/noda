@@ -94,23 +94,6 @@ export default function Home() {
     setRadios((radios) => Object.fromEntries(Object.entries(radios).map(([id, radio], idx) => ([id, { ...radio, frequency: (idx === radioIdx ? frequency : radio.frequency), facility: (idx === radioIdx ? facility : radio.facility) }]))));
   }, []);
 
-  // useEffect(() => {
-  //   Object.values(radios).forEach((radio, idx) => {
-  //     const { micGain, outputTrack } = trackControls.get(idx) ?? {};
-
-  //     // console.log(radio, idx, micGain, outputTrack);
-  //     // console.log(idx, radio.transmitting, radio.receiving);
-
-  //     if (micGain) {
-  //       micGain.gain.value = radio.transmitting ? 1 : 0;
-  //     }
-
-  //     if (outputTrack) {
-  //       outputTrack.enabled = radio.receiving;
-  //     }
-  //   });
-  // }, [radios, trackControls]);
-
   useButtonPanels({ onTransmitting: onTransmittingChange, onToggleMonitoring: onToggleMonitoring, radios });
 
   return (

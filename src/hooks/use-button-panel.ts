@@ -123,7 +123,7 @@ export const useButtonPanels = ({ onTransmitting, onToggleMonitoring, radios }: 
     buttonPanel.fillKeyColor(keyIndex, r, g, b);
   }
 
-  const drawLcd = async   (buttonPanel: StreamDeck.StreamDeckWeb, localIndex: number, channel: number, aircraft: string | undefined, frequency: string, receiving: boolean) => {
+  const drawLcd = async (buttonPanel: StreamDeck.StreamDeckWeb, localIndex: number, channel: number, aircraft: string | undefined, frequency: string, receiving: boolean) => {
     const offset = (localIndex - 1.5) * 20;
 
     // const canvas = createCanvas(200, 100);
