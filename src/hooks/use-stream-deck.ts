@@ -6,17 +6,16 @@ type EventHandlers = {
   [K in keyof StreamDeckEvents]?: (...args: StreamDeckEvents[K]) => void;
 };
 
-function useStreamDeck(eventHandlers: EventHandlers) {
+function useStreamDeck(eventHandlers?: EventHandlers) {
   const [streamDecks, setStreamDecks] = useState<StreamDeck.StreamDeckWeb[]>([]);
 
   // Fetch currently attached Stream Decks on mount
   useEffect(() => {
-    let isMounted = true;
-
     async function getAttachedStreamDecks() {
       try {
         const decks = await StreamDeck.getStreamDecks();
-        if (isMounted) {
+        console.log('got stream decks', decks.length);
+        if (decks.length > 0) {
           setStreamDecks(decks);
         }
       } catch (err) {
@@ -27,7 +26,7 @@ function useStreamDeck(eventHandlers: EventHandlers) {
     getAttachedStreamDecks();
 
     return () => {
-      isMounted = false;
+      streamDecks.forEach((deck) => deck.close());
     };
   }, []);
 
@@ -58,7 +57,8 @@ function useStreamDeck(eventHandlers: EventHandlers) {
     streamDecks.forEach((deck) => {
       deck.removeAllListeners();
 
-      Object.entries(eventHandlers).forEach(([event, handler]) => {
+      Object.entries(eventHandlers ?? {}).forEach(([event, handler]) => {
+        // TODO: should specify index of stream deck
         // @ts-expect-error
         deck.on(event as keyof StreamDeckEvents, handler);
       });

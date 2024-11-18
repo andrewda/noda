@@ -22,6 +22,7 @@ import { Label } from './ui/label';
 import { Slider } from './ui/slider';
 
 import 'ol/ol.css'; // Import OpenLayers CSS
+import { boundingExtent, containsCoordinate } from 'ol/extent';
 
 // Opacity Slider Component
 const OpacitySlider = ({ opacity, setOpacity }: { opacity: number, setOpacity: (opacity: number) => void }) => (
@@ -68,7 +69,7 @@ const BaseLayerPicker = ({ map }: { map: OlMap }) => {
         width: 180,
         height: 'fit-content',
         zIndex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
         padding: '8px',
         borderRadius: '4px',
         color: 'white',
@@ -154,6 +155,28 @@ const MapPanel = ({
 
   // Weather layer ref
   const weatherLayerRef = useRef<ImageLayer<ImageStatic>>();
+
+  // Update map view when selected aircraft changes
+  useEffect(() => {
+    const selectedAircraft = aircraft?.[selectedAircraftCallsign ?? ''];
+    const view = map?.getView();
+
+    if (!map || !view || !selectedAircraft) return;
+
+    const extent = view.calculateExtent();
+    const aircraftPosition = fromLonLat(selectedAircraft.position.toReversed());
+
+    if (!containsCoordinate(extent, aircraftPosition)) {
+      const center = view.getCenter()!;
+      const newExtent = boundingExtent([center, aircraftPosition]);
+
+      view.fit(newExtent, {
+        padding: [200, 200, 100, 100],
+        duration: 400,
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedAircraftCallsign])
 
   useEffect(() => {
     // Initialize map with base layers
@@ -499,9 +522,9 @@ const MapPanel = ({
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
       <div ref={mapElement} style={{ width: '100%', height: '100%' }}></div>
 
-      <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 1, display: 'flex', gap: '0.75em' }}>
-        {map && <BaseLayerPicker map={map} />}
+      <div style={{ position: 'absolute', top: 10, right: 10, zIndex: 1, display: 'flex', gap: '0.75em' }}>
         <OpacitySlider opacity={opacity} setOpacity={setOpacity} />
+        {map && <BaseLayerPicker map={map} />}
       </div>
     </div>
   );

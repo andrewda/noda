@@ -1,3 +1,4 @@
+import { useEffect, useState, useRef } from 'react';
 import Flop from '../../public/images/flop.svg';
 import Monitor from '../../public/images/monitor.svg';
 import Ownship from '../../public/images/ownship.svg';
@@ -13,7 +14,7 @@ export type RadioCommunicationBoard = {
   transmitting: boolean;
 }
 
-const frequencyToFacility: Record<string, string> = {
+export const frequencyToFacility: Record<string, string> = {
   '123.000': 'CTAF',
   '123.450': 'KPDX TWR',
   '118.100': 'KPDX APP',
@@ -42,9 +43,23 @@ type RadioProps = {
   onSelect: () => void;
   setMonitoring: (monitoring: boolean) => void;
   setTransmitting: (transmitting: boolean) => void;
-  setFrequency: (frequency: string, facility: string) => void;
+  setFrequency: (frequency: string) => void;
 }
 function Radio({ radio, selected, className, onSelect, setMonitoring, setTransmitting, setFrequency }: RadioProps) {
+  const [focused, setFocused] = useState<boolean>(false);
+  const [internalFrequency, setInternalFrequency] = useState<string>(radio.frequency);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!focused) {
+      setInternalFrequency(radio.frequency);
+    }
+  }, [radio.frequency]);
+
+  const handleFocus = (event: any) => {
+    event.target.select();
+    setFocused(true);
+  }
 
   const handleBlur = (event: any) => {
     let value = parseFloat(event.target.value);
@@ -55,19 +70,43 @@ function Radio({ radio, selected, className, onSelect, setMonitoring, setTransmi
       value += 100;
     }
 
+    if (value > 137) {
+      const firstThreeDigits = Number((value + '').slice(0, 3));
+      if (firstThreeDigits < 108 || firstThreeDigits > 137) {
+        value = Number(`1${value}`);
+      }
+
+      value = value / (10 ** ((value + '').length - 3));
+    }
+
     if (value < 108.000 || value > 137.000) {
       value = Math.max(108.000, Math.min(137.000, value));
     }
 
     const freq = value.toFixed(3);
-    setFrequency(freq, frequencyToFacility[freq] ?? '');
-    event.target.value = '';
+    setInternalFrequency(freq);
+
+    if (freq !== radio.frequency) {
+      setFrequency(freq);
+    }
+
+    setFocused(false);
+  }
+
+  const handleKeyDown = (event: any) => {
+    if (event.key === 'Enter') {
+      handleBlur(event);
+      event.target.blur();
+    }
+    if (event.key === 'Escape') {
+      setInternalFrequency(radio.frequency);
+    }
   }
 
   return (
-    <div className={`w-full h-20 px-1 py-1.5 rounded border ${selected ? 'border-fuchsia-400 bg-fuchsia-950/30' : 'border-[#ababab]'} flex-col justify-between items-start inline-flex overflow-hidden ${className}`}>
+    <div onClick={onSelect} className={`w-full h-20 px-1 py-1.5 rounded border ${radio.aircraft ? 'cursor-pointer hover:brightness-[0.85]' : ''} ${selected ? 'border-fuchsia-400 bg-fuchsia-950/30 hover:brightness-100' : 'border-[#ababab]'} flex-col justify-between items-start inline-flex overflow-hidden ${className}`}>
       <div className="self-stretch px-0.5 justify-between items-center inline-flex">
-        <div onClick={onSelect} className={`h-5 relative flex flex-row items-center gap-1 ${radio.aircraft ? 'cursor-pointer hover:brightness-75' : ''} ${selected ? 'text-fuchsia-400' : 'text-gray-200'}`}>
+        <div className={`h-5 relative flex flex-row items-center gap-1 ${selected ? 'text-fuchsia-400' : 'text-gray-200'}`}>
           {radio.aircraft ? (
             <>
               <Ownship width={16} height={16} />
@@ -83,15 +122,18 @@ function Radio({ radio, selected, className, onSelect, setMonitoring, setTransmi
           <Transmit height={16} className={`cursor-pointer hover:brightness-75 ${radio.transmitting ? 'text-teal-400 drop-shadow-[0_0_4px]' : 'text-gray-300/60'}`} onMouseDown={() => setTransmitting(true)} onMouseUp={() => setTransmitting(false)} />
         </div>
         <div className="flex flex-grow flex-col justify-between items-end h-full min-w-0">
-          <div className="inline-flex justify-end items-center gap-1 cursor-pointer text-gray-200 hover:brightness-75">
+          <div className="inline-flex justify-end items-center gap-1 cursor-pointer text-gray-200 hover:brightness-75" onClick={() => inputRef.current?.select()}>
             <input
+              ref={inputRef}
               type="number"
               className="w-full text-sm text-right select-all text-gray-200 bg-transparent border-none focus:outline-none placeholder:text-gray-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               min={118.900}
               max={136.000}
               step={0.025}
-              placeholder={radio.frequency}
-              onClick={(e) => (e.target as any).select()}
+              value={internalFrequency}
+              onChange={(e) => setInternalFrequency(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onFocus={handleFocus}
               onBlur={handleBlur}
             />
             <div className="flex-shrink-0">
@@ -100,7 +142,7 @@ function Radio({ radio, selected, className, onSelect, setMonitoring, setTransmi
           </div>
 
           {/* Use dir="rtl" so that the text is truncated from the left side. */}
-          <div className="text-[#ababab] text-xs font-medium text-right w-full whitespace-nowrap text-ellipsis overflow-hidden" dir="rtl">{frequencyToFacility[radio.frequency] ?? ''}</div>
+          <div className="text-[#ababab] text-xs font-medium text-right w-full whitespace-nowrap text-ellipsis overflow-hidden" dir="rtl">{frequencyToFacility[internalFrequency] ?? ''}</div>
         </div>
       </div>
     </div>
@@ -113,7 +155,7 @@ type RadioPanelProps = {
   onSelectAircraft: (aircraftCallsign: string | undefined) => void;
   onMonitoringChange: (radio: number, monitoring: boolean) => void;
   onTransmittingChange: (radio: number, transmitting: boolean) => void;
-  onSetFrequency: (radio: number, frequency: string, facility: string) => void;
+  onSetFrequency: (radio: number, frequency: string) => void;
 }
 export default function RadioPanel({ radios, selectedAircraftCallsign, onSelectAircraft, onMonitoringChange, onTransmittingChange, onSetFrequency }: RadioPanelProps) {
   return (
@@ -126,7 +168,7 @@ export default function RadioPanel({ radios, selectedAircraftCallsign, onSelectA
           onSelect={() => radio.aircraft ? onSelectAircraft(radio.aircraft) : null}
           setMonitoring={(monitoring) => onMonitoringChange(i, monitoring)}
           setTransmitting={(transmitting) => onTransmittingChange(i, transmitting)}
-          setFrequency={(frequency, facility) => onSetFrequency(i, frequency, facility)}
+          setFrequency={(frequency) => onSetFrequency(i, frequency)}
           className="last:col-start-4 justify-self-center" />
       ))}
     </div>

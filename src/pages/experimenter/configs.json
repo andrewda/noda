@@ -4,10 +4,15 @@
       "name": "Group 1 (4/long/light)",
       "weather": "nominal",
       "initial_aircraft": [
-        { "callsign": "HMT 954", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KUAO", "arrival_runway": "RW17", "approach": "R17", "flight_plan": ["YIBPU", "MOKIY"], "cruise_alt": 4000 },
-        { "callsign": "HMT 498", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KHIO", "arrival_runway": "RW13R", "approach": "R13R", "flight_plan": ["JALAG", "PITER", "DUCKA"], "cruise_alt": 7000 },
-        { "callsign": "HMT 525", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["YIBPU", "ENDZZ", "UBG"], "cruise_alt": 3000 },
-        { "callsign": "HMT 710", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KKLS", "arrival_runway": "RW12", "approach": "R12", "flight_plan": ["JALAG", "LOATH", "AMAVE"], "cruise_alt": 8000 }
+        { "callsign": "HMT 954", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KUAO", "arrival_runway": "RW17", "approach": "R17", "flight_plan": ["YIBPU", "MOKIY"], "cruise_alt": 4000 },
+        { "callsign": "HMT 498", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KHIO", "arrival_runway": "RW13R", "approach": "R13R", "flight_plan": ["JALAG", "PITER", "DUCKA"], "cruise_alt": 7000 },
+        { "callsign": "HMT 525", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["YIBPU", "ENDZZ", "UBG"], "cruise_alt": 3000 },
+        { "callsign": "HMT 710", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KKLS", "arrival_runway": "RW12", "approach": "R12", "flight_plan": ["JALAG", "LOATH", "AMAVE"], "cruise_alt": 8000 }
+      ],
+      "script": [
+        { "callsign": "HMT 954", "trigger": { "type": "time", "time": 10 }, "dialog": "cleared for takeoff runway 17" },
+        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "contact Seattle Center 118.1" },
+        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "MOKIY", "distance": -8 }, "dialog": "8 miles from MOKIY, cross MOKIY at or above 3500, cleared for the RNAV 17 approach at Aurora" }
       ],
       "additional_aircraft": []
     },
@@ -35,13 +40,13 @@
       "name": "Group 5 (7/long/light)",
       "weather": "nominal",
       "initial_aircraft": [
-        { "callsign": "HMT 954", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KUAO", "arrival_runway": "RW17", "approach": "R17", "flight_plan": ["YIBPU", "MOKIY"], "cruise_alt": 4000 },
-        { "callsign": "HMT 498", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KHIO", "arrival_runway": "RW13R", "approach": "R13R", "flight_plan": ["JALAG", "PITER", "DUCKA"], "cruise_alt": 7000 },
-        { "callsign": "HMT 642", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KEUG", "arrival_runway": "RW16R", "approach": "R16RY", "flight_plan": ["JALAG", "OSWEG", "MAGOT", "SHEDD"], "starting_leg": 1, "starting_alt": 6000, "cruise_alt": 6000 },
-        { "callsign": "HMT 813", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KTTD", "arrival_runway": "RW25", "approach": "R25", "flight_plan": ["YIBPU", "CIZZL", "SSDEE", "SHYNE"], "cruise_alt": 2000 },
-        { "callsign": "HMT 525", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["YIBPU", "ENDZZ", "UBG"], "cruise_alt": 3000 },
-        { "callsign": "HMT 948", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KMMV", "arrival_runway": "RW22", "approach": "R22", "flight_plan": ["YIBPU", "MULES", "OSWEG", "NNIKE", "OZIER"], "starting_leg": 3, "starting_alt": 5000, "cruise_alt": 5000 },
-        { "callsign": "HMT 710", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KKLS", "arrival_runway": "RW12", "approach": "R12", "flight_plan": ["JALAG", "LOATH", "AMAVE"] }
+        { "callsign": "HMT 954", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KUAO", "arrival_runway": "RW17", "approach": "R17", "flight_plan": ["YIBPU", "MOKIY"], "cruise_alt": 4000 },
+        { "callsign": "HMT 498", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KHIO", "arrival_runway": "RW13R", "approach": "R13R", "flight_plan": ["JALAG", "PITER", "DUCKA"], "cruise_alt": 7000 },
+        { "callsign": "HMT 642", "initial_frequency": "118.100", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KEUG", "arrival_runway": "RW16R", "approach": "R16RY", "flight_plan": ["JALAG", "OSWEG", "MAGOT", "SHEDD"], "starting_leg": 1, "starting_alt": 6000, "cruise_alt": 6000 },
+        { "callsign": "HMT 813", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KTTD", "arrival_runway": "RW25", "approach": "R25", "flight_plan": ["YIBPU", "CIZZL", "SSDEE", "SHYNE"], "cruise_alt": 2000 },
+        { "callsign": "HMT 525", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["YIBPU", "ENDZZ", "UBG"], "cruise_alt": 3000 },
+        { "callsign": "HMT 948", "initial_frequency": "125.800", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KMMV", "arrival_runway": "RW22", "approach": "R22", "flight_plan": ["YIBPU", "MULES", "OSWEG", "NNIKE", "OZIER"], "starting_leg": 3, "starting_alt": 5000, "cruise_alt": 5000 },
+        { "callsign": "HMT 710", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KKLS", "arrival_runway": "RW12", "approach": "R12", "flight_plan": ["JALAG", "LOATH", "AMAVE"] }
       ],
       "additional_aircraft": []
     },

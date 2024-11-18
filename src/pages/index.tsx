@@ -11,6 +11,10 @@ import { useSimulation } from '@/hooks/use-simulation'
 import { useSocket, useSocketEvent } from '@/lib/socket'
 import { useAudioMonitor, usePeerConnection } from '@/lib/communications'
 import { useButtonPanels } from '@/hooks/use-button-panel'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, AlertDialogPortal, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
+import { Button } from '@/components/ui/button'
+import { PauseIcon } from '@radix-ui/react-icons'
+import useStreamDeck from '@/hooks/use-stream-deck'
 
 const MapPanel = dynamic(
   () => import('../components/MapPanel'),
@@ -44,7 +48,7 @@ const makeRadio = (id: string) => ({
 
 export default function Home() {
   const socket = useSocket();
-  const { aircraft, weather } = useSimulation();
+  const { paused, aircraft, weather } = useSimulation();
   const [radios, setRadios] = useState<Record<string, RadioCommunicationBoard>>(Object.fromEntries(Array.from(Array(8).keys()).map((i) => [i.toString(), makeRadio(i.toString())])));
 
   const [connectionState, setConnectionState] = useState<'connected' | 'disconnected'>(socket?.connected ? 'connected' : 'disconnected');
@@ -66,11 +70,16 @@ export default function Home() {
   }, [aircraft, selectedAircraftCallsign])
 
   useEffect(() => {
-    setRadios((radios) => Object.fromEntries(Object.entries(radios).map(([id, radio], idx) => ([id, {
-      ...radio,
-      aircraft: Object.keys(aircraft)[idx],
-      receiving: remoteAudioMonitors.get(idx) ?? false,
-    }]))));
+    setRadios((radios) => Object.fromEntries(Object.entries(radios).map(([id, radio], idx) => {
+      const aircraftIdent = Object.keys(aircraft)[idx];
+      const { frequency } = aircraft[aircraftIdent] ?? '';
+      return ([id, {
+        ...radio,
+        aircraft: aircraftIdent,
+        frequency,
+        receiving: remoteAudioMonitors.get(idx) ?? false,
+      }]);
+    })));
   }, [aircraft, remoteAudioMonitors, localAudioMonitors]);
 
   const onToggleMonitoring = useCallback((radioIdx: number) => {
@@ -90,25 +99,43 @@ export default function Home() {
     }
   }, [trackControls]);
 
-  const onSetFrequency = useCallback((radioIdx: number, frequency: string, facility: string) => {
-    setRadios((radios) => Object.fromEntries(Object.entries(radios).map(([id, radio], idx) => ([id, { ...radio, frequency: (idx === radioIdx ? frequency : radio.frequency), facility: (idx === radioIdx ? facility : radio.facility) }]))));
-  }, []);
+  const onSetFrequency = useCallback((radioIdx: number, frequency: string) => {
+    socket?.emit('command', { aircraft: radios[radioIdx].aircraft, command: 'frequency', payload: frequency });
+  }, [socket, radios]);
 
-  useButtonPanels({ onTransmitting: onTransmittingChange, onToggleMonitoring: onToggleMonitoring, radios });
+  const onSetSelectedAircraft = useCallback((callsign: string | undefined) => {
+    if (!callsign) return;
+
+    socket?.emit('command', { aircraft: callsign, command: 'select' });
+    setSelectedAircraftCallsign(callsign);
+  }, [socket, setSelectedAircraftCallsign]);
+
+  const { streamDecks } = useStreamDeck();
+
+  useButtonPanels({ buttonPanels: streamDecks, onTransmitting: onTransmittingChange, onToggleMonitoring: onToggleMonitoring, radios, selectedAircraftCallsign });
 
   return (
     <div className="flex relative h-[100vh] w-[100vw]">
+      <AlertDialog open={paused || Object.keys(aircraft).length === 0}>
+        <AlertDialogOverlay className="bg-black/40" />
+        <AlertDialogContent className="flex flex-col justify-center items-center w-[80vw] h-[80vh] max-w-full">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex flex-col items-center gap-2"><PauseIcon width="4em" height="auto" /> Simulation Paused</AlertDialogTitle>
+          </AlertDialogHeader>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <div className="flex flex-col w-[620px]">
-        <C2Panel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
-        <RadioPanel radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} onMonitoringChange={onMonitoringChange} onTransmittingChange={onTransmittingChange} onSetFrequency={onSetFrequency} />
+        <C2Panel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={onSetSelectedAircraft} />
+        <RadioPanel radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={onSetSelectedAircraft} onMonitoringChange={onMonitoringChange} onTransmittingChange={onTransmittingChange} onSetFrequency={onSetFrequency} />
       </div>
       <ResizablePanes uniqueId="one" className="flex-1">
         <Pane id="P0" size={3}>
           <Toaster position="top-left" containerStyle={{ position: 'relative' }} />
-          <MapPanel weather={weather} aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
+          <MapPanel weather={weather} aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={onSetSelectedAircraft} />
         </Pane>
         <Pane id="P1" size={1} minSize={1}>
-          <TimelinePanel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
+          <TimelinePanel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={onSetSelectedAircraft} />
         </Pane>
       </ResizablePanes>
     </div>

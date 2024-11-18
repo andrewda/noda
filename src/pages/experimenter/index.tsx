@@ -11,6 +11,7 @@ import { Combobox } from '@/components/ui/combobox';
 import configs from './configs.json';
 import { Pane, ResizablePanes } from 'resizable-panes-react';
 import TimelinePanel from '@/components/TimelinePanel';
+import { frequencyToFacility } from '@/components/RadioPanel';
 
 export default function ExperimenterPage() {
   const socket = useSocket();
@@ -34,6 +35,7 @@ export default function ExperimenterPage() {
         aircraft: null,
         command: 'init',
         payload: {
+          name: `group_${configIndex}`,
           paused: true,
           weather: config.weather,
           aircraft: config.initial_aircraft,
@@ -101,20 +103,17 @@ export default function ExperimenterPage() {
           <div className="text-sm">Last Message Time: <span className="font-mono">{lastMessageTime?.toLocaleString() ?? '—'}</span></div>
           <div className="text-sm">Number of Aircraft: <span className="font-mono">{Object.keys(aircraft).length}</span></div>
           {Object.entries(aircraft).map(([callsign, aircraft]) => (
-            <div key={callsign} className="flex gap-4 items-center">
-              <div className="w-8 h-8 rounded-full border border-neutral-400 flex-shrink-0"></div>
+            <div key={callsign} className="flex gap-4 items-center hover:brightness-75 cursor-pointer" onClick={() => setSelectedAircraftCallsign(callsign)}>
+              <div className="w-3 h-3 rounded-full border border-neutral-400 flex-shrink-0"></div>
               <div className="flex-grow">
-                <div className="font-mono">{callsign}</div>
+                <div className={`font-mono ${callsign === selectedAircraftCallsign ? 'text-fuchsia-400' : 'text-neutral-200'}`}>{callsign}</div>
                 <div className="text-xs font-mono text-neutral-400">{aircraft.altitude.toFixed(0)} ft / {aircraft.tas.toFixed(0)} kt</div>
+                <div className="text-xs font-mono text-neutral-400">{aircraft.frequency} / {frequencyToFacility[aircraft.frequency] ?? ''}</div>
               </div>
             </div>
           ))}
         </div>
       </div>
-
-      {/* <div className="w-full h-full flex-1">
-        <MapPanel weather={weather} aircraft={aircraft} radios={undefined} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
-      </div> */}
 
       <ResizablePanes uniqueId="one" className="flex-1">
         <Pane id="P0" size={3}>
