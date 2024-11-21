@@ -4,15 +4,41 @@
       "name": "Group 1 (4/long/light)",
       "weather": "nominal",
       "initial_aircraft": [
+        { "callsign": "HMT 525", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["YIBPU", "ENDZZ", "UBG"], "cruise_alt": 3000 },
         { "callsign": "HMT 954", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KUAO", "arrival_runway": "RW17", "approach": "R17", "flight_plan": ["YIBPU", "MOKIY"], "cruise_alt": 4000 },
         { "callsign": "HMT 498", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KHIO", "arrival_runway": "RW13R", "approach": "R13R", "flight_plan": ["JALAG", "PITER", "DUCKA"], "cruise_alt": 7000 },
-        { "callsign": "HMT 525", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["YIBPU", "ENDZZ", "UBG"], "cruise_alt": 3000 },
-        { "callsign": "HMT 710", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KKLS", "arrival_runway": "RW12", "approach": "R12", "flight_plan": ["JALAG", "LOATH", "AMAVE"], "cruise_alt": 8000 }
+        { "callsign": "HMT 710", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KKLS", "arrival_runway": "RW12", "approach": "R12", "flight_plan": ["JALAG", "LOATH", "AMAVE"], "cruise_alt": 8000 }
       ],
       "script": [
-        { "callsign": "HMT 954", "trigger": { "type": "time", "time": 10 }, "dialog": "cleared for takeoff runway 17" },
-        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "contact Seattle Center 118.1" },
-        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "MOKIY", "distance": -8 }, "dialog": "8 miles from MOKIY, cross MOKIY at or above 3500, cleared for the RNAV 17 approach at Aurora" }
+        { "callsign": "HMT 525", "trigger": { "type": "time", "time": 95 }, "dialog": "cleared for takeoff Runway 28L" },
+        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "contact Portland Departure 118.1" },
+        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "Portland Departure, Portland altimeter 2999" },
+        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "ENDZZ" }, "dialog": "contact Seattle Center 125.8" },
+        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "ENDZZ" }, "dialog": "Seattle Center, Salem altimeter 29.96" },
+        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "UBG" }, "dialog": "turn right heading 100, vectors for traffic" },
+
+        { "callsign": "HMT 954", "trigger": { "type": "time", "time": 35 }, "dialog": "cleared for takeoff Runway 28L" },
+        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "contact Portland Departure 118.1" },
+        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "Portland Departure, Aurora altimeter 2999" },
+        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "MOKIY", "distance": -4 }, "dialog": "4 miles from MOKIY, cross MOKIY at or above 3500, cleared for the RNAV 17 approach at Aurora" },
+        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "LUTZZ" }, "dialog": "contact Aurora Tower 120.35" },
+        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "LUTZZ" }, "dialog": "Aurora Tower, winds 100 at 4, cleared to land Runway 17" },
+
+        { "callsign": "HMT 498", "trigger": { "type": "time", "time": 5 }, "dialog": "cleared for takeoff Runway 28R" },
+        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "contact Portland Departure 118.1" },
+        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "Portland Departure, Portland altimeter 2999" },
+        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER", "distance": -8 }, "dialog": "contact Seattle Center 125.8" },
+        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER", "distance": -8 }, "dialog": "Seattle Center, Hilsboro altimeter 29.98" },
+        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER" }, "dialog": "8 miles from DUCKA, cross DUCKA at or above 5000, cleared for the RNAV 13R approach at Hilsboro" },
+        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "DUCKA" }, "dialog": "contact Hilsboro Tower TODO" },
+        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "DUCKA" }, "dialog": "Hilsboro Tower, winds 120 at 4, cleared to land Runway 13R" },
+
+        { "callsign": "HMT 710", "trigger": { "type": "time", "time": 65 }, "dialog": "cleared for takeoff Runway 28R" },
+        { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "contact Portland Departure 118.1" },
+        { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "Portland Departure, Portland altimeter 2999" },
+        { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "LOATH", "distance": -15 }, "dialog": "contact Seattle Center 125.8" },
+        { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "LOATH", "distance": -15 }, "dialog": "Seattle Center, Kelso altimeter 3002" },
+        { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "LOATH", "distance": -10 }, "dialog": "descend and maintain 6000" }
       ],
       "additional_aircraft": []
     },
@@ -20,7 +46,42 @@
       "name": "Group 2 (4/long/heavy)",
       "weather": "heavy",
       "initial_aircraft": [
-        { "callsign": "HMT 140", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KRDM", "arrival_runway": "RW11", "approach": "R11", "flight_plan": ["YIBPU", "CUKIS", "JJACE", "JJETT", "YONKU"], "starting_leg": 1, "starting_alt": 10000, "cruise_alt": 10000 }
+        { "callsign": "HMT 642", "initial_frequency": "118.100", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KEUG", "arrival_runway": "RW16R", "approach": "R16RY", "flight_plan": ["JALAG", "OSWEG", "MAGOT", "SHEDD"], "cruise_alt": 7000 },
+        { "callsign": "HMT 140", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KRDM", "arrival_runway": "RW11", "approach": "R11", "flight_plan": ["JALAG", "CUKIS", "JJACE", "JJETT", "YONKU"], "starting_leg": 1, "starting_alt": 10000, "cruise_alt": 10000 },
+        { "callsign": "HMT 813", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KTTD", "arrival_runway": "RW25", "approach": "R25", "flight_plan": ["YIBPU", "CIZZL", "SSDEE", "SHYNE"], "cruise_alt": 2000 },
+        { "callsign": "HMT 948", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KMMV", "arrival_runway": "RW22", "approach": "R22", "flight_plan": ["YIBPU", "OSWEG", "NNIKE", "OZIER"], "cruise_alt": 5000 }
+      ],
+      "script": [
+        { "callsign": "HMT 642", "trigger": { "type": "time", "time": 35 }, "dialog": "cleared for takeoff Runway 28R" },
+        { "callsign": "HMT 642", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "contact Portland Departure 118.1" },
+        { "callsign": "HMT 642", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "Portland Departure, Portland altimeter 2997" },
+        { "callsign": "HMT 642", "trigger": { "type": "waypoint", "waypoint": "OSWEG" }, "dialog": "contact Seattle Center 125.8" },
+        { "callsign": "HMT 642", "trigger": { "type": "waypoint", "waypoint": "OSWEG" }, "dialog": "Seattle Center, welcome, Salem altimeter 2999" },
+        { "callsign": "HMT 642", "trigger": { "type": "time", "time": 690 }, "dialog": "turn right heading 240, vectors for traffic" },
+        { "callsign": "HMT 642", "trigger": { "type": "time", "time": 810 }, "dialog": "descend and maintain 5000" },
+
+        { "callsign": "HMT 140", "trigger": { "type": "time", "time": 60 }, "dialog": "change to my frequency 126.150" },
+        { "callsign": "HMT 140", "trigger": { "type": "time", "time": 60 }, "dialog": "welcome, Redmond altimeter 3010" },
+        { "callsign": "HMT 140", "trigger": { "type": "waypoint", "waypoint": "JJACE", "distance": -10 }, "condition": "on vector request", "dialog": "uh roger, standby, I have your request on file" },
+        { "callsign": "HMT 140", "trigger": { "type": "waypoint", "waypoint": "JJACE", "distance": -5 }, "condition": "on vector request", "dialog": "turn right heading 170, vectors for weather" },
+        { "callsign": "HMT 140", "trigger": { "type": "time", "time": 590 }, "dialog": "descend and maintain 7000" },
+        { "callsign": "HMT 140", "trigger": { "type": "time", "time": 680 }, "dialog": "turn left heading 110" },
+
+        { "callsign": "HMT 813", "trigger": { "type": "time", "time": 65 }, "dialog": "cleared for takeoff Runway 28L" },
+        { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "contact Portland Departure 118.1" },
+        { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "Portland Departure, Troutdale altimeter 2998" },
+        { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "SSDEE", "distance": -5 }, "dialog": "cleared for the Visual 25 approach at Troutdale" },
+        { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "SSDEE" }, "dialog": "contact Troutdale Tower 120.9" },
+        { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "SSDEE" }, "dialog": "Troutdale Tower, base your discretion, call when on base" },
+        { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "SSDEE" }, "dialog": "number 2 following a Cessna, cleared to land Runway 25" },
+
+        { "callsign": "HMT 948", "trigger": { "type": "time", "time": 5 }, "dialog": "cleared for takeoff Runway 28L" },
+        { "callsign": "HMT 948", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "contact Portland Departure 118.1" },
+        { "callsign": "HMT 948", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "Portland Departure, Portland altimeter 2997" },
+        { "callsign": "HMT 948", "trigger": { "type": "waypoint", "waypoint": "OSWEG" }, "dialog": "contact Seattle Center 125.8" },
+        { "callsign": "HMT 948", "trigger": { "type": "waypoint", "waypoint": "OSWEG" }, "dialog": "Seattle Center, welcome, McMinnville altimeter 2998" },
+        { "callsign": "HMT 948", "trigger": { "type": "waypoint", "waypoint": "UNECE", "distance": -6 }, "dialog": "6 miles from UNECE, cross UNECE at or above 4000, cleared for the RNAV 22 approach at McMinnville" },
+        { "callsign": "HMT 948", "trigger": { "type": "waypoint", "waypoint": "UNECE" }, "dialog": "frequency change approved" }
       ],
       "additional_aircraft": []
     },
@@ -44,25 +105,117 @@
         { "callsign": "HMT 498", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KHIO", "arrival_runway": "RW13R", "approach": "R13R", "flight_plan": ["JALAG", "PITER", "DUCKA"], "cruise_alt": 7000 },
         { "callsign": "HMT 642", "initial_frequency": "118.100", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KEUG", "arrival_runway": "RW16R", "approach": "R16RY", "flight_plan": ["JALAG", "OSWEG", "MAGOT", "SHEDD"], "starting_leg": 1, "starting_alt": 6000, "cruise_alt": 6000 },
         { "callsign": "HMT 813", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KTTD", "arrival_runway": "RW25", "approach": "R25", "flight_plan": ["YIBPU", "CIZZL", "SSDEE", "SHYNE"], "cruise_alt": 2000 },
-        { "callsign": "HMT 525", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["YIBPU", "ENDZZ", "UBG"], "cruise_alt": 3000 },
-        { "callsign": "HMT 948", "initial_frequency": "125.800", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KMMV", "arrival_runway": "RW22", "approach": "R22", "flight_plan": ["YIBPU", "MULES", "OSWEG", "NNIKE", "OZIER"], "starting_leg": 3, "starting_alt": 5000, "cruise_alt": 5000 },
-        { "callsign": "HMT 710", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KKLS", "arrival_runway": "RW12", "approach": "R12", "flight_plan": ["JALAG", "LOATH", "AMAVE"] }
+        { "callsign": "HMT 525", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["YIBPU", "ENDZZ", "UBG"], "cruise_alt": 5000 },
+        { "callsign": "HMT 948", "initial_frequency": "125.800", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KMMV", "arrival_runway": "RW22", "approach": "R22", "flight_plan": ["YIBPU", "MULES", "OSWEG", "NNIKE", "OZIER"], "starting_leg": 1, "starting_alt": 6000, "cruise_alt": 6000 },
+        { "callsign": "HMT 710", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KKLS", "arrival_runway": "RW12", "approach": "R12", "flight_plan": ["JALAG", "LOATH", "AMAVE"], "cruise_alt": 8000 }
       ],
-      "additional_aircraft": []
+      "additional_aircraft": [],
+      "script": [
+        { "callsign": "HMT 954", "trigger": { "type": "time", "time": 5 }, "dialog": "cleared for takeoff Runway 28L" },
+        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "contact Portland Departure 118.1" },
+        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "Portland Departure, Aurora altimeter 2997" },
+        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "MOKIY", "distance": -5 }, "dialog": "5 miles from MOKIY, cross MOKIY at or above 3500, cleared for the RNAV 17 approach at Aurora" },
+        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "LUTZZ" }, "dialog": "contact Aurora Tower 120.35" },
+        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "LUTZZ" }, "dialog": "winds 100 at 4, cleared to land Runway 17" },
+
+        { "callsign": "HMT 498", "trigger": { "type": "time", "time": 35 }, "dialog": "cleared for takeoff Runway 28R" },
+        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "contact Portland Departure 118.1" },
+        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "Portland Departure, Hillsboro altimeter 2998" },
+        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER", "distance": -8 }, "dialog": "contact Seattle Center 125.8" },
+        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER", "distance": -8 }, "dialog": "Seattle Center, Hillsboro altimeter 2998" },
+        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER" }, "dialog": "8 miles from DUCKA, cross DUCKA at or above 5000, cleared for the RNAV 13R approach at Hillsboro" },
+
+        { "callsign": "HMT 642", "trigger": { "type": "time", "time": 45 }, "dialog": "contact Seattle Center 125.8" },
+        { "callsign": "HMT 642", "trigger": { "type": "time", "time": 45 }, "dialog": "Seattle Center, welcome, Salem altimeter 2998" },
+        { "callsign": "HMT 642", "trigger": { "type": "time", "time": 280 }, "dialog": "turn right heading 240, vectors for traffic" },
+        { "callsign": "HMT 642", "trigger": { "type": "time", "time": 540 }, "dialog": "turn left heading 200" },
+        { "callsign": "HMT 642", "trigger": { "type": "time", "time": 700 }, "dialog": "descend and maintain 5000" },
+
+        { "callsign": "HMT 813", "trigger": { "type": "time", "time": 65 }, "dialog": "cleared for takeoff Runway 28L" },
+        { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "contact Portland Departure 118.1" },
+        { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "Portland Departure, Troutdale altimeter 2996" },
+        { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "SSDEE", "distance": -8 }, "dialog": "cleared for the Visual 25 approach at Troutdale" },
+        { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "SSDEE", "distance": -5 }, "dialog": "contact Troutdale Tower 120.9" },
+        { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "SSDEE", "distance": -5 }, "dialog": "Troutdale Tower, base your discretion, call when on base" },
+        { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "SSDEE", "distance": -5 }, "condition": "on base call", "dialog": "number 2 following a Cessna, cleared to land Runway 25" },
+
+        { "callsign": "HMT 525", "trigger": { "type": "time", "time": 95 }, "dialog": "cleared for takeoff Runway 28L" },
+        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "contact Portland Departure 118.1" },
+        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "Portland Departure, Portland altimeter 2996" },
+        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "ENDZZ" }, "dialog": "contact Seattle Center 125.8" },
+        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "ENDZZ" }, "dialog": "Seattle Center, Salem altimeter 2998" },
+        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "UBG" }, "dialog": "descend and maintain 3600" },
+
+        { "callsign": "HMT 948", "trigger": { "type": "waypoint", "waypoint": "OSWEG" }, "dialog": "contact Seattle Center 125.8" },
+        { "callsign": "HMT 948", "trigger": { "type": "waypoint", "waypoint": "OSWEG" }, "dialog": "Seattle Center, welcome, McMinnville altimeter 2996" },
+        { "callsign": "HMT 948", "trigger": { "type": "waypoint", "waypoint": "NNIKE" }, "dialog": "descend and maintain 5000" },
+        { "callsign": "HMT 948", "trigger": { "type": "waypoint", "waypoint": "UNECE", "distance": -6 }, "dialog": "6 miles from UNECE, cross UNECE at or above 4000, cleared for the RNAV 22 approach at McMinnville" },
+        { "callsign": "HMT 948", "trigger": { "type": "waypoint", "waypoint": "UNECE" }, "dialog": "frequency change approved" },
+
+        { "callsign": "HMT 710", "trigger": { "type": "time", "time": 125 }, "dialog": "cleared for takeoff Runway 28R" },
+        { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "contact Portland Departure 118.1" },
+        { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "Portland Departure, Portland altimeter 2996" },
+        { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "LOATH", "distance": -20 }, "dialog": "contact Seattle Center 125.8" },
+        { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "LOATH", "distance": -20 }, "dialog": "Seattle Center, welcome, Kelso altimeter 2998" },
+        { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "LOATH", "distance": -15 }, "dialog": "descend and maintain 6000" },
+        { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "LOATH", "distance": -5 }, "dialog": "descend and maintain 5400" }
+      ]
     },
     {
       "name": "Group 6 (7/long/heavy)",
       "weather": "heavy",
       "initial_aircraft": [
-        { "callsign": "HMT 531", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KRDM", "arrival_runway": "RW11", "approach": "R11", "flight_plan": ["YIBPU", "MULES", "JJACE", "JJETT", "YONKU"], "starting_leg": 1, "starting_alt": 5000, "cruise_alt": 10000 },
+        { "callsign": "HMT 140", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KRDM", "arrival_runway": "RW11", "approach": "R11", "flight_plan": ["JALAG", "CUKIS", "JJACE", "JJETT", "YONKU"], "starting_leg": 1, "starting_alt": 10000, "cruise_alt": 10000 },
         { "callsign": "HMT 447", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KKLS", "arrival_runway": "RW12", "approach": "R12", "flight_plan": ["JALAG", "LOATH", "AMAVE"] },
         { "callsign": "HMT 255", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KUAO", "arrival_runway": "RW17", "approach": "R17", "flight_plan": ["YIBPU", "MOKIY"], "cruise_alt": 4000 },
         { "callsign": "HMT 843", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KCVO", "arrival_runway": "RW17", "approach": "R17", "flight_plan": ["YIBPU", "BREAF", "ADLOW"], "starting_leg": 1, "starting_alt": 5000, "cruise_alt": 5000 },
         { "callsign": "HMT 945", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KSPB", "arrival_runway": "RW15", "approach": "R15", "flight_plan": ["JALAG", "VOODU", "IMJUS"], "cruise_alt": 4000 },
         { "callsign": "HMT 589", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["YIBPU", "UBG", "KIGKE", "MCCOY"], "starting_leg": 2, "starting_alt": 3000, "cruise_alt": 3000 },
-        { "callsign": "HMT 498", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KHIO", "arrival_runway": "RW13R", "approach": "R13R", "flight_plan": ["JALAG", "PITER", "DUCKA"], "cruise_alt": 7000 }
+        { "callsign": "HMT 499", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KHIO", "arrival_runway": "RW13R", "approach": "R13R", "flight_plan": ["JALAG", "PITER", "DUCKA"], "cruise_alt": 7000 }
       ],
-      "additional_aircraft": []
+      "additional_aircraft": [],
+      "script": [
+        { "callsign": "HMT 140", "trigger": { "type": "time", "time": 60 }, "dialog": "change to my frequency 126.150" },
+        { "callsign": "HMT 140", "trigger": { "type": "time", "time": 60 }, "dialog": "welcome, Redmond altimeter 3010" },
+        { "callsign": "HMT 140", "trigger": { "type": "waypoint", "waypoint": "JJACE", "distance": -10 }, "condition": "on vector request", "dialog": "uh roger, standby, I have your request on file" },
+        { "callsign": "HMT 140", "trigger": { "type": "waypoint", "waypoint": "JJACE", "distance": -5 }, "condition": "on vector request", "dialog": "turn right heading 170, vectors for weather" },
+        { "callsign": "HMT 140", "trigger": { "type": "time", "time": 590 }, "dialog": "descend and maintain 7000" },
+        { "callsign": "HMT 140", "trigger": { "type": "time", "time": 680 }, "dialog": "turn left heading 110" },
+
+        { "callsign": "HMT 447", "trigger": { "type": "time", "time": 125 }, "dialog": "cleared for takeoff Runway 28R" },
+        { "callsign": "HMT 447", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "contact Portland Departure 118.1" },
+        { "callsign": "HMT 447", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "Portland Departure, Portland altimeter 2996" },
+        { "callsign": "HMT 447", "trigger": { "type": "waypoint", "waypoint": "LOATH", "distance": -8 }, "dialog": "contact Seattle Center 125.8" },
+        { "callsign": "HMT 447", "trigger": { "type": "waypoint", "waypoint": "LOATH", "distance": -8 }, "dialog": "Seattle Center, welcome, Kelso altimeter 2998" },
+
+        { "callsign": "HMT 255", "trigger": { "type": "time", "time": 35 }, "dialog": "cleared for takeoff Runway 28L" },
+        { "callsign": "HMT 255", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "contact Portland Departure 118.1" },
+        { "callsign": "HMT 255", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "Portland Departure, Aurora altimeter 2997" },
+        { "callsign": "HMT 255", "trigger": { "type": "waypoint", "waypoint": "MOKIY", "distance": -5 }, "dialog": "5 miles from MOKIY, cross MOKIY at or above 3500, cleared for the RNAV 17 approach at Aurora" },
+        { "callsign": "HMT 255", "trigger": { "type": "waypoint", "waypoint": "LUTZZ" }, "dialog": "contact Aurora Tower 120.35" },
+        { "callsign": "HMT 255", "trigger": { "type": "waypoint", "waypoint": "LUTZZ" }, "dialog": "winds 100 at 4, cleared to land Runway 17" },
+
+        { "callsign": "HMT 843", "trigger": { "type": "waypoint", "waypoint": "ADLOW", "distance": -7 }, "dialog": "7 miles from ADLOW, cross ADLOW at or above 3700, cleared for the RNAV 17 approach at Corvallis" },
+        { "callsign": "HMT 843", "trigger": { "type": "waypoint", "waypoint": "INNOP" }, "dialog": "frequency change approved" },
+
+        { "callsign": "HMT 945", "trigger": { "type": "time", "time": 5 }, "dialog": "cleared for takeoff Runway 28R" },
+        { "callsign": "HMT 945", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "contact Portland Departure 118.1" },
+        { "callsign": "HMT 945", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "Portland Departure, Scappoose altimeter 2998" },
+        { "callsign": "HMT 945", "trigger": { "type": "waypoint", "waypoint": "VOODU" }, "dialog": "contact Seattle Center 125.8" },
+        { "callsign": "HMT 945", "trigger": { "type": "waypoint", "waypoint": "VOODU" }, "dialog": "Seattle Center, Scappoose altimeter 2998" },
+        { "callsign": "HMT 945", "trigger": { "type": "waypoint", "waypoint": "IMJUS", "distance": -8 }, "dialog": "8 miles from IMJUS, cross IMJUS at or above 3500, cleared for the RNAV 15 approach at Scappoose" },
+
+        { "callsign": "HMT 589", "trigger": { "type": "waypoint", "waypoint": "MCCOY", "distance": -5 }, "dialog": "5 miles from MCCOY, cross MCCOY at or above 3100, cleared for the RNAV 13 approach at Salem" },
+        { "callsign": "HMT 589", "trigger": { "type": "waypoint", "waypoint": "BREAF" }, "dialog": "contact Salem Tower 119.1" },
+        { "callsign": "HMT 589", "trigger": { "type": "waypoint", "waypoint": "BREAF" }, "dialog": "winds 120 at 3, number 2 following a Citation, cleared to land Runway 13" },
+
+        { "callsign": "HMT 499", "trigger": { "type": "time", "time": 65 }, "dialog": "cleared for takeoff Runway 28R" },
+        { "callsign": "HMT 499", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "contact Portland Departure 118.1" },
+        { "callsign": "HMT 499", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "Portland Departure, Hillsboro altimeter 2998" },
+        { "callsign": "HMT 499", "trigger": { "type": "waypoint", "waypoint": "PITER", "distance": -8 }, "dialog": "contact Seattle Center 125.8" },
+        { "callsign": "HMT 499", "trigger": { "type": "waypoint", "waypoint": "PITER", "distance": -8 }, "dialog": "Seattle Center, Hillsboro altimeter 2998" },
+        { "callsign": "HMT 499", "trigger": { "type": "waypoint", "waypoint": "PITER" }, "dialog": "8 miles from DUCKA, cross DUCKA at or above 5000, cleared for the RNAV 13R approach at Hillsboro" }
+      ]
     },
     {
       "name": "Group 7 (7/pof/light)",

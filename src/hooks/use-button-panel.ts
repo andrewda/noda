@@ -1,12 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { toCanvas } from 'html-to-image';
-import * as StreamDeck from '@elgato-stream-deck/webhid';
 import { RadioCommunicationBoard } from '@/components/RadioPanel';
-import Frame from 'canvas-to-buffer';
-import { Image } from 'image-js';
-import { color } from 'd3';
-import { StreamDeckButtonControlDefinitionBase } from '@elgato-stream-deck/core';
-import { V } from 'ol/renderer/webgl/FlowLayer';
+import * as StreamDeck from '@elgato-stream-deck/webhid';
+import { useCallback, useEffect, useState } from 'react';
 
 export type UseButtonPanelsProps = {
   buttonPanels: StreamDeck.StreamDeckWeb[];
@@ -43,6 +37,14 @@ export const useButtonPanels = ({ buttonPanels, onTransmitting, onToggleMonitori
         onTransmitting(column + index * 4, false);
       }
     });
+
+    // buttonPanel.on('lcdShortPress', (button, { x }) => {
+    //   console.log('lcdShortPress', button, pos);
+    // });
+
+    // buttonPanel.on('lcdLongPress', (button, pos) => {
+    //   console.log('lcdLongPress', button, pos);
+    // });
   }, [onTransmitting, onToggleMonitoring]);
 
   useEffect(() => {
@@ -91,7 +93,7 @@ export const useButtonPanels = ({ buttonPanels, onTransmitting, onToggleMonitori
 
     ctx.textBaseline = 'top';
     ctx.textAlign = 'center';
-    ctx.letterSpacing = '3px';
+    ctx.letterSpacing = '4px';
 
     radios.forEach(({ aircraft, frequency }, idx) => {
       if (aircraft === selectedAircraftCallsign) {
@@ -123,7 +125,7 @@ export const useButtonPanels = ({ buttonPanels, onTransmitting, onToggleMonitori
     buttonCtx.rotate(Math.PI);
     buttonCtx.translate(-buttonCanvas.width, -buttonCanvas.height);
 
-    buttons.forEach(({ row, column, pixelSize }, idx) => {
+    buttons.forEach(({ row, column, pixelSize }) => {
       const radio = radios[column];
 
       let image;

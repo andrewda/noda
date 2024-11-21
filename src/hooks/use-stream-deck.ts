@@ -26,7 +26,7 @@ function useStreamDeck(eventHandlers?: EventHandlers) {
     getAttachedStreamDecks();
 
     return () => {
-      streamDecks.forEach((deck) => deck.close());
+      // streamDecks.forEach((deck) => deck.close());
     };
   }, []);
 

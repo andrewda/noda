@@ -286,7 +286,7 @@ const MapPanel = ({
     // Update Weather Layer
     if (weather) {
       const extent = transformExtent(
-        [-127.85, 40.85, -107.67, 50.5],
+        [-127.45, 40.55, -107.27, 50.20],
         'EPSG:4326',
         map.getView().getProjection()
       );
@@ -350,7 +350,7 @@ const MapPanel = ({
       const selected = callsign === selectedAircraftCallsign;
 
       const altitudeText = Math.round(aircraftItem.altitude / 100).toString().padStart(3, '0')
-      const airspeedText = Math.round(aircraftItem.tas / 100).toString().padStart(3, '0')
+      const airspeedText = Math.round(aircraftItem.tas).toString().padStart(3, '0')
 
       const aircraftLabelStyle = new Style({
         text: new Text({
@@ -459,13 +459,13 @@ const MapPanel = ({
       innerCircle.setStyle(
         new Style({
           stroke: new Stroke({ color: 'red', width: 3 }),
-          fill: new Fill({ color: 'rgba(255, 0, 0, 0.1)' }),
+          // fill: new Fill({ color: 'rgba(255, 0, 0, 0.1)' }),
         })
       );
       outerCircle.setStyle(
         new Style({
           stroke: new Stroke({ color: 'blue', width: 3 }),
-          fill: new Fill({ color: 'rgba(0, 0, 255, 0.1)' }),
+          // fill: new Fill({ color: 'rgba(0, 0, 255, 0.1)' }),
         })
       );
 

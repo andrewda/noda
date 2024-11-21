@@ -104,7 +104,7 @@ function Radio({ radio, selected, className, onSelect, setMonitoring, setTransmi
   }
 
   return (
-    <div onClick={onSelect} className={`w-full h-20 px-1 py-1.5 rounded border ${radio.aircraft ? 'cursor-pointer hover:brightness-[0.85]' : ''} ${selected ? 'border-fuchsia-400 bg-fuchsia-950/30 hover:brightness-100' : 'border-[#ababab]'} flex-col justify-between items-start inline-flex overflow-hidden ${className}`}>
+    <div onMouseDown={onSelect} className={`w-full h-20 px-1 py-1.5 rounded border ${radio.aircraft ? 'cursor-pointer hover:brightness-[0.85]' : ''} ${selected ? 'border-fuchsia-400 bg-fuchsia-950/30 hover:brightness-100' : 'border-[#ababab]'} flex-col justify-between items-start inline-flex overflow-hidden ${className}`}>
       <div className="self-stretch px-0.5 justify-between items-center inline-flex">
         <div className={`h-5 relative flex flex-row items-center gap-1 ${selected ? 'text-fuchsia-400' : 'text-gray-200'}`}>
           {radio.aircraft ? (

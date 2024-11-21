@@ -60,6 +60,7 @@ export type AircraftStateBoard = {
   flightPlanPos: [number, number][];
   flightPlanTargetSpeed: number[];
   flightPlanIndex: number;
+  dist: number;
 
   departureAirport: string;
   departureRunway: string;

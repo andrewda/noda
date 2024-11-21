@@ -88,6 +88,11 @@ export const usePeerConnection = ({ streamCount }: { streamCount: number }) => {
 
       await audioContext.resume();
 
+      // If we are receiving more than the expected number of tracks, assume there's been a disconnection and reset
+      if ((remoteStream?.getTracks().length ?? 0) >= streamCount) {
+        remoteStream?.getTracks().forEach((track) => remoteStream?.removeTrack(track));
+      }
+
       remoteStream?.addTrack(track);
 
       // Match incoming tracks to the correct index
@@ -177,7 +182,6 @@ export const usePeerConnection = ({ streamCount }: { streamCount: number }) => {
         break;
       case 'answer':
         if (data) {
-          console.log('in webrtcCallback - answer', peerConnection.connectionState, peerConnection.signalingState, peerConnection.remoteDescription, Date.now());
           if (peerConnection.signalingState === 'stable') return;
           peerConnection.setRemoteDescription(data);
         }
@@ -312,7 +316,6 @@ const createOffer = async ({ socket, localStream, peerConnection, streamCount }:
 const acceptOffer = async ({ socket, localStream, peerConnection, remoteDescription, streamCount }: { socket: Socket | undefined, localStream: MediaStream, peerConnection: RTCPeerConnection, remoteDescription: RTCSessionDescriptionInit, streamCount: number }) => {
   const trackControls = new Map<number, { micGain: GainNode, audioContext: AudioContext, outputTrack: MediaStreamTrack }>();
 
-  console.log('in acceptOffer', peerConnection.connectionState, peerConnection.signalingState, peerConnection.remoteDescription, peerConnection.localDescription);
   if (peerConnection.signalingState !== 'stable') return;
 
   await peerConnection.setRemoteDescription(remoteDescription);

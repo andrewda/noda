@@ -1,4 +1,5 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useForm } from 'react-hook-form';
 
 import MapPanel from '@/components/MapPanel';
@@ -7,47 +8,97 @@ import { Input } from '@/components/ui/input';
 import { useSimulation } from '@/hooks/use-simulation';
 import { useSocket, useSocketEvent } from '@/lib/socket';
 import { Combobox } from '@/components/ui/combobox';
+import SpeakIcon from '@mui/icons-material/RecordVoiceOver';
+import CheckIcon from '@mui/icons-material/Check';
 
 import configs from './configs.json';
 import { Pane, ResizablePanes } from 'resizable-panes-react';
 import TimelinePanel from '@/components/TimelinePanel';
-import { frequencyToFacility } from '@/components/RadioPanel';
+import { frequencyToFacility, MonitorIndicator } from '@/components/RadioPanel';
+import { useScript } from '@/hooks/use-script';
+import { useAudioMonitor, useLocalStream, usePeerConnection } from '@/lib/communications';
 
 export default function ExperimenterPage() {
   const socket = useSocket();
   const { register, handleSubmit, watch, getValues, resetField, setValue } = useForm();
 
+  const localStream = useLocalStream();
+  const { peerConnection, connectionStatus, dataChannel, tracks, trackControls, createOffer } = usePeerConnection({ streamCount: 8 });
+  const localTracks = useMemo(() => new Map(Array.from(trackControls?.entries() ?? []).map(([i, { outputTrack }]) => [i, outputTrack])), [trackControls]);
+
+  const remoteAudioMonitors = useAudioMonitor(tracks);
+  const localAudioMonitors = useAudioMonitor(localTracks);
+
   const [configIndex, setConfigIndex] = useState<string | undefined>(undefined);
   const [selectedAircraftCallsign, setSelectedAircraftCallsign] = useState<string | undefined>(undefined);
-
+  const [startTime, setStartTime] = useState<Date>(new Date());
+  const [running, setRunning] = useState<boolean>(false);
+  const [transmitStartTime, setTransmitStartTime] = useState<Date>();
   const [connectionState, setConnectionState] = useState<'connected' | 'disconnected'>(socket?.connected ? 'connected' : 'disconnected');
 
-  const { lastMessageTime, aircraft, weather } = useSimulation();
+  const { lastMessageTime, paused, globalTime, aircraft, weather } = useSimulation();
+
+  const config = useMemo(() => configs['groups'][Number(configIndex)], [configIndex]);
+
+  const [spokenScriptEvents, setSpokenScriptEvents] = useState<string[]>([]);
+  const [completedScriptEvents, setCompletedScriptEvents] = useState<string[]>([]);
+
+  const activeScript = useScript(startTime, config, spokenScriptEvents, completedScriptEvents, running ? aircraft : {}, globalTime ?? 0);
+
+  const beginTransmit = useCallback((scriptEvent?: any) => {
+    // TODO: start broadcasting on freuqency of {callsign}
+    setTransmitStartTime(new Date());
+
+    const aircraftIdx = Object.keys(aircraft).findIndex((callsign) => callsign === scriptEvent?.callsign);
+    const micGain = trackControls.get(aircraftIdx)?.micGain;
+    if (micGain) {
+      micGain.gain.value = 1;
+    }
+  }, [aircraft, trackControls]);
+
+
+  const endTransmit = useCallback((scriptEvent?: any) => {
+    // TODO: stop broadcasting on freuqency of {callsign}
+    socket?.emit('command', { aircraft: scriptEvent?.callsign, command: 'transmit-atc', payload: { frequency: '', dialog: scriptEvent?.dialog, start: transmitStartTime, end: new Date() } });
+    setTransmitStartTime(undefined);
+    // setSpokenScriptEvents((prev) => [...prev, scriptEvent.id]);
+
+    // const aircraftIdx = Object.keys(aircraft).findIndex((callsign) => callsign === scriptEvent?.callsign);
+    // const micGain = trackControls.get(aircraftIdx)?.micGain;
+    // if (micGain) {
+    //   micGain.gain.value = 0;
+    // }
+    trackControls.forEach(({ micGain }) => micGain.gain.value = 0);
+  }, [socket, transmitStartTime, aircraft, trackControls]);
+
+  const completeScriptEvent = useCallback((dialogId: string) => {
+    setCompletedScriptEvents((prev) => [...prev, dialogId]);
+  }, []);
 
   const commandInit = useCallback(() => {
     socket?.emit('runSimulation', 'StudyFullFlight');
 
+    setSpokenScriptEvents([]);
+    setCompletedScriptEvents([]);
+    setRunning(false);
+
     // TODO: this is a little hacky, but it works for now
     setTimeout(() => {
-      const config = configs['groups'][Number(configIndex)];
-
       socket?.emit('command', {
         aircraft: null,
         command: 'init',
         payload: {
-          name: `group_${configIndex}`,
+          name: `group_${Number(configIndex) + 1}`,
           paused: true,
           weather: config.weather,
           aircraft: config.initial_aircraft,
         }
+      }, () => {
+        setStartTime(new Date());
+        setRunning(true);
       });
     }, 2000);
-  }, [socket, configIndex]);
-
-  const commandTakeoff = useCallback(() => {
-    socket?.emit('command', { aircraft: getValues('takeoffAircraft'), command: 'takeoff' });
-    setValue('takeoffAircraft', '');
-  }, [socket, getValues, setValue]);
+  }, [socket, config, configIndex]);
 
   const commandRemove = useCallback(() => {
     const callsign = getValues('removeAircraft');
@@ -70,48 +121,83 @@ export default function ExperimenterPage() {
 
   return (
     <div className="flex items-start h-screen">
-      <div className="flex flex-col items-center gap-4 w-full max-w-lg flex-1">
-        <h1 className="text-4xl flex items-center gap-4 mt-20">
+      <div className="flex flex-col gap-4 p-4 w-full h-full max-w-lg flex-1">
+        <h1 className="text-4xl flex items-center self-center gap-4 mt-4">
           Mission Control
           <div title={`WebSocket status: ${connectionState}`} className={`w-6 h-6 rounded-full shadow-inner ${connectionState === 'connected' ? 'bg-green-400 shadow-green-800' : 'bg-red-400 shadow-red-800'}`}></div>
         </h1>
 
-        <div className="w-96 flex flex-col gap-4">
-          <div className="flex gap-4">
-            {/* <Input className="flex-1" type="text" placeholder="Simulation Name" {...register('simulationName')} /> */}
-            <Combobox className="w-full" label="Simulation Name" options={configs.groups.map(({ name }, index) => ({ label: name, value: index.toString() }))} value={configIndex} onValueChange={setConfigIndex} />
+        <div className="w-96 flex flex-col self-center gap-4">
+          <div className="flex w-full gap-4">
+            <Combobox className="flex-1" label="Simulation Name" options={configs.groups.map(({ name }, index) => ({ label: name, value: index.toString() }))} value={configIndex} onValueChange={setConfigIndex} />
             <Button className="w-36" onClick={commandInit}>Start Simulation</Button>
           </div>
 
-          <div className="flex gap-4">
-            <Button className="w-36" onClick={() => commandPaused(true)}>Pause</Button>
-            <Button className="w-36" onClick={() => commandPaused(false)}>Resume</Button>
+          <div className="flex w-full gap-4">
+            <Button className="w-full" disabled={paused} onClick={() => commandPaused(true)}>Pause</Button>
+            <Button className="w-full" disabled={!paused} onClick={() => commandPaused(false)}>Resume</Button>
           </div>
 
-          <div className="flex gap-4">
-            <Input className="flex-1" type="text" placeholder="Aircraft Callsign" {...register('takeoffAircraft')} />
-            <Button className="w-36" disabled={watch('takeoffAircraft') === ''} onClick={commandTakeoff}>Takeoff</Button>
-          </div>
-
-          <div className="flex gap-4">
+          <div className="flex w-full gap-4">
             <Input className="flex-1" type="text" placeholder="Aircraft Callsign" {...register('removeAircraft')} />
             <Button className="w-36" disabled={watch('removeAircraft') === ''} onClick={commandRemove}>Remove</Button>
           </div>
         </div>
 
+        <div className="flex gap-2 text-sm self-center">
+          <span suppressHydrationWarning>
+            <span>Local:</span> <span className={localStream ? 'text-green-500' : 'text-neutral-400'}>{localStream ? 'connected' : 'disconnected'}</span>
+          </span>
+          <span>|</span>
+          <span suppressHydrationWarning>
+            <span>Peer:</span> <span className={`cursor-pointer ${connectionStatus === 'connected' ? 'text-green-500' : 'text-neutral-400'}`} onClick={() => createOffer?.()}>{connectionStatus ?? 'disconnected'}</span>
+          </span>
+        </div>
+
+        <div className="text-sm self-center">Last Message Time: <span className="font-mono">{lastMessageTime?.toLocaleString() ?? '—'}</span></div>
+
         <div className="flex flex-col gap-4">
-          <div className="text-sm">Last Message Time: <span className="font-mono">{lastMessageTime?.toLocaleString() ?? '—'}</span></div>
-          <div className="text-sm">Number of Aircraft: <span className="font-mono">{Object.keys(aircraft).length}</span></div>
-          {Object.entries(aircraft).map(([callsign, aircraft]) => (
-            <div key={callsign} className="flex gap-4 items-center hover:brightness-75 cursor-pointer" onClick={() => setSelectedAircraftCallsign(callsign)}>
-              <div className="w-3 h-3 rounded-full border border-neutral-400 flex-shrink-0"></div>
-              <div className="flex-grow">
-                <div className={`font-mono ${callsign === selectedAircraftCallsign ? 'text-fuchsia-400' : 'text-neutral-200'}`}>{callsign}</div>
-                <div className="text-xs font-mono text-neutral-400">{aircraft.altitude.toFixed(0)} ft / {aircraft.tas.toFixed(0)} kt</div>
-                <div className="text-xs font-mono text-neutral-400">{aircraft.frequency} / {frequencyToFacility[aircraft.frequency] ?? ''}</div>
+          <div className="grid grid-cols-2 grid-rows-4 grid-flow-col gap-2 mx-4">
+            {Object.entries(aircraft).map(([callsign, aircraft], idx) => (
+              <div key={callsign} className={`flex flex-row gap-4 items-center border ${callsign === selectedAircraftCallsign ? 'border-fuchsia-400 bg-fuchsia-950/30' : 'border-neutral-400'} rounded-md px-2 py-1`}>
+                <div className="flex-grow hover:brightness-75 cursor-pointer" onClick={() => setSelectedAircraftCallsign(callsign)}>
+                  <div className="flex gap-2 items-center">
+                    <MonitorIndicator receive={remoteAudioMonitors.get(idx) ?? false} className="w-3 h-3" />
+                    <div className={`font-mono ${callsign === selectedAircraftCallsign ? 'text-fuchsia-400' : 'text-neutral-200'}`}>{callsign}</div>
+                  </div>
+                  <div className="text-xs font-mono text-neutral-400">{aircraft.altitude.toFixed(0)} ft / {aircraft.tas.toFixed(0)} kt</div>
+                  <div className="text-xs font-mono text-neutral-400">{aircraft.frequency} / {frequencyToFacility[aircraft.frequency] ?? ''}</div>
+                </div>
+                <Button className="w-12 active:bg-cyan-500/80" onMouseDown={() => beginTransmit({ callsign })} onMouseUp={() => endTransmit({ callsign })} ><SpeakIcon style={{ fontSize: '1.2em' }} /></Button>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col self-start gap-2 w-full h-full overflow-y-scroll">
+          <AnimatePresence>
+            {activeScript?.map((scriptEvent: any) => (
+              <motion.div
+                key={scriptEvent.id}
+                className="flex flex-row gap-2 bg-neutral-800 p-3 rounded-md border border-neutral-400"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <div className="flex-grow">
+                  <div className="font-mono">
+                    {scriptEvent.callsign}
+                    <span className="text-xs text-neutral-400 ml-2">{scriptEvent.condition ?? ''}</span>
+                  </div>
+                  <div className="text-xs font-mono text-neutral-200">{scriptEvent.dialog}</div>
+                </div>
+                <div className="flex gap-2">
+                  <Button className="active:bg-cyan-500/80" onMouseDown={() => beginTransmit(scriptEvent)} onMouseUp={() => endTransmit(scriptEvent)} ><SpeakIcon style={{ fontSize: '1.2em' }} /></Button>
+                  <Button className="w-12" onClick={() => completeScriptEvent(scriptEvent.id)}><CheckIcon style={{ fontSize: '1.2em' }} /></Button>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       </div>
 

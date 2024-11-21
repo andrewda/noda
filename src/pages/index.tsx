@@ -2,19 +2,17 @@ import C2Panel from '@/components/C2Panel'
 import RadioPanel, { RadioCommunicationBoard } from '@/components/RadioPanel'
 import TimelinePanel from '@/components/TimelinePanel'
 import dynamic from 'next/dynamic'
-import Head from 'next/head'
-import { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Toaster } from 'react-hot-toast'
 import { Pane, ResizablePanes } from 'resizable-panes-react'
 
-import { useSimulation } from '@/hooks/use-simulation'
-import { useSocket, useSocketEvent } from '@/lib/socket'
-import { useAudioMonitor, usePeerConnection } from '@/lib/communications'
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogOverlay, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { useButtonPanels } from '@/hooks/use-button-panel'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, AlertDialogPortal, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
-import { PauseIcon } from '@radix-ui/react-icons'
+import { useSimulation } from '@/hooks/use-simulation'
 import useStreamDeck from '@/hooks/use-stream-deck'
+import { useAudioMonitor, usePeerConnection } from '@/lib/communications'
+import { useSocket, useSocketEvent } from '@/lib/socket'
+import { PauseIcon } from '@radix-ui/react-icons'
 
 const MapPanel = dynamic(
   () => import('../components/MapPanel'),
@@ -59,6 +57,7 @@ export default function Home() {
 
   const { peerConnection, connectionStatus, dataChannel, tracks, trackControls, createOffer } = usePeerConnection({ streamCount: 8 });
   const localTracks = useMemo(() => new Map(Array.from(trackControls?.entries() ?? []).map(([i, { outputTrack }]) => [i, outputTrack])), [trackControls]);
+  const [transmitStartTime, setTransmitStartTime] = useState<Date>();
 
   const remoteAudioMonitors = useAudioMonitor(tracks);
   const localAudioMonitors = useAudioMonitor(localTracks);
@@ -70,7 +69,7 @@ export default function Home() {
   }, [aircraft, selectedAircraftCallsign])
 
   useEffect(() => {
-    setRadios((radios) => Object.fromEntries(Object.entries(radios).map(([id, radio], idx) => {
+    const newRadios = Object.fromEntries(Object.entries(radios).map(([id, radio], idx) => {
       const aircraftIdent = Object.keys(aircraft)[idx];
       const { frequency } = aircraft[aircraftIdent] ?? '';
       return ([id, {
@@ -79,8 +78,12 @@ export default function Home() {
         frequency,
         receiving: remoteAudioMonitors.get(idx) ?? false,
       }]);
-    })));
-  }, [aircraft, remoteAudioMonitors, localAudioMonitors]);
+    }));
+
+    if (JSON.stringify(newRadios) !== JSON.stringify(radios)) {
+      setRadios(newRadios);
+    }
+  }, [aircraft, radios, remoteAudioMonitors, localAudioMonitors]);
 
   const onToggleMonitoring = useCallback((radioIdx: number) => {
     setRadios((radios) => Object.fromEntries(Object.entries(radios).map(([id, radio], idx) => ([id, { ...radio, monitoring: (idx === radioIdx ? !radio.monitoring : radio.monitoring) }]))));
@@ -97,7 +100,13 @@ export default function Home() {
     if (micGain) {
       micGain.gain.value = transmitting ? 1 : 0;
     }
-  }, [trackControls]);
+
+    if (transmitting) {
+      setTransmitStartTime(new Date());
+    } else {
+      socket?.emit('command', { aircraft: radios[radioIdx].aircraft, command: 'transmit', payload: { frequency: radios[radioIdx].frequency, start: transmitStartTime, end: new Date() } });
+    }
+  }, [socket, radios, transmitStartTime, trackControls]);
 
   const onSetFrequency = useCallback((radioIdx: number, frequency: string) => {
     socket?.emit('command', { aircraft: radios[radioIdx].aircraft, command: 'frequency', payload: frequency });
