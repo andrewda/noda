@@ -24,12 +24,12 @@ export interface ComboboxProps extends React.HTMLAttributes<HTMLDivElement> {
   options: { label: string; value: string }[];
   defaultValue?: string;
   value?: string;
-  onValueChange?: (value: string) => void;
+  onValueChange?: (value: string | undefined) => void;
 }
 
 export function Combobox({ label, options, value, defaultValue, onValueChange, ...props }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
-  const [selectedValue, setSelectedValue] = React.useState<any>(undefined)
+  const [selectedValue, setSelectedValue] = React.useState<string | undefined>(undefined)
 
   React.useEffect(() => {
     setSelectedValue(value ?? defaultValue);
@@ -61,8 +61,9 @@ export function Combobox({ label, options, value, defaultValue, onValueChange, .
                   key={options.value}
                   value={options.value}
                   onSelect={(currentValue) => {
-                    setSelectedValue(currentValue === selectedValue ? undefined : currentValue)
-                    onValueChange?.(currentValue);
+                    const newValue = currentValue === selectedValue ? undefined : currentValue;
+                    setSelectedValue(newValue);
+                    onValueChange?.(newValue);
                     setOpen(false)
                   }}
                 >

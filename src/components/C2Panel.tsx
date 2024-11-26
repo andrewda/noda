@@ -45,6 +45,7 @@ export type AircraftStateBoard = {
   track: number;
   heading: number;
   altitude: number;
+  altimeter: number;
   tas: number;
   cas: number;
   vs: number;
@@ -304,7 +305,7 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
           <ArmableInput value={heading ?? ''} placeholder={Math.round(aircraft.heading)?.toLocaleString()} labelText="Heading" armText={heading === undefined ? 'Arm' : `Arm ${heading}`} armDisabled={heading === undefined} type="number" unit="deg" onChange={(e: any) => setHeading(e.target.value !== '' ? clamp(Number(e.target.value), -360, 360) : undefined)} onArm={() => { armCommand({ label: `Heading ${heading}`, command: 'heading', payload: heading }); setHeading(undefined); }} />
           <ArmableInput value={altitude ?? ''} placeholder={formatAltitudeString(aircraft.altitude, aircraft.vs)} labelText="Altitude" armText={altitude === undefined ? 'Arm' : `Arm ${formatAltitude(altitude)} ft`} armDisabled={altitude === undefined} type="number" unit="ft" onChange={(e: any) => setAltitude(e.target.value !== '' ? clamp(Number(e.target.value), 0, 30000) : undefined)} onArm={() => { armCommand({ label: `Altitude ${formatAltitude(altitude ?? 0)}`, command: 'altitude', payload: altitude }); setAltitude(undefined); }} />
           <ArmableInput value={airspeed ?? ''} placeholder={Math.round(aircraft.tas)?.toLocaleString()} labelText="Airspeed" armText={airspeed === undefined ? 'Arm' : `Arm ${airspeed} kt`} armDisabled={airspeed === undefined} type="number" unit="kt" onChange={(e: any) => setAirspeed(e.target.value !== '' ? clamp(Number(e.target.value), 0, 180) : undefined)} onArm={() => { armCommand({ label: `Speed ${airspeed} kt`, command: 'airspeed', payload: airspeed }); setAirspeed(undefined); }} />
-          <ArmableInput value={altimeter ?? ''} placeholder={29.97} labelText="Altimeter" armText={altimeter === undefined ? 'Arm' : `Arm ${altimeter}`} armDisabled={altimeter === undefined} type="number" unit="inHg" onChange={(e: any) => setAltimeter(e.target.value !== '' ? calculateAltimeter(e.target.value) : undefined)} onArm={() => { armCommand({ label: `Altimeter ${altimeter}`, command: 'altimeter', payload: altimeter }); setAltimeter(undefined); }} />
+          <ArmableInput value={altimeter ?? ''} placeholder={aircraft.altimeter?.toFixed(2) ?? '30.00'} labelText="Altimeter" armText={altimeter === undefined ? 'Arm' : `Arm ${altimeter}`} armDisabled={altimeter === undefined} type="number" unit="inHg" onChange={(e: any) => setAltimeter(e.target.value !== '' ? calculateAltimeter(e.target.value) : undefined)} onArm={() => { armCommand({ label: `Altimeter ${altimeter}`, command: 'altimeter', payload: altimeter }); setAltimeter(undefined); }} />
 
           {aircraft.flightPhase === 2 && <Button className="relative w-full mt-4" onClick={() => armCommand({ label: 'Takeoff', command: 'takeoff' })}>Takeoff</Button>}
 

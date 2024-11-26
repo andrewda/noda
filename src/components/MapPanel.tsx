@@ -79,6 +79,7 @@ const BaseLayerPicker = ({ map }: { map: OlMap }) => {
       }}
     >
       <Label>Base Layer</Label>
+      {/* @ts-ignore */}
       <Combobox label="Base Layer" options={[{ label: 'Simple Dark', value: 'Simple Dark' }, { label: 'Aerial', value: 'Aerial' }, { label: 'VFR Sectional', value: 'VFR Sectional' }, { label: 'IFR Chart', value: 'IFR Chart' }]} defaultValue={selectedLayer} onValueChange={onChange} />
     </div>
   );
@@ -176,7 +177,7 @@ const MapPanel = ({
       });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedAircraftCallsign])
+  }, [selectedAircraftCallsign]);
 
   useEffect(() => {
     // Initialize map with base layers
@@ -339,18 +340,18 @@ const MapPanel = ({
 
     const callsignsPresent = new Set();
 
-    Object.values(aircraft || {}).forEach((aircraftItem) => {
+    Object.values(aircraft || {}).forEach((aircraftItem, idx) => {
       const callsign = aircraftItem.callsign;
       callsignsPresent.add(callsign);
 
       const coords = fromLonLat([aircraftItem.position[1], aircraftItem.position[0]]);
       const point = new Point(coords);
 
-      const receiving = radios?.[callsign]?.receiving || false;
+      const receiving = radios?.[idx]?.receiving ?? false;
       const selected = callsign === selectedAircraftCallsign;
 
-      const altitudeText = Math.round(aircraftItem.altitude / 100).toString().padStart(3, '0')
-      const airspeedText = Math.round(aircraftItem.tas).toString().padStart(3, '0')
+      const altitudeText = Math.round(aircraftItem.altitude / 100).toString().padStart(3, '0');
+      const airspeedText = Math.round(aircraftItem.tas).toString().padStart(3, '0');
 
       const aircraftLabelStyle = new Style({
         text: new Text({
@@ -366,7 +367,6 @@ const MapPanel = ({
         image: new CircleStyle({
           radius: 3,
           fill: new Fill({ color: receiving ? '#00d30a' : 'transparent' }),
-          // stroke: new Stroke({ color: 'black', width: 1 }),
           displacement: [62, 1]
         }),
       });
@@ -381,11 +381,7 @@ const MapPanel = ({
       });
 
       const feature = new Feature({ geometry: point, aircraft: aircraftItem });
-      feature.setStyle((feature, resolution) => {
-        // console.log(resolution);
-        // aircraftLabelStyle.getText()?.setScale(Math.min(1, 1 / resolution));
-        return [aircraftDotStyle, aircraftLabelStyle];
-      });
+      feature.setStyle((feature, resolution) => [aircraftDotStyle, aircraftLabelStyle]);
 
       if (selected) {
         selectedAircraftSource.addFeature(feature);

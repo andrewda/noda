@@ -201,6 +201,8 @@ export const usePeerConnection = ({ streamCount }: { streamCount: number }) => {
     createOffer({ socket, localStream, peerConnection, streamCount }).then((trackControls) => setTrackControls(trackControls));
   }, [localStream, peerConnection, socket, streamCount]);
 
+
+
   return { peerConnection, connectionStatus, dataChannel, tracks: remoteTracks, trackControls, createOffer: createOfferFn };
 }
 
@@ -232,7 +234,7 @@ export const useAudioMonitor = (tracks: Map<number, MediaStreamTrack> | undefine
         const sum = dataArray.reduce((a, b) => a + b, 0);
         const average = sum / dataArray.length;
 
-        setAudioMonitors((monitors) => new Map(monitors.set(i, average > 10)));
+        setAudioMonitors((monitors) => new Map(monitors.set(i, average > 2)));
       });
     };
 
@@ -252,7 +254,7 @@ const loadAudioBuffer = async (audioContext: AudioContext, url: string) => fetch
     .then(response => response.arrayBuffer())
     .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer));
 
-const createMicrophoneStream = (micTrack: MediaStreamTrack, audioClip?: string, applyEffects?: boolean) => {
+const createAudioStream = (micTrack: MediaStreamTrack, audioClip?: string, applyEffects?: boolean) => {
   const audioContext = new AudioContext();
   const destination = audioContext.createMediaStreamDestination();
 
@@ -279,7 +281,7 @@ const createMicrophoneStream = (micTrack: MediaStreamTrack, audioClip?: string, 
   const outputStream = destination.stream;
   const outputTrack = outputStream.getAudioTracks()[0];
 
-  return { audioContext, micGain, outputStream, outputTrack };
+  return { audioContext, micGain, outputStream, outputTrack, destination };
 }
 
 /**
@@ -294,7 +296,7 @@ const createOffer = async ({ socket, localStream, peerConnection, streamCount }:
   const micTrack = localStream.getAudioTracks()[0];
 
   for (let i = 0; i < streamCount; i++) {
-    const { audioContext, micGain, outputStream, outputTrack } = createMicrophoneStream(micTrack);
+    const { audioContext, micGain, outputStream, outputTrack } = createAudioStream(micTrack);
 
     // trackControls.set(i, { micGain, clipGain, audioContext, clipBuffer, outputTrack });
     trackControls.set(i, { micGain, audioContext, outputTrack });
@@ -324,7 +326,7 @@ const acceptOffer = async ({ socket, localStream, peerConnection, remoteDescript
   const micTrack = localStream.getAudioTracks()[0];
 
   for (let i = 0; i < streamCount; i++) {
-    const { audioContext, micGain, outputStream, outputTrack } = createMicrophoneStream(micTrack);
+    const { audioContext, micGain, outputStream, outputTrack } = createAudioStream(micTrack);
 
     trackControls.set(i, { micGain, audioContext, outputTrack });
     peerConnection.addTrack(outputTrack, outputStream);

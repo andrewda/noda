@@ -13,6 +13,17 @@
   font-weight: 500;
 }
 
+@keyframes flashGreen {
+  0% {
+    @apply text-green-400;
+  }
+  100% {}
+}
+
+.flash-change {
+  animation: flashGreen 1s ease-in-out infinite;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

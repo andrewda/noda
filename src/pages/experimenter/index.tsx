@@ -14,9 +14,18 @@ import CheckIcon from '@mui/icons-material/Check';
 import configs from './configs.json';
 import { Pane, ResizablePanes } from 'resizable-panes-react';
 import TimelinePanel from '@/components/TimelinePanel';
-import { frequencyToFacility, MonitorIndicator } from '@/components/RadioPanel';
 import { useScript } from '@/hooks/use-script';
 import { useAudioMonitor, useLocalStream, usePeerConnection } from '@/lib/communications';
+import { AircraftGrid } from '@/components/AircraftGrid';
+import { cn } from '@/lib/utils';
+
+const secondsToMmss = (seconds: number | undefined) => {
+  if (!seconds || seconds <= 0) return '0:00';
+
+  const displayMinutes = Math.floor(seconds / 60);
+  const displaySeconds = Math.floor(seconds % 60).toString().padStart(2, '0');
+  return `${displayMinutes}:${displaySeconds}`;
+}
 
 export default function ExperimenterPage() {
   const socket = useSocket();
@@ -56,7 +65,6 @@ export default function ExperimenterPage() {
     }
   }, [aircraft, trackControls]);
 
-
   const endTransmit = useCallback((scriptEvent?: any) => {
     // TODO: stop broadcasting on freuqency of {callsign}
     socket?.emit('command', { aircraft: scriptEvent?.callsign, command: 'transmit-atc', payload: { frequency: '', dialog: scriptEvent?.dialog, start: transmitStartTime, end: new Date() } });
@@ -82,35 +90,58 @@ export default function ExperimenterPage() {
     setCompletedScriptEvents([]);
     setRunning(false);
 
+    if (!config) {
+      alert('No config selected');
+      return;
+    }
+
     // TODO: this is a little hacky, but it works for now
     setTimeout(() => {
       socket?.emit('command', {
         aircraft: null,
         command: 'init',
         payload: {
-          name: `group_${Number(configIndex) + 1}`,
+          name: config.name.replace(/\s/g, '_').toLowerCase(),
           paused: true,
           weather: config.weather,
-          aircraft: config.initial_aircraft,
+          // @ts-ignore
+          aircraft: config.aircraft.filter(({ defer }) => !defer).map(({ defer, ...aircraft }) => aircraft),
+          // @ts-ignore
+          order: config.aircraft.filter(({ defer }) => !defer).map(({ callsign }) => callsign),
         }
       }, () => {
         setStartTime(new Date());
         setRunning(true);
       });
     }, 2000);
-  }, [socket, config, configIndex]);
+  }, [socket, config]);
 
-  const commandRemove = useCallback(() => {
-    const callsign = getValues('removeAircraft');
+  const commandReplacement = useCallback(() => {
+    const removeAircraft = getValues('removeAircraft');
+    const replacementAircraft = getValues('replacementAircraft');
 
-    if (aircraft[callsign].flightPhase < 10) {
-      const confirmation = confirm(`Aircraft ${callsign} has not yet landed. Are you sure you want to delete it?`);
+    if (aircraft[removeAircraft].flightPhase < 10) {
+      const confirmation = confirm(`Aircraft ${removeAircraft} has not yet landed. Are you sure you want to replace it with ${replacementAircraft}?`);
       if (!confirmation) return;
     }
 
-    socket?.emit('command', { aircraft: callsign, command: 'delete' });
-    setValue('removeAircraft', '');
-  }, [aircraft, socket, getValues, setValue]);
+    // @ts-ignore
+    const { defer, ...newAircraft } = config.aircraft.find(({ callsign }) => callsign === replacementAircraft);
+    const newOrder = Object.keys(aircraft).map((callsign) => callsign === removeAircraft ? replacementAircraft : callsign);
+
+    // Create a new aircraft
+    socket?.emit('command', {
+      aircraft: null,
+      command: 'init',
+      payload: {
+        aircraft: [newAircraft],
+        order: newOrder,
+      }
+    });
+
+    setValue('removeAircraft', undefined);
+    setValue('replacementAircraft', undefined);
+  }, [socket, getValues, setValue, aircraft, config?.aircraft]);
 
   const commandPaused = useCallback((paused: boolean) => {
     socket?.emit('command', { aircraft: null, command: 'paused', payload: paused });
@@ -121,15 +152,19 @@ export default function ExperimenterPage() {
 
   return (
     <div className="flex items-start h-screen">
-      <div className="flex flex-col gap-4 p-4 w-full h-full max-w-lg flex-1">
-        <h1 className="text-4xl flex items-center self-center gap-4 mt-4">
+      <div className="flex flex-col gap-4 p-4 w-full h-full max-w-xl flex-1 relative">
+        <div className="absolute top-4 right-4">
+          <span className="font-mono">{secondsToMmss(globalTime)}</span>
+        </div>
+
+        <h1 className="text-4xl flex items-center self-center gap-4 mt-4" onMouseEnter={(evt) => (evt.target as HTMLDivElement).title = lastMessageTime?.toLocaleString() ?? '—'}>
           Mission Control
           <div title={`WebSocket status: ${connectionState}`} className={`w-6 h-6 rounded-full shadow-inner ${connectionState === 'connected' ? 'bg-green-400 shadow-green-800' : 'bg-red-400 shadow-red-800'}`}></div>
         </h1>
 
         <div className="w-96 flex flex-col self-center gap-4">
           <div className="flex w-full gap-4">
-            <Combobox className="flex-1" label="Simulation Name" options={configs.groups.map(({ name }, index) => ({ label: name, value: index.toString() }))} value={configIndex} onValueChange={setConfigIndex} />
+            <Combobox className="flex-1" label="Simulation Name" options={configs.groups.map(({ name, description }, index) => ({ label: `${name} (${description})`, value: index.toString() }))} value={configIndex} onValueChange={setConfigIndex} />
             <Button className="w-36" onClick={commandInit}>Start Simulation</Button>
           </div>
 
@@ -139,8 +174,9 @@ export default function ExperimenterPage() {
           </div>
 
           <div className="flex w-full gap-4">
-            <Input className="flex-1" type="text" placeholder="Aircraft Callsign" {...register('removeAircraft')} />
-            <Button className="w-36" disabled={watch('removeAircraft') === ''} onClick={commandRemove}>Remove</Button>
+            <Combobox className="flex-1" label="Old Acft" options={Object.keys(aircraft).map((callsign) => ({ label: callsign, value: callsign }))} value={watch('removeAircraft')} onValueChange={(value) => setValue('removeAircraft', value)} />
+            <Combobox className="flex-1" label="New Acft" options={config?.aircraft.filter(({ callsign }) => !aircraft[callsign]).map(({ callsign }) => ({ label: callsign, value: callsign })) ?? []} value={watch('replacementAircraft')} onValueChange={(value) => setValue('replacementAircraft', value)} />
+            <Button className="w-36" disabled={!watch('removeAircraft') || !watch('replacementAircraft')} onClick={commandReplacement}>Replace</Button>
           </div>
         </div>
 
@@ -154,25 +190,14 @@ export default function ExperimenterPage() {
           </span>
         </div>
 
-        <div className="text-sm self-center">Last Message Time: <span className="font-mono">{lastMessageTime?.toLocaleString() ?? '—'}</span></div>
-
-        <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-2 grid-rows-4 grid-flow-col gap-2 mx-4">
-            {Object.entries(aircraft).map(([callsign, aircraft], idx) => (
-              <div key={callsign} className={`flex flex-row gap-4 items-center border ${callsign === selectedAircraftCallsign ? 'border-fuchsia-400 bg-fuchsia-950/30' : 'border-neutral-400'} rounded-md px-2 py-1`}>
-                <div className="flex-grow hover:brightness-75 cursor-pointer" onClick={() => setSelectedAircraftCallsign(callsign)}>
-                  <div className="flex gap-2 items-center">
-                    <MonitorIndicator receive={remoteAudioMonitors.get(idx) ?? false} className="w-3 h-3" />
-                    <div className={`font-mono ${callsign === selectedAircraftCallsign ? 'text-fuchsia-400' : 'text-neutral-200'}`}>{callsign}</div>
-                  </div>
-                  <div className="text-xs font-mono text-neutral-400">{aircraft.altitude.toFixed(0)} ft / {aircraft.tas.toFixed(0)} kt</div>
-                  <div className="text-xs font-mono text-neutral-400">{aircraft.frequency} / {frequencyToFacility[aircraft.frequency] ?? ''}</div>
-                </div>
-                <Button className="w-12 active:bg-cyan-500/80" onMouseDown={() => beginTransmit({ callsign })} onMouseUp={() => endTransmit({ callsign })} ><SpeakIcon style={{ fontSize: '1.2em' }} /></Button>
-              </div>
-            ))}
-          </div>
-        </div>
+        <AircraftGrid
+          aircraft={aircraft}
+          remoteAudioMonitors={remoteAudioMonitors}
+          selectedAircraftCallsign={selectedAircraftCallsign}
+          onSelectAircraft={setSelectedAircraftCallsign}
+          onStartTransmit={(callsign) => beginTransmit({ callsign })}
+          onEndTransmit={(callsign) => endTransmit({ callsign })}
+        />
 
         <div className="flex flex-col self-start gap-2 w-full h-full overflow-y-scroll">
           <AnimatePresence>
@@ -186,7 +211,7 @@ export default function ExperimenterPage() {
               >
                 <div className="flex-grow">
                   <div className="font-mono">
-                    {scriptEvent.callsign}
+                    <span className={cn('cursor-pointer text-neutral-50', { 'text-fuchsia-400': scriptEvent.callsign === selectedAircraftCallsign })} onClick={() => setSelectedAircraftCallsign(scriptEvent.callsign)}>{scriptEvent.callsign}</span>
                     <span className="text-xs text-neutral-400 ml-2">{scriptEvent.condition ?? ''}</span>
                   </div>
                   <div className="text-xs font-mono text-neutral-200">{scriptEvent.dialog}</div>
@@ -211,25 +236,5 @@ export default function ExperimenterPage() {
       </ResizablePanes>
 
     </div>
-  )
-
-  // return (
-  //   <>
-  //     <div className="flex relative h-[100vh] w-[100vw]">
-  //       <div className="flex flex-col w-[620px]">
-  //         <C2Panel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
-  //         <RadioPanel radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} onMonitoringChange={onMonitoringChange} onTransmittingChange={onTransmittingChange} />
-  //       </div>
-  //       <ResizablePanes uniqueId="one" className="flex-1">
-  //         <Pane id="P0" size={3}>
-  //           <Toaster position="top-left" containerStyle={{ position: 'relative' }} />
-  //           <MapPanel weather={weather} aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
-  //         </Pane>
-  //         <Pane id="P1" size={1} minSize={1}>
-  //           <TimelinePanel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
-  //         </Pane>
-  //       </ResizablePanes>
-  //     </div>
-  //   </>
-  // )
+  );
 }

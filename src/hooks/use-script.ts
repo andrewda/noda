@@ -33,6 +33,10 @@ export const useScript = (startTime: Date, config: any, spokenScriptEvents: stri
       return true
     }
 
+    if (trigger.type === 'landed' && aircraftItem.flightPhase >= 10) {
+      return true;
+    }
+
     if (trigger.type === 'waypoint') {
       const triggerWaypointIndex = aircraftItem.flightPlan?.findIndex((waypoint) => waypoint === trigger.waypoint);
 

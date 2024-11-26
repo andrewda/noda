@@ -3,6 +3,7 @@ import Flop from '../../public/images/flop.svg';
 import Monitor from '../../public/images/monitor.svg';
 import Ownship from '../../public/images/ownship.svg';
 import Transmit from '../../public/images/transmit.svg';
+import { cn } from '@/lib/utils';
 
 export type RadioCommunicationBoard = {
   id: string;
@@ -24,6 +25,8 @@ export const frequencyToFacility: Record<string, string> = {
   '119.100': 'KSLE TWR',
   '120.900': 'KTTD TWR',
   '124.500': 'KRDM TWR',
+  '119.600': 'KEUG APP',
+  '118.900': 'KEUG TWR',
 }
 
 type ReceiveIndicatorProps = {
@@ -31,8 +34,38 @@ type ReceiveIndicatorProps = {
   className?: string;
 }
 export function MonitorIndicator({ receive, className }: ReceiveIndicatorProps) {
+  /*
+
+  @keyframes diminish-border {
+    from {
+      stroke-dashoffset: 0;
+    }
+    to {
+      stroke-dashoffset: 377; // 2 * π * 60 ≈ 377
+    }
+  }
+
+  .animate-diminish {
+    animation: diminish-border 10s linear forwards;
+  }
+
+  <svg class="w-32 h-32">
+    <circle
+      class="stroke-green-500 animate-diminish"
+      cx="50%"
+      cy="50%"
+      r="60"
+      fill="transparent"
+      stroke-width="4"
+      stroke-dasharray="377"
+      stroke-dashoffset="0"
+    ></circle>
+  </svg>
+
+  */
+
   return (
-    <div className={`rounded-full border-slate-400 border-2 border-solid ${receive ? 'bg-[#00d30a] shadow-[#00d30a] shadow-[0_0_6px_1px]' : 'bg-none'} ${className}`}></div>
+    <div className={cn('rounded-full border-slate-400 border-2 border-solid transition-[border,_box-shadow] ease-in', receive ? 'border-[#00d30a] bg-[#00d30a] shadow-[#00d30a] shadow-[0_0_6px_1px]' : 'bg-none', className)} style={{ transitionDuration: receive ? '0s' : '10s' }}></div>
   );
 }
 
