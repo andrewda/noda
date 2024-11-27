@@ -106,7 +106,7 @@ export const useButtonPanels = ({ buttonPanels, onTransmitting, onToggleMonitori
       ctx.fillText(aircraft ?? 'N/A', 100 + idx * 200, 15);
 
       ctx.font = '24px Roboto Mono';
-      ctx.fillText(frequency, 100 + idx * 200, 15 + 32 + 5);
+      ctx.fillText(frequency ?? 'N/A', 100 + idx * 200, 15 + 32 + 5);
     });
 
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
