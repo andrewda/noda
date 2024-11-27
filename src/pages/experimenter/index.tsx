@@ -1,15 +1,15 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useForm } from 'react-hook-form';
 
 import MapPanel from '@/components/MapPanel';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useSimulation } from '@/hooks/use-simulation';
 import { useSocket, useSocketEvent } from '@/lib/socket';
 import { Combobox } from '@/components/ui/combobox';
 import SpeakIcon from '@mui/icons-material/RecordVoiceOver';
 import CheckIcon from '@mui/icons-material/Check';
+import SwapIcon from '@mui/icons-material/SwapHoriz';
 
 import configs from './configs.json';
 import { Pane, ResizablePanes } from 'resizable-panes-react';
@@ -52,7 +52,36 @@ export default function ExperimenterPage() {
   const [spokenScriptEvents, setSpokenScriptEvents] = useState<string[]>([]);
   const [completedScriptEvents, setCompletedScriptEvents] = useState<string[]>([]);
 
-  const activeScript = useScript(startTime, config, spokenScriptEvents, completedScriptEvents, running ? aircraft : {}, globalTime ?? 0);
+  const [backgroundCompletedScriptEvents, setBackgroundCompletedScriptEvents] = useState<string[]>([]);
+
+  const activeScript = useScript(startTime, config?.script ?? [], spokenScriptEvents, completedScriptEvents, running ? aircraft : {}, globalTime ?? 0);
+  const backgroundScript = useScript(startTime, config?.background_script ?? [], [], backgroundCompletedScriptEvents, running ? aircraft : {}, globalTime ?? 0);
+
+  useEffect(() => {
+    if (backgroundScript?.length >= 3) {
+      console.log('SKIPPING BACKGROUND SCRIPT -- TOO MANY EVENTS');
+      socket?.emit('command', { aircraft: '', command: 'debug', payload: 'skipping background script -- too many events' });
+
+      setBackgroundCompletedScriptEvents((prev) => [...prev, ...backgroundScript.map((scriptEvent: any) => scriptEvent.id)]);
+      return;
+    };
+
+    if (backgroundScript?.length > 0) {
+      backgroundScript.forEach((scriptEvent: any) => {
+        const aircraftItem = aircraft[scriptEvent?.callsign];
+
+        const trackIndex = Object.keys(aircraft).findIndex((callsign) => callsign === scriptEvent.callsign);
+        setBackgroundCompletedScriptEvents((prev) => [...prev, scriptEvent.id]);
+
+        trackControls.get(trackIndex)?.playAudio(`/speech/${scriptEvent.file}`).then((audioNode) => {
+          const transmitStartTime = new Date();
+          audioNode.onended = () => {
+            socket?.emit('command', { aircraft: '', command: 'transmit-atc-bg', payload: { frequency: aircraftItem?.frequency ?? '', file: scriptEvent.file, start: transmitStartTime, end: new Date() } });
+          }
+        });
+      });
+    }
+  }, [socket, JSON.stringify(backgroundScript)]);
 
   const beginTransmit = useCallback((scriptEvent?: any) => {
     // TODO: start broadcasting on freuqency of {callsign}
@@ -66,8 +95,8 @@ export default function ExperimenterPage() {
   }, [aircraft, trackControls]);
 
   const endTransmit = useCallback((scriptEvent?: any) => {
-    // TODO: stop broadcasting on freuqency of {callsign}
-    socket?.emit('command', { aircraft: scriptEvent?.callsign, command: 'transmit-atc', payload: { frequency: '', dialog: scriptEvent?.dialog, start: transmitStartTime, end: new Date() } });
+    const aircraftItem = aircraft[scriptEvent?.callsign];
+    socket?.emit('command', { aircraft: scriptEvent?.callsign, command: 'transmit-atc', payload: { frequency: aircraftItem?.frequency ?? '', dialog: scriptEvent?.dialog, start: transmitStartTime, end: new Date() } });
     setTransmitStartTime(undefined);
     // setSpokenScriptEvents((prev) => [...prev, scriptEvent.id]);
 
@@ -79,15 +108,18 @@ export default function ExperimenterPage() {
     trackControls.forEach(({ micGain }) => micGain.gain.value = 0);
   }, [socket, transmitStartTime, aircraft, trackControls]);
 
-  const completeScriptEvent = useCallback((dialogId: string) => {
-    setCompletedScriptEvents((prev) => [...prev, dialogId]);
-  }, []);
+  const completeScriptEvent = useCallback((scriptEvent: any) => {
+    const aircraftItem = aircraft[scriptEvent?.callsign];
+    socket?.emit('command', { aircraft: scriptEvent?.callsign, command: 'atc-interaction-complete', payload: { frequency: aircraftItem?.frequency ?? '', dialog: scriptEvent?.dialog } });
+    setCompletedScriptEvents((prev) => [...prev, scriptEvent.id]);
+  }, [socket, aircraft]);
 
   const commandInit = useCallback(() => {
     socket?.emit('runSimulation', 'StudyFullFlight');
 
     setSpokenScriptEvents([]);
     setCompletedScriptEvents([]);
+    setBackgroundCompletedScriptEvents([]);
     setRunning(false);
 
     if (!config) {
@@ -116,13 +148,10 @@ export default function ExperimenterPage() {
     }, 2000);
   }, [socket, config]);
 
-  const commandReplacement = useCallback(() => {
-    const removeAircraft = getValues('removeAircraft');
-    const replacementAircraft = getValues('replacementAircraft');
-
+  const commandReplacement = useCallback((removeAircraft: string, replacementAircraft: string) => {
     if (aircraft[removeAircraft].flightPhase < 10) {
       const confirmation = confirm(`Aircraft ${removeAircraft} has not yet landed. Are you sure you want to replace it with ${replacementAircraft}?`);
-      if (!confirmation) return;
+      if (!confirmation) return false;
     }
 
     // @ts-ignore
@@ -139,9 +168,19 @@ export default function ExperimenterPage() {
       }
     });
 
+    return true;
+  }, [socket, config, aircraft]);
+
+  const handleReplacementClick = useCallback(() => {
+    const removeAircraft = getValues('removeAircraft');
+    const replacementAircraft = getValues('replacementAircraft');
+
+    const replaced = commandReplacement(removeAircraft, replacementAircraft);
+    if (!replaced) return;
+
     setValue('removeAircraft', undefined);
     setValue('replacementAircraft', undefined);
-  }, [socket, getValues, setValue, aircraft, config?.aircraft]);
+  }, [getValues, setValue, commandReplacement]);
 
   const commandPaused = useCallback((paused: boolean) => {
     socket?.emit('command', { aircraft: null, command: 'paused', payload: paused });
@@ -149,6 +188,46 @@ export default function ExperimenterPage() {
 
   useSocketEvent('connect', () => setConnectionState('connected'));
   useSocketEvent('disconnect', () => setConnectionState('disconnected'));
+
+  const renderScriptEvent = (scriptEvent: any) => {
+    if (scriptEvent.dialog) {
+      return (
+        <>
+          <div className="flex-grow">
+            <div className="font-mono">
+              <span className={cn('cursor-pointer text-neutral-50', { 'text-fuchsia-400': scriptEvent.callsign === selectedAircraftCallsign })} onClick={() => setSelectedAircraftCallsign(scriptEvent.callsign)}>{scriptEvent.callsign}</span>
+              <span className="text-xs text-neutral-400 ml-2">{scriptEvent.condition ?? ''}</span>
+            </div>
+            <div className="text-xs font-mono text-neutral-200">{scriptEvent.dialog}</div>
+          </div>
+          <div className="flex gap-2">
+            <Button className="w-12 active:bg-cyan-500/80" onMouseDown={() => beginTransmit(scriptEvent)} onMouseUp={() => endTransmit(scriptEvent)}><SpeakIcon style={{ fontSize: '1.2em' }} /></Button>
+            <Button className="w-12" onClick={() => completeScriptEvent(scriptEvent)}><CheckIcon style={{ fontSize: '1.2em' }} /></Button>
+          </div>
+        </>
+      )
+    } else if (scriptEvent.replace) {
+      return (
+        <>
+          <div className="flex-grow">
+            <div className="font-mono">
+              <span className={cn('cursor-pointer text-neutral-50', { 'text-fuchsia-400': scriptEvent.callsign === selectedAircraftCallsign })} onClick={() => setSelectedAircraftCallsign(scriptEvent.callsign)}>{scriptEvent.callsign}</span>
+              <span className="text-xs text-neutral-400 ml-2">{scriptEvent.condition ?? ''}</span>
+            </div>
+            <div className="text-xs italic font-mono text-neutral-200">Replace with {scriptEvent.replace}</div>
+          </div>
+          <div className="flex gap-2">
+            <Button className="w-12" onClick={() => commandReplacement(scriptEvent.callsign, scriptEvent.replace)}><SwapIcon style={{ fontSize: '1.2em' }} /></Button>
+            <Button className="w-12" onClick={() => completeScriptEvent(scriptEvent)}><CheckIcon style={{ fontSize: '1.2em' }} /></Button>
+          </div>
+        </>
+      )
+    }
+
+    return (
+      <>Unknown script event</>
+    )
+  }
 
   return (
     <div className="flex items-start h-screen">
@@ -176,7 +255,7 @@ export default function ExperimenterPage() {
           <div className="flex w-full gap-4">
             <Combobox className="flex-1" label="Old Acft" options={Object.keys(aircraft).map((callsign) => ({ label: callsign, value: callsign }))} value={watch('removeAircraft')} onValueChange={(value) => setValue('removeAircraft', value)} />
             <Combobox className="flex-1" label="New Acft" options={config?.aircraft.filter(({ callsign }) => !aircraft[callsign]).map(({ callsign }) => ({ label: callsign, value: callsign })) ?? []} value={watch('replacementAircraft')} onValueChange={(value) => setValue('replacementAircraft', value)} />
-            <Button className="w-36" disabled={!watch('removeAircraft') || !watch('replacementAircraft')} onClick={commandReplacement}>Replace</Button>
+            <Button className="w-36" disabled={!watch('removeAircraft') || !watch('replacementAircraft')} onClick={handleReplacementClick}>Replace</Button>
           </div>
         </div>
 
@@ -209,17 +288,7 @@ export default function ExperimenterPage() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                <div className="flex-grow">
-                  <div className="font-mono">
-                    <span className={cn('cursor-pointer text-neutral-50', { 'text-fuchsia-400': scriptEvent.callsign === selectedAircraftCallsign })} onClick={() => setSelectedAircraftCallsign(scriptEvent.callsign)}>{scriptEvent.callsign}</span>
-                    <span className="text-xs text-neutral-400 ml-2">{scriptEvent.condition ?? ''}</span>
-                  </div>
-                  <div className="text-xs font-mono text-neutral-200">{scriptEvent.dialog}</div>
-                </div>
-                <div className="flex gap-2">
-                  <Button className="active:bg-cyan-500/80" onMouseDown={() => beginTransmit(scriptEvent)} onMouseUp={() => endTransmit(scriptEvent)} ><SpeakIcon style={{ fontSize: '1.2em' }} /></Button>
-                  <Button className="w-12" onClick={() => completeScriptEvent(scriptEvent.id)}><CheckIcon style={{ fontSize: '1.2em' }} /></Button>
-                </div>
+                {renderScriptEvent(scriptEvent)}
               </motion.div>
             ))}
           </AnimatePresence>

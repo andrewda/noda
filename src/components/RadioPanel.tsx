@@ -19,6 +19,7 @@ export const frequencyToFacility: Record<string, string> = {
   '123.000': 'CTAF',
   '123.450': 'KPDX TWR',
   '118.100': 'KPDX APP',
+  '124.200': 'SEA CTR',
   '125.800': 'SEA CTR',
   '126.150': 'SEA CTR',
   '120.350': 'KUAO TWR',
@@ -27,6 +28,7 @@ export const frequencyToFacility: Record<string, string> = {
   '124.500': 'KRDM TWR',
   '119.600': 'KEUG APP',
   '118.900': 'KEUG TWR',
+  '119.300': 'KHIO TWR',
 }
 
 type ReceiveIndicatorProps = {

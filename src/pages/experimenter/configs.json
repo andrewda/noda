@@ -58,10 +58,10 @@
         { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "contact Portland Departure 118.1" },
         { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "Portland Departure, Portland altimeter 2999" },
         { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER", "distance": -8 }, "dialog": "contact Seattle Center 125.8" },
-        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER", "distance": -8 }, "dialog": "Seattle Center, Hilsboro altimeter 29.98" },
-        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER" }, "dialog": "8 miles from DUCKA, cross DUCKA at or above 5000, cleared for the RNAV 13R approach at Hilsboro" },
-        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "DUCKA" }, "dialog": "contact Hilsboro Tower TODO" },
-        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "DUCKA" }, "dialog": "Hilsboro Tower, winds 120 at 4, cleared to land Runway 13R" },
+        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER", "distance": -8 }, "dialog": "Seattle Center, Hillsboro altimeter 29.98" },
+        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER" }, "dialog": "8 miles from DUCKA, cross DUCKA at or above 5000, cleared for the RNAV 13R approach at Hillsboro" },
+        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "DUCKA" }, "dialog": "contact Hillsboro Tower 119.3" },
+        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "DUCKA" }, "dialog": "Hillsboro Tower, winds 120 at 4, cleared to land Runway 13R" },
 
         { "callsign": "HMT 710", "trigger": { "type": "time", "time": 65 }, "dialog": "cleared for takeoff Runway 28R" },
         { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "contact Portland Departure 118.1" },
@@ -69,6 +69,27 @@
         { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "LOATH", "distance": -15 }, "dialog": "contact Seattle Center 125.8" },
         { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "LOATH", "distance": -15 }, "dialog": "Seattle Center, Kelso altimeter 3002" },
         { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "LOATH", "distance": -10 }, "dialog": "descend and maintain 6000" }
+      ],
+      "background_script": [
+        { "callsign": "HMT 525", "trigger": { "type": "time", "time": 22 }, "file": "contact_ground_emirates_203-alloy.wav" },
+        { "callsign": "HMT 525", "trigger": { "type": "time", "time": 52 }, "file": "taxi_united_235-alloy.wav" },
+        { "callsign": "HMT 525", "trigger": { "type": "time", "time": 83 }, "file": "landing_cirrus_7rd-alloy.wav" },
+        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "YIBPU", "distance": -2 }, "file": "takeoff_delta_71-alloy.wav" },
+        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "ENDZZ", "distance": -10 }, "file": "contact_tower_allegiant_999-alloy.wav" },
+        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "ENDZZ", "distance": -7 }, "file": "contact_tower_cessna_2fg-alloy.wav" },
+        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "ENDZZ", "distance": -5 }, "file": "attention_all_aircraft_pdx-alloy.wav" },
+        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "ENDZZ", "distance": -3 }, "file": "descend_american_482-alloy.wav" },
+        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "UBG", "distance": -3 }, "file": "climb_cessna_5mt-alloy.wav" },
+
+        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "FIDOV", "distance": -4 }, "file": "pattern_cessna_2lc-alloy.wav" },
+
+        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER", "distance": -15 }, "file": "turn_jetblue_211-alloy.wav" },
+        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER", "distance": -11 }, "file": "climb_frontier_521-alloy.wav" },
+        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER", "distance": -6 }, "file": "turn_southwest_122-alloy.wav" },
+        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER", "distance": -5 }, "file": "climb_horizon_330-alloy.wav" },
+
+        { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "LOATH", "distance": -19 }, "file": "contact_departure_southwest_619-alloy.wav" },
+        { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "LOATH", "distance": -12 }, "file": "descend_aircanada_812-alloy.wav" }
       ]
     },
     {
@@ -100,10 +121,10 @@
         { "callsign": "HMT 813", "trigger": { "type": "time", "time": 65 }, "dialog": "cleared for takeoff Runway 28L" },
         { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "contact Portland Departure 118.1" },
         { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "Portland Departure, Troutdale altimeter 2998" },
-        { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "SSDEE", "distance": -5 }, "dialog": "cleared for the Visual 25 approach at Troutdale" },
-        { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "SSDEE" }, "dialog": "contact Troutdale Tower 120.9" },
-        { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "SSDEE" }, "dialog": "Troutdale Tower, base your discretion, call when on base" },
-        { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "SSDEE" }, "dialog": "number 2 following a Cessna, cleared to land Runway 25" },
+        { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "SSDEE", "distance": -8 }, "dialog": "cleared for the Visual 25 approach at Troutdale" },
+        { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "SSDEE", "distance": -5 }, "dialog": "contact Troutdale Tower 120.9" },
+        { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "SSDEE", "distance": -5 }, "dialog": "Troutdale Tower, base your discretion, call when on base" },
+        { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "SSDEE" }, "condition": "on base call", "dialog": "number 2 following a Cessna, cleared to land Runway 25" },
 
         { "callsign": "HMT 948", "trigger": { "type": "time", "time": 5 }, "dialog": "cleared for takeoff Runway 28L" },
         { "callsign": "HMT 948", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "contact Portland Departure 118.1" },
@@ -112,6 +133,28 @@
         { "callsign": "HMT 948", "trigger": { "type": "waypoint", "waypoint": "OSWEG" }, "dialog": "Seattle Center, welcome, McMinnville altimeter 2998" },
         { "callsign": "HMT 948", "trigger": { "type": "waypoint", "waypoint": "UNECE", "distance": -6 }, "dialog": "6 miles from UNECE, cross UNECE at or above 4000, cleared for the RNAV 22 approach at McMinnville" },
         { "callsign": "HMT 948", "trigger": { "type": "waypoint", "waypoint": "UNECE" }, "dialog": "frequency change approved" }
+      ],
+      "background_script": [
+        { "callsign": "HMT 642", "trigger": { "type": "waypoint", "waypoint": "JALAG", "distance": -1 }, "file": "takeoff_delta_71-alloy.wav" },
+        { "callsign": "HMT 642", "trigger": { "type": "waypoint", "waypoint": "OSWEG", "distance": -5 }, "file": "contact_tower_allegiant_999-alloy.wav" },
+        { "callsign": "HMT 642", "trigger": { "type": "time", "time": 212 }, "file": "contact_center_skyhawk_2pl-alloy.wav" },
+        { "callsign": "HMT 642", "trigger": { "type": "time", "time": 380 }, "file": "contact_tower_cessna_2fg-alloy.wav" },
+        { "callsign": "HMT 642", "trigger": { "type": "time", "time": 643 }, "file": "descend_american_482-alloy.wav" },
+        { "callsign": "HMT 642", "trigger": { "type": "time", "time": 825 }, "file": "climb_cessna_5mt-alloy.wav" },
+
+        { "callsign": "HMT 140", "trigger": { "type": "time", "time": 75 }, "file": "turn_jetblue_211-alloy.wav" },
+        { "callsign": "HMT 140", "trigger": { "type": "time", "time": 286 }, "file": "climb_frontier_521-alloy.wav" },
+        { "callsign": "HMT 140", "trigger": { "type": "time", "time": 533 }, "file": "turn_southwest_122-alloy.wav" },
+        { "callsign": "HMT 140", "trigger": { "type": "time", "time": 718 }, "file": "altimeter_american_642-alloy.wav" },
+        { "callsign": "HMT 140", "trigger": { "type": "time", "time": 800 }, "file": "climb_horizon_330-alloy.wav" },
+
+        { "callsign": "HMT 813", "trigger": { "type": "time", "time": 22 }, "file": "landing_cirrus_7rd-alloy.wav" },
+        { "callsign": "HMT 813", "trigger": { "type": "time", "time": 52 }, "file": "taxi_united_235-alloy.wav" },
+        { "callsign": "HMT 813", "trigger": { "type": "time", "time": 468 }, "file": "visual_cessna_22g-alloy.wav" },
+        { "callsign": "HMT 813", "trigger": { "type": "waypoint", "waypoint": "SSDEE", "distance": -2 }, "file": "pattern_cessna_2lc-alloy.wav" },
+
+        { "callsign": "HMT 948", "trigger": { "type": "waypoint", "waypoint": "LOATH", "distance": -19 }, "file": "contact_departure_southwest_619-alloy.wav" },
+        { "callsign": "HMT 948", "trigger": { "type": "waypoint", "waypoint": "LOATH", "distance": -12 }, "file": "descend_aircanada_812-alloy.wav" }
       ]
     },
     {
@@ -151,9 +194,26 @@
         { "callsign": "HMT 535", "trigger": { "type": "waypoint", "waypoint": "WALAP", "distance": -8 }, "dialog": "Portland Approach, welcome, Portland altimeter 3002" },
         { "callsign": "HMT 535", "trigger": { "type": "waypoint", "waypoint": "WALAP", "distance": -3 }, "dialog": "3 miles from WALAP, cross WALAP at or above 3700, cleared for the RNAV 28L approach at Portland" },
         { "callsign": "HMT 535", "trigger": { "type": "waypoint", "waypoint": "HANAH" }, "dialog": "contact Portland Tower 123.45" },
-        { "callsign": "HMT 535", "trigger": { "type": "waypoint", "waypoint": "HANAH" }, "dialog": "Portland Tower, winds 250 at 5, cleared to land Runway 28L" },
+        { "callsign": "HMT 535", "trigger": { "type": "waypoint", "waypoint": "HANAH" }, "dialog": "Portland Tower, winds 250 at 5, cleared to land Runway 28L" }
+      ],
+      "background_script": [
+        { "callsign": "HMT 657", "trigger": { "type": "waypoint", "waypoint": "CUKIS", "distance": -8 }, "file": "contact_center_skyhawk_2pl-alloy.wav" },
+        { "callsign": "HMT 657", "trigger": { "type": "waypoint", "waypoint": "CUKIS", "distance": -3 }, "file": "climb_cessna_5mt-alloy.wav" },
+        { "callsign": "HMT 657", "trigger": { "type": "waypoint", "waypoint": "CUKIS" }, "file": "contact_tower_cessna_2fg-alloy.wav" },
+        { "callsign": "HMT 657", "trigger": { "type": "waypoint", "waypoint": "NACIY", "distance": -4 }, "file": "landing_cirrus_7rd-alloy.wav" },
+        { "callsign": "HMT 657", "trigger": { "type": "waypoint", "waypoint": "NACIY" }, "file": "pattern_cessna_2lc-alloy.wav" },
 
-        {}
+        { "callsign": "HMT 400", "trigger": { "type": "time", "time": 5 }, "file": "turn_jetblue_211-alloy.wav" },
+        { "callsign": "HMT 400", "trigger": { "type": "time", "time": 279 }, "file": "climb_frontier_521-alloy.wav" },
+        { "callsign": "HMT 400", "trigger": { "type": "time", "time": 513 }, "file": "turn_southwest_122-alloy.wav" },
+        { "callsign": "HMT 400", "trigger": { "type": "time", "time": 697 }, "file": "squawk_n929de-alloy.wav" },
+        { "callsign": "HMT 400", "trigger": { "type": "time", "time": 806 }, "file": "taxi_united_235-alloy.wav" },
+
+        { "callsign": "HMT 786", "trigger": { "type": "waypoint", "waypoint": "WALAP", "distance": -2 }, "file": "squawk_n283px-alloy.wav" },
+        { "callsign": "HMT 786", "trigger": { "type": "time", "time": 473 }, "file": "say_altitude_cessna_433-alloy.wav" },
+
+        { "callsign": "HMT 535", "trigger": { "type": "waypoint", "waypoint": "MAVER" }, "file": "contact_departure_southwest_619-alloy.wav" },
+        { "callsign": "HMT 535", "trigger": { "type": "waypoint", "waypoint": "HPSTR", "distance": -5 }, "file": "descend_aircanada_812-alloy.wav" }
       ]
     },
     {
@@ -161,14 +221,13 @@
       "description": "4/pof/heavy",
       "weather": "heavy",
       "aircraft": [
-        { "callsign": "HMT 797", "initial_frequency": "118.100", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KEUG", "arrival_runway": "RW16R", "approach": "R16RY", "flight_plan": ["JALAG", "OSWEG", "MAGOT", "SHEDD"], "starting_leg": 2, "starting_alt": 8000, "cruise_alt": 8000 },
-        { "callsign": "HMT 166", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "S33", "arrival_runway": "RW16", "approach": "R16", "flight_plan": ["JALAG", "CUKIS", "HARZL", "JJACE", "GASHE", "HETIM"], "starting_leg": 2, "starting_alt": 10000, "cruise_alt": 10000 },
-        { "callsign": "HMT 455", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KMMV", "arrival_runway": "RW22", "approach": "R22", "flight_plan": ["YIBPU", "OSWEG", "NNIKE", "OZIER"], "starting_leg": 2, "starting_alt": 5000, "cruise_alt": 5000 },
-        { "callsign": "HMT 525", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["YIBPU", "ENDZZ", "UBG", "MCCOY"], "starting_leg": 2, "starting_alt": 3000, "cruise_alt": 3000 },
+        { "callsign": "HMT 797", "initial_frequency": "125.800", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KEUG", "arrival_runway": "RW16R", "approach": "R16RY", "flight_plan": ["JALAG", "OSWEG", "MAGOT", "SHEDD"], "starting_leg": 2, "starting_alt": 8000, "cruise_alt": 8000 },
+        { "callsign": "HMT 166", "initial_frequency": "126.150", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "S33", "arrival_runway": "RW16", "approach": "R16", "flight_plan": ["JALAG", "CUKIS", "HARZL", "JJACE", "GASHE", "HETIM"], "starting_leg": 2, "starting_alt": 10000, "cruise_alt": 10000 },
+        { "callsign": "HMT 455", "initial_frequency": "125.800", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KMMV", "arrival_runway": "RW22", "approach": "R22", "flight_plan": ["YIBPU", "OSWEG", "NNIKE", "OZIER"], "starting_leg": 2, "starting_alt": 5000, "cruise_alt": 5000 },
+        { "callsign": "HMT 503", "initial_frequency": "125.800", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["YIBPU", "ENDZZ", "UBG", "MCCOY"], "starting_leg": 2, "starting_alt": 4000, "cruise_alt": 4000 },
         { "defer": true, "callsign": "HMT 954", "initial_frequency": "124.200", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KTMK", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["YIBPU", "VIPRE", "JEQEF"], "starting_leg": 1, "starting_alt": 6000, "cruise_alt": 6000 },
-        { "defer": true, "callsign": "HMT 933", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KHIO", "arrival_runway": "RW13R", "approach": "R13R", "flight_plan": ["JALAG", "PITER", "DUCKA"], "starting_leg": 1, "starting_alt": 4000, "cruise_alt": 4000 },
         { "defer": true, "callsign": "HMT 119", "initial_frequency": "125.800", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KONP", "arrival_runway": "RW16", "approach": "R16", "flight_plan": ["YIBPU", "UBG", "DANES", "CUTEL"], "starting_leg": 2, "starting_alt": 5000, "cruise_alt": 5000 },
-        { "defer": true, "callsign": "HMT 710", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KKLS", "arrival_runway": "RW12", "approach": "R12", "flight_plan": ["JALAG", "LOATH", "AMAVE"], "starting_leg": 1, "starting_alt": 5000, "cruise_alt": 5000 }
+        { "defer": true, "callsign": "HMT 710", "initial_frequency": "125.800", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KKLS", "arrival_runway": "RW12", "approach": "R12", "flight_plan": ["JALAG", "LOATH", "AMAVE"], "starting_leg": 1, "starting_alt": 5000, "cruise_alt": 5000 }
       ],
       "script": [
         { "callsign": "HMT 797", "trigger": { "type": "waypoint", "waypoint": "MAGOT" }, "dialog": "contact Cascade Approach 119.6" },
@@ -184,30 +243,53 @@
         { "callsign": "HMT 166", "trigger": { "type": "waypoint", "waypoint": "JJACE" }, "condition": "on vector request", "dialog": "turn left heading 080, vectors for weather" },
         { "callsign": "HMT 166", "trigger": { "type": "time", "time": 650 }, "dialog": "turn right heading 120, vectors for final" },
         { "callsign": "HMT 166", "trigger": { "type": "time", "time": 708 }, "dialog": "descend and maintain 8000" },
-        { "callsign": "HMT 166", "trigger": { "type": "landed" }, "replace": "HMT 933" },
 
         { "callsign": "HMT 455", "trigger": { "type": "waypoint", "waypoint": "UNECE", "distance": -4 }, "dialog": "4 miles from UNECE, cross UNECE at or above 4000, cleared for the RNAV 22 approach at McMinnville" },
         { "callsign": "HMT 455", "trigger": { "type": "waypoint", "waypoint": "UNECE" }, "dialog": "frequency change approved" },
         { "callsign": "HMT 455", "trigger": { "type": "landed" }, "replace": "HMT 119" },
 
-        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "MCCOY", "distance": -5 }, "dialog": "5 miles from MCCOY, cross MCCOY at or above 3100, cleared for the RNAV 13 approach at Salem" },
-        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "IVRSN" }, "dialog": "contact Salem Tower 119.1" },
-        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "IVRSN" }, "dialog": "winds 120 at 3, number 2 following a Citation, cleared to land Runway 13" },
-        { "callsign": "HMT 525", "trigger": { "type": "landed" }, "replace": "HMT 710" },
+        { "callsign": "HMT 503", "trigger": { "type": "waypoint", "waypoint": "MCCOY", "distance": -5 }, "dialog": "5 miles from MCCOY, cross MCCOY at or above 3100, cleared for the RNAV 13 approach at Salem" },
+        { "callsign": "HMT 503", "trigger": { "type": "waypoint", "waypoint": "IVRSN" }, "dialog": "contact Salem Tower 119.1" },
+        { "callsign": "HMT 503", "trigger": { "type": "waypoint", "waypoint": "IVRSN" }, "dialog": "winds 120 at 3, number 2 following a Citation, cleared to land Runway 13" },
+        { "callsign": "HMT 503", "trigger": { "type": "landed" }, "replace": "HMT 710" },
 
         { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "JEQEF", "distance": -18 }, "dialog": "descend and maintain 5000" },
         { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "JEQEF", "distance": -10 }, "dialog": "9 miles from JEQEF, cross JEQEF at or above 4500, cleared for the RNAV 13 approach at Newport" },
         { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "JEQEF" }, "dialog": "frequency change approved" },
-
-        { "callsign": "HMT 933", "trigger": { "type": "waypoint", "waypoint": "DUCKA", "distance": -8 }, "dialog": "8 miles from DUCKA, cross DUCKA at or above 5000, cleared for the RNAV 13R approach at Hillsboro" },
-        { "callsign": "HMT 933", "trigger": { "type": "waypoint", "waypoint": "DUCKA" }, "dialog": "contact Hilsboro Tower TODO" },
-        { "callsign": "HMT 933", "trigger": { "type": "waypoint", "waypoint": "DUCKA" }, "dialog": "Hilsboro Tower, winds 120 at 4, cleared to land Runway 13R" },
 
         { "callsign": "HMT 119", "trigger": { "type": "waypoint", "waypoint": "CUTEL", "distance": -6 }, "dialog": "6 miles from CUTEL, cross CUTEL at or above 3700, cleared for the RNAV 16 approach at Newport" },
         { "callsign": "HMT 119", "trigger": { "type": "waypoint", "waypoint": "BOILR" }, "dialog": "frequency change approved" },
 
         { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "YAPEC", "distance": -12 }, "dialog": "10 miles from YAPEC, cross YAPEC at or above 3500, cleared for the RNAV 12 approach at Kelso" },
         { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "YAPEC", "distance": -5 }, "dialog": "frequency change approved" }
+      ],
+      "background_script": [
+        { "callsign": "HMT 797", "trigger": { "type": "waypoint", "waypoint": "SHEDD", "distance": -7 }, "file": "contact_center_skyhawk_2pl-alloy.wav" },
+        { "callsign": "HMT 797", "trigger": { "type": "waypoint", "waypoint": "SHEDD", "distance": -2 }, "file": "climb_cessna_5mt-alloy.wav" },
+        { "callsign": "HMT 797", "trigger": { "type": "waypoint", "waypoint": "HOCUM" }, "file": "contact_tower_cessna_2fg-alloy.wav" },
+        { "callsign": "HMT 797", "trigger": { "type": "waypoint", "waypoint": "WATAL", "distance": -2 }, "file": "pattern_cessna_2lc-alloy.wav" },
+
+        { "callsign": "HMT 166", "trigger": { "type": "time", "time": 25 }, "file": "turn_jetblue_211-alloy.wav" },
+        { "callsign": "HMT 166", "trigger": { "type": "time", "time": 273 }, "file": "squawk_n929de-alloy.wav" },
+        { "callsign": "HMT 166", "trigger": { "type": "time", "time": 508 }, "file": "climb_frontier_521-alloy.wav" },
+        { "callsign": "HMT 166", "trigger": { "type": "time", "time": 697 }, "file": "turn_southwest_122-alloy.wav" },
+        { "callsign": "HMT 166", "trigger": { "type": "time", "time": 799 }, "file": "squawk_n283px-alloy.wav" },
+
+        { "callsign": "HMT 455", "trigger": { "type": "waypoint", "waypoint": "UNECE", "distance": -7 }, "file": "contact_departure_southwest_619-alloy.wav" },
+        { "callsign": "HMT 455", "trigger": { "type": "waypoint", "waypoint": "UNECE", "distance": -6 }, "file": "descend_fedex_61-alloy.wav" },
+        { "callsign": "HMT 455", "trigger": { "type": "waypoint", "waypoint": "UNECE", "distance": -1 }, "file": "climb_horizon_330-alloy.wav" },
+
+        { "callsign": "HMT 503", "trigger": { "type": "waypoint", "waypoint": "MCCOY", "distance": -12 }, "file": "say_altitude_cessna_433-alloy.wav" },
+        { "callsign": "HMT 503", "trigger": { "type": "waypoint", "waypoint": "MCCOY", "distance": -9 }, "file": "contact_departure_cessna_6sg-alloy.wav" },
+        { "callsign": "HMT 503", "trigger": { "type": "waypoint", "waypoint": "MCCOY", "distance": -3 }, "file": "ptac_alaska_28-alloy.wav" },
+
+        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "JEQEF", "distance": -17 }, "file": "visual_cessna_22g-alloy.wav" },
+        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "JEQEF", "distance": -14 }, "file": "contact_tower_allegiant_999-alloy.wav" },
+
+        { "callsign": "HMT 119", "trigger": { "type": "waypoint", "waypoint": "CUTEL", "distance": -9 }, "file": "ptac_cessna_38p-alloy.wav" },
+        { "callsign": "HMT 119", "trigger": { "type": "waypoint", "waypoint": "CUTEL", "distance": -4 }, "file": "turn_spirit_125-alloy.wav" },
+
+        { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "YAPEC", "distance": -10 }, "file": "altimeter_american_642-alloy.wav" }
       ]
     },
     {
@@ -340,7 +422,7 @@
     },
     {
       "name": "Group 8",
-      "description": "7/pof/heavy",
+      "description": "7/pof/heavy - nr",
       "weather": "heavy",
       "aircraft": [
         { "callsign": "HMT 261", "departure_airport": "KCVO", "departure_runway": "RW17", "arrival_airport": "KPDX", "arrival_runway": "RW28L", "approach": "R28LX", "flight_plan": ["ARTTY", "MAVER", "WALAP"], "starting_leg": 1, "starting_alt": 5000, "cruise_alt": 5000 },

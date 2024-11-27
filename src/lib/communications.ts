@@ -65,6 +65,13 @@ export const useLocalStream = () => {
   return stream;
 }
 
+export type AudioTrackControls = {
+  micGain: GainNode,
+  audioContext: AudioContext,
+  outputTrack: MediaStreamTrack,
+  playAudio: (audioFilePath: string) => Promise<AudioBufferSourceNode>
+}
+
 export const usePeerConnection = ({ streamCount }: { streamCount: number }) => {
   const socket = useSocket();
 
@@ -74,7 +81,7 @@ export const usePeerConnection = ({ streamCount }: { streamCount: number }) => {
 
   const [connectionStatus, setConnectionStatus] = useState<RTCPeerConnection['connectionState']>('disconnected');
   const [remoteTracks, setRemoteTracks] = useState<Map<number, MediaStreamTrack>>(new Map());
-  const [trackControls, setTrackControls] = useState<Map<number, { micGain: GainNode, audioContext: AudioContext, outputTrack: MediaStreamTrack }>>(new Map());
+  const [trackControls, setTrackControls] = useState<Map<number, AudioTrackControls>>(new Map());
 
   const dataChannel = useMemo(() => peerConnection?.createDataChannel('data', { negotiated: true, id: 0 }), [peerConnection]);
 
@@ -127,7 +134,7 @@ export const usePeerConnection = ({ streamCount }: { streamCount: number }) => {
       const noiseGain = new Tone.Gain(0.02);
       noise.connect(noiseGain);
 
-      const follower = new Tone.Follower(0.1);
+      const follower = new Tone.Follower(0.8);
       gainNode.connect(follower);
 
       const threshold = new Tone.GreaterThan(0.001); // Adjust the threshold as needed
@@ -201,8 +208,6 @@ export const usePeerConnection = ({ streamCount }: { streamCount: number }) => {
     createOffer({ socket, localStream, peerConnection, streamCount }).then((trackControls) => setTrackControls(trackControls));
   }, [localStream, peerConnection, socket, streamCount]);
 
-
-
   return { peerConnection, connectionStatus, dataChannel, tracks: remoteTracks, trackControls, createOffer: createOfferFn };
 }
 
@@ -250,23 +255,77 @@ export const useAudioMonitor = (tracks: Map<number, MediaStreamTrack> | undefine
   return audioMonitors;
 }
 
+const createWavSource = (audioContext: AudioContext, buffer: AudioBuffer) => {
+  const source = audioContext.createBufferSource();
+  source.buffer = buffer;
+  return source;
+}
+
 const loadAudioBuffer = async (audioContext: AudioContext, url: string) => fetch(url)
     .then(response => response.arrayBuffer())
     .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer));
 
-const createAudioStream = (micTrack: MediaStreamTrack, audioClip?: string, applyEffects?: boolean) => {
+const createAudioStream = async (micTrack: MediaStreamTrack) => {
   const audioContext = new AudioContext();
-  const destination = audioContext.createMediaStreamDestination();
+  const destinationNode = audioContext.createMediaStreamDestination();
 
   // Microphone source
-  const micSource = audioContext.createMediaStreamSource(new MediaStream([micTrack]));
+  const micSourceNode = audioContext.createMediaStreamSource(new MediaStream([micTrack]));
+
+  await audioContext.audioWorklet.addModule('/vad-processor.js');
+
+  const vadNode = new AudioWorkletNode(audioContext, 'vad-processor');
+
+  // Set VAD parameters via messages
+  vadNode.port.postMessage({ type: 'setThreshold', threshold: 0.01 });
+  vadNode.port.postMessage({ type: 'setSilenceDuration', duration: 800 });
 
   // Mic GainNode
-  const micGain = audioContext.createGain();
-  micGain.gain.value = 0; // Initially muted
+  const micGainNode = audioContext.createGain();
+  micGainNode.gain.value = 0; // Mic initially muted
+
+  const wavGainNode = audioContext.createGain();
+  wavGainNode.gain.value = 1;
+
+  // Make experimenter wav a little quieter
+  const localWavGainNode = audioContext.createGain();
+  localWavGainNode.gain.value = 0.2;
+
+  micSourceNode.connect(micGainNode);
+  micGainNode.connect(vadNode);
+  micGainNode.connect(destinationNode);
+  // micSourceNode.connect(micGainNode).connect(destinationNode);
+
+  wavGainNode.connect(destinationNode);
+
+  let isSpeaking = false;
+
+  vadNode.port.onmessage = (event) => {
+    if (event.data.type === 'voiceStart') {
+      isSpeaking = true;
+      wavGainNode.gain.setValueAtTime(0, audioContext.currentTime);
+      console.log('Voice detected: WAV audio muted');
+    }
+    if (event.data.type === 'voiceStop') {
+      isSpeaking = false;
+      wavGainNode.gain.setValueAtTime(1, audioContext.currentTime);
+      console.log('Voice stopped: WAV audio unmuted');
+    }
+  };
+
+  const playAudio = async (wavFile: string) => {
+    console.log('playAudio', wavFile);
+    const buffer = await loadAudioBuffer(audioContext, wavFile);
+    const wavSource = createWavSource(audioContext, buffer);
+    wavSource.connect(wavGainNode);
+    wavSource.connect(localWavGainNode).connect(audioContext.destination);
+    wavSource.start(0);
+
+    return wavSource;
+  };
 
   // Connect mic to micGain
-  micSource.connect(micGain);
+  // micSource.connect(micGain);
 
   // Pre-recorded audio source
   // const clipBuffer = await loadAudioBuffer(audioContext, '/clips/clip1.wav');
@@ -274,14 +333,14 @@ const createAudioStream = (micTrack: MediaStreamTrack, audioClip?: string, apply
   // clipGain.gain.value = 0; // Initially muted
 
   // Connect gains to destination
-  micGain.connect(destination);
+  // micGain.connect(destination);
   // clipGain.connect(destination);
 
   // Create MediaStreamTrack from destination
-  const outputStream = destination.stream;
+  const outputStream = destinationNode.stream;
   const outputTrack = outputStream.getAudioTracks()[0];
 
-  return { audioContext, micGain, outputStream, outputTrack, destination };
+  return { audioContext, micGain: micGainNode, outputStream, outputTrack, destination: destinationNode, playAudio };
 }
 
 /**
@@ -290,16 +349,16 @@ const createAudioStream = (micTrack: MediaStreamTrack, audioClip?: string, apply
  */
 const createOffer = async ({ socket, localStream, peerConnection, streamCount }: { socket: Socket | undefined, localStream: MediaStream, peerConnection: RTCPeerConnection, streamCount: number }) => {
   // const trackControls = new Map<number, { micGain: GainNode, clipGain: GainNode, audioContext: AudioContext, clipBuffer: AudioBuffer, outputTrack: MediaStreamTrack }>();
-  const trackControls = new Map<number, { micGain: GainNode, audioContext: AudioContext, outputTrack: MediaStreamTrack }>();
+  const trackControls = new Map<number, AudioTrackControls>();
 
   // const localStream = await getLocalStream();
   const micTrack = localStream.getAudioTracks()[0];
 
   for (let i = 0; i < streamCount; i++) {
-    const { audioContext, micGain, outputStream, outputTrack } = createAudioStream(micTrack);
+    const { audioContext, micGain, outputStream, outputTrack, playAudio } = await createAudioStream(micTrack);
 
     // trackControls.set(i, { micGain, clipGain, audioContext, clipBuffer, outputTrack });
-    trackControls.set(i, { micGain, audioContext, outputTrack });
+    trackControls.set(i, { micGain, audioContext, outputTrack, playAudio });
     peerConnection.addTrack(outputTrack, outputStream);
   }
 
@@ -316,7 +375,7 @@ const createOffer = async ({ socket, localStream, peerConnection, streamCount }:
  * Accept offer as the Participant.
  */
 const acceptOffer = async ({ socket, localStream, peerConnection, remoteDescription, streamCount }: { socket: Socket | undefined, localStream: MediaStream, peerConnection: RTCPeerConnection, remoteDescription: RTCSessionDescriptionInit, streamCount: number }) => {
-  const trackControls = new Map<number, { micGain: GainNode, audioContext: AudioContext, outputTrack: MediaStreamTrack }>();
+  const trackControls = new Map<number, AudioTrackControls>();
 
   if (peerConnection.signalingState !== 'stable') return;
 
@@ -326,9 +385,9 @@ const acceptOffer = async ({ socket, localStream, peerConnection, remoteDescript
   const micTrack = localStream.getAudioTracks()[0];
 
   for (let i = 0; i < streamCount; i++) {
-    const { audioContext, micGain, outputStream, outputTrack } = createAudioStream(micTrack);
+    const { audioContext, micGain, outputStream, outputTrack, playAudio } = await createAudioStream(micTrack);
 
-    trackControls.set(i, { micGain, audioContext, outputTrack });
+    trackControls.set(i, { micGain, audioContext, outputTrack, playAudio });
     peerConnection.addTrack(outputTrack, outputStream);
   }
 

@@ -3,7 +3,7 @@ import RadioPanel, { RadioCommunicationBoard } from '@/components/RadioPanel'
 import TimelinePanel from '@/components/TimelinePanel'
 import dynamic from 'next/dynamic'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Toaster } from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
 import { Pane, ResizablePanes } from 'resizable-panes-react'
 
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogOverlay, AlertDialogTitle } from '@/components/ui/alert-dialog'
@@ -19,21 +19,6 @@ const MapPanel = dynamic(
   { ssr: false }
 );
 
-type LatLonTuple = [number, number];
-
-function radiosReducer(state: Record<string, RadioCommunicationBoard>, action: any) {
-  switch (action.type) {
-    case 'add':
-      return { ...state, [action.payload.id]: action.payload };
-    case 'update':
-      return { ...state, [action.payload.id]: action.payload };
-    case 'remove':
-      return Object.fromEntries(Object.entries(state).filter(([id]) => id !== action.payload));
-    default:
-      throw new Error(`Unknown action type: ${action.type}`);
-  }
-}
-
 const makeRadio = (id: string) => ({
   id,
   aircraft: undefined,
@@ -46,7 +31,13 @@ const makeRadio = (id: string) => ({
 
 export default function Home() {
   const socket = useSocket();
-  const { paused, aircraft, weather } = useSimulation();
+  const { paused, aircraft, weather } = useSimulation({
+    onAircraftAdded: (aircraft, globalTime) => {
+      if (globalTime > 0) {
+        toast(`New aircraft: ${aircraft.callsign}`, { duration: 10000 });
+      }
+    }
+  });
   const [radios, setRadios] = useState<Record<string, RadioCommunicationBoard>>(Object.fromEntries(Array.from(Array(8).keys()).map((i) => [i.toString(), makeRadio(i.toString())])));
 
   const [connectionState, setConnectionState] = useState<'connected' | 'disconnected'>(socket?.connected ? 'connected' : 'disconnected');
@@ -62,6 +53,19 @@ export default function Home() {
   const remoteAudioMonitors = useAudioMonitor(tracks);
   const localAudioMonitors = useAudioMonitor(localTracks);
 
+  const remoteFrequencyMonitors = useMemo(() => {
+    const monitors = new Map<string, boolean>();
+
+    remoteAudioMonitors.forEach((monitor, i) => {
+      const aircraftItem = aircraft[Object.keys(aircraft)[i]];
+      if (aircraftItem?.frequency) {
+        monitors.set(aircraftItem.frequency, monitor || monitors.get(aircraftItem.frequency) || false);
+      }
+    });
+
+    return monitors;
+  }, [remoteAudioMonitors, aircraft])
+
   useEffect(() => {
     if (!selectedAircraftCallsign && Object.keys(aircraft).length > 0) {
       setSelectedAircraftCallsign(Object.keys(aircraft)[0]);
@@ -76,14 +80,15 @@ export default function Home() {
         ...radio,
         aircraft: aircraftIdent,
         frequency,
-        receiving: remoteAudioMonitors.get(idx) ?? false,
+        // receiving: remoteAudioMonitors.get(idx) ?? false,
+        receiving: remoteFrequencyMonitors.get(frequency) ?? false,
       }]);
     }));
 
     if (JSON.stringify(newRadios) !== JSON.stringify(radios)) {
       setRadios(newRadios);
     }
-  }, [aircraft, radios, remoteAudioMonitors, localAudioMonitors]);
+  }, [aircraft, radios, remoteFrequencyMonitors]);
 
   const onToggleMonitoring = useCallback((radioIdx: number) => {
     setRadios((radios) => Object.fromEntries(Object.entries(radios).map(([id, radio], idx) => ([id, { ...radio, monitoring: (idx === radioIdx ? !radio.monitoring : radio.monitoring) }]))));

@@ -1,0 +1,126 @@
+[
+	{
+		"file": "climb_cessna_5mt",
+		"text": "Cessna five mike tango, climb and maintain three thousand five hundred."
+	},
+	{
+		"file": "climb_frontier_521",
+		"text": "Frontier five twenty-one, expedite climb to flight level two three zero."
+	},
+	{
+		"file": "climb_horizon_330",
+		"text": "Horizon three thirty, climb and maintain seven thousand."
+	},
+  {
+    "file": "contact_center_skyhawk_2pl",
+    "text": "Skyhawk two papa lima, contact center one two one point four five."
+  },
+	{
+		"file": "contact_departure_southwest_619",
+		"text": "Southwest six nineteen, contact departure one two four point three five."
+	},
+  {
+    "file": "contact_departure_cessna_6sg",
+    "text": "Cessna six sierra golf, contact departure one two four point three five."
+  },
+	{
+		"file": "contact_ground_emirates_203",
+		"text": "Emirates two zero three super, contact ground one two one point niner."
+	},
+	{
+		"file": "contact_tower_allegiant_999",
+		"text": "Allegiant nine ninety-one, maintain present speed, contact tower one two zero point one five."
+	},
+  {
+    "file": "contact_tower_cessna_2fg",
+    "text": "Cessna two foxtrot golf, contact tower one two three point four five."
+  },
+	{
+		"file": "descend_aircanada_812",
+		"text": "Air Canada eight twelve, descend and maintain five thousand, expect vectors for visual approach."
+	},
+	{
+		"file": "descend_american_482",
+		"text": "American four eighty-two, descend and maintain three thousand."
+	},
+	{
+		"file": "descend_fedex_61",
+		"text": "FedEx three sixty-one heavy, descend and maintain flight level two one zero, expect ILS runway one zero."
+	},
+	{
+		"file": "landing_alaska_43",
+		"text": "Alaska forty-three, cleared to land runway one-six-right."
+	},
+	{
+		"file": "landing_cirrus_7rd",
+		"text": "Cirrus seven romeo delta, cleared for the option runway one eight, on the go make right traffic."
+	},
+	{
+		"file": "pattern_cessna_2lc",
+		"text": "Cessna two lima charlie, enter left downwind runway two seven, report midfield."
+	},
+	{
+		"file": "takeoff_american_574",
+		"text": "American five seventy-four, line up and wait runway two eight right, traffic on a five-mile final."
+	},
+	{
+		"file": "takeoff_delta_71",
+		"text": "Delta seventy-one, after takeoff turn left heading one eight zero, cleared for takeoff runway two-two-right."
+	},
+	{
+		"file": "taxi_united_235",
+		"text": "United two thirty-five, cross runway three six left, hold short of taxiway delta."
+	},
+	{
+		"file": "taxi_ups_82",
+		"text": "UPS eighty-two heavy, cross runway one two left, taxi to cargo via hotel charlie foxtrot."
+	},
+	{
+		"file": "turn_jetblue_211",
+		"text": "JetBlue two eleven, turn left heading three three zero."
+	},
+	{
+		"file": "turn_southwest_122",
+		"text": "Southwest one twenty-two, turn left heading two one zero, descend and maintain six thousand."
+	},
+	{
+		"file": "turn_spirit_125",
+		"text": "Spirit one twenty-five, turn right heading one six zero."
+	},
+  {
+    "file": "say_altitude_cessna_433",
+    "text": "Cessna four thirty-three, say present altitude."
+  },
+  {
+    "file": "say_again_cessna_433",
+    "text": "Cessna four thirty-three, say again."
+  },
+  {
+    "file": "ptac_alaska_28",
+    "text": "Alaska two eight, 5 miles from thorn, cross thorn at or above three thousand two hundred, cleared for the I L S one six right approach."
+  },
+  {
+    "file": "visual_cessna_22g",
+    "text": "Cessna two two golf, cleared for the visual two two approach."
+  },
+  {
+    "file": "attention_all_aircraft_pdx",
+    "text": "Attention all aircraft, information sierra now current at Portland."
+  },
+  {
+    "file": "ptac_cessna_38p",
+    "text": "Cessna three eight papa, 4 miles from hive, cross hive at or above four thousand, cleared for the R-nav one eight right approach."
+  },
+  {
+    "file": "squawk_n283px",
+    "text": "November two eight three papa x-ray, squawk four seven three two."
+  },
+  {
+    "file": "squawk_n929de",
+    "text": "November niner two niner delta echo, squawk three zero niner two."
+  },
+  {
+    "file": "altimeter_american_642",
+    "text": "American six forty-two, welcome, altimeter three zero zero two."
+  }
+]

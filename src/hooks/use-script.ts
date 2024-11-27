@@ -1,17 +1,14 @@
 import { AircraftStateBoard } from "@/components/C2Panel";
-import { useSocketEvent } from "@/lib/socket";
 import { useEffect, useMemo, useState } from "react";
 
 const kKmToNm = 0.539957;
 
-export const useScript = (startTime: Date, config: any, spokenScriptEvents: string[], completedScriptEvents: string[], aircraft: Record<string, AircraftStateBoard>, globalTime: number) => {
-  const { script: rawScript } = config ?? {};
-
+export const useScript = (startTime: Date, rawScript: any[], spokenScriptEvents: string[], completedScriptEvents: string[], aircraft: Record<string, AircraftStateBoard>, globalTime: number) => {
   const [triggeredTime, setTriggeredTime] = useState<{ [id: string]: Date }>({});
 
   useEffect(() => {
     setTriggeredTime({});
-  }, [startTime, config]);
+  }, [startTime, rawScript]);
 
   const compiledScript = useMemo(() => rawScript?.map((scriptItem: any) => ({
     ...scriptItem,
@@ -20,7 +17,7 @@ export const useScript = (startTime: Date, config: any, spokenScriptEvents: stri
 
   const script = useMemo(() => compiledScript?.filter((scriptItem: any) => !completedScriptEvents.includes(scriptItem.id)), [compiledScript, completedScriptEvents]);
 
-  const activeScript = useMemo(() => script?.filter((scriptItem: any) => {
+  const activeScript = useMemo<any[]>(() => script?.filter((scriptItem: any) => {
     const { callsign: scriptCallsign, trigger } = scriptItem;
 
     const aircraftItem = aircraft[scriptCallsign];
@@ -44,7 +41,7 @@ export const useScript = (startTime: Date, config: any, spokenScriptEvents: stri
         return true;
       }
 
-      if (trigger.distance) {
+      if (trigger.distance && aircraftItem.dist !== 0) {
         const distanceToWaypoint = aircraftItem.dist * kKmToNm;
 
         // If distance is negative, distance is before the trigger waypoint
@@ -53,7 +50,7 @@ export const useScript = (startTime: Date, config: any, spokenScriptEvents: stri
         }
 
         // If distance is positive, distance is after the trigger waypoint
-        // TODO: need some way of tracking distance since passing waypoint... worth it?
+        // TODO: maybe need some way of tracking distance since passing waypoint... worth it?
         // if (triggerWaypointIndex === aircraftItem.flightPlanIndex + 1 && trigger.distance > 0 && TODO) {
         //   return true;
         // }

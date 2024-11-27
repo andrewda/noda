@@ -309,7 +309,7 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
 
           {aircraft.flightPhase === 2 && <Button className="relative w-full mt-4" onClick={() => armCommand({ label: 'Takeoff', command: 'takeoff' })}>Takeoff</Button>}
 
-          <Popover>
+          {/* <Popover>
             <PopoverTrigger asChild>
               <Button className="relative w-full mt-4">
                 Modify Flight Plan
@@ -319,7 +319,7 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
             <PopoverContent className="w-72">
               <FlightPlanModal departureAirport={aircraft.departureAirport} departureRunway={aircraft.departureRunway} arrivalAirport={aircraft.arrivalAirport} arrivalRunway={aircraft.arrivalRunway} flightPlan={aircraft.flightPlanEnroute} flightPlanIndex={aircraft.flightPlanIndex} approach={aircraft.approach} onModify={() => {}} />
             </PopoverContent>
-          </Popover>
+          </Popover> */}
         </div>
 
         <hr className="w-full border-neutral-600 border-b-2" />

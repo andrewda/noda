@@ -53,7 +53,6 @@ const BaseLayerPicker = ({ map }: { map: OlMap }) => {
   const onChange = (value: string) => {
     setSelectedLayer(value);
 
-    console.log(map.getLayers());
     map.getLayers().forEach((layer) => {
       if (layer instanceof LayerGroup) {
         layer.getLayers().forEach((lyr) => {
@@ -258,18 +257,15 @@ const MapPanel = ({
     initialMap.addInteraction(selectClick);
 
     selectClick.on('select', (event) => {
-      console.log(event.selected);
       const selectedFeatures = event.selected;
       if (selectedFeatures.length > 0) {
         const selectedFeature = selectedFeatures[0];
         const aircraftItem = selectedFeature.get('aircraft');
         if (aircraftItem) {
-          console.log(aircraftItem);
           onSelectAircraft?.(aircraftItem.callsign);
         }
       } else {
-        console.log('no feature selected');
-        onSelectAircraft?.(undefined);
+        // onSelectAircraft?.(undefined);
       }
     });
 
