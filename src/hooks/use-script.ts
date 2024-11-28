@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 
 const kKmToNm = 0.539957;
 
-export const useScript = (startTime: Date, rawScript: any[], spokenScriptEvents: string[], completedScriptEvents: string[], aircraft: Record<string, AircraftStateBoard>, globalTime: number) => {
+export const useScript = (startTime: Date, rawScript: any[] | undefined, spokenScriptEvents: string[], completedScriptEvents: string[], aircraft: Record<string, AircraftStateBoard>, globalTime: number) => {
   const [triggeredTime, setTriggeredTime] = useState<{ [id: string]: Date }>({});
 
   useEffect(() => {
@@ -13,7 +13,7 @@ export const useScript = (startTime: Date, rawScript: any[], spokenScriptEvents:
   const compiledScript = useMemo(() => rawScript?.map((scriptItem: any) => ({
     ...scriptItem,
     id: crypto.randomUUID(),
-  })), [rawScript]);
+  })) ?? [], [rawScript]);
 
   const script = useMemo(() => compiledScript?.filter((scriptItem: any) => !completedScriptEvents.includes(scriptItem.id)), [compiledScript, completedScriptEvents]);
 

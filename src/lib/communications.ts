@@ -239,12 +239,16 @@ export const useAudioMonitor = (tracks: Map<number, MediaStreamTrack> | undefine
         const sum = dataArray.reduce((a, b) => a + b, 0);
         const average = sum / dataArray.length;
 
-        setAudioMonitors((monitors) => new Map(monitors.set(i, average > 2)));
+        setAudioMonitors((monitors) => {
+          const newValue = average > 4;
+          if (newValue === monitors.get(i)) return monitors;
+          return new Map(monitors.set(i, newValue))
+        });
       });
     };
 
     updateDataArrays();
-    const interval = setInterval(updateDataArrays, 100);
+    const interval = setInterval(updateDataArrays, 200);
 
     return () => {
       analysers.forEach((analyser) => analyser?.disconnect());

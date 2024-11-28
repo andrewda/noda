@@ -47,11 +47,11 @@ export default function Home() {
   useSocketEvent('disconnect', () => setConnectionState('disconnected'));
 
   const { peerConnection, connectionStatus, dataChannel, tracks, trackControls, createOffer } = usePeerConnection({ streamCount: 8 });
-  const localTracks = useMemo(() => new Map(Array.from(trackControls?.entries() ?? []).map(([i, { outputTrack }]) => [i, outputTrack])), [trackControls]);
+  // const localTracks = useMemo(() => new Map(Array.from(trackControls?.entries() ?? []).map(([i, { outputTrack }]) => [i, outputTrack])), [trackControls]);
   const [transmitStartTime, setTransmitStartTime] = useState<Date>();
 
   const remoteAudioMonitors = useAudioMonitor(tracks);
-  const localAudioMonitors = useAudioMonitor(localTracks);
+  // const localAudioMonitors = useAudioMonitor(localTracks);
 
   const remoteFrequencyMonitors = useMemo(() => {
     const monitors = new Map<string, boolean>();

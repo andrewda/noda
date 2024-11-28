@@ -33,10 +33,10 @@ export default function ExperimenterPage() {
 
   const localStream = useLocalStream();
   const { peerConnection, connectionStatus, dataChannel, tracks, trackControls, createOffer } = usePeerConnection({ streamCount: 8 });
-  const localTracks = useMemo(() => new Map(Array.from(trackControls?.entries() ?? []).map(([i, { outputTrack }]) => [i, outputTrack])), [trackControls]);
+  // const localTracks = useMemo(() => new Map(Array.from(trackControls?.entries() ?? []).map(([i, { outputTrack }]) => [i, outputTrack])), [trackControls]);
 
   const remoteAudioMonitors = useAudioMonitor(tracks);
-  const localAudioMonitors = useAudioMonitor(localTracks);
+  // const localAudioMonitors = useAudioMonitor(localTracks);
 
   const [configIndex, setConfigIndex] = useState<string | undefined>(undefined);
   const [selectedAircraftCallsign, setSelectedAircraftCallsign] = useState<string | undefined>(undefined);
@@ -54,8 +54,8 @@ export default function ExperimenterPage() {
 
   const [backgroundCompletedScriptEvents, setBackgroundCompletedScriptEvents] = useState<string[]>([]);
 
-  const activeScript = useScript(startTime, config?.script ?? [], spokenScriptEvents, completedScriptEvents, running ? aircraft : {}, globalTime ?? 0);
-  const backgroundScript = useScript(startTime, config?.background_script ?? [], [], backgroundCompletedScriptEvents, running ? aircraft : {}, globalTime ?? 0);
+  const activeScript = useScript(startTime, config?.script, spokenScriptEvents, completedScriptEvents, running ? aircraft : {}, globalTime ?? 0);
+  const backgroundScript = useScript(startTime, config?.background_script, [], backgroundCompletedScriptEvents, running ? aircraft : {}, globalTime ?? 0);
 
   useEffect(() => {
     if (backgroundScript?.length >= 3) {

@@ -30,5 +30,5 @@ export const useSimulation = (props?: UseSimulationProps) => {
     setPaused(data.paused);
   });
 
-  return {lastMessageTime, globalTime, paused, aircraft, weather};
+  return { lastMessageTime, globalTime, paused, aircraft, weather };
 }

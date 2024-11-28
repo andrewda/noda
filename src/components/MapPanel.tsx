@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Feature } from 'ol';
 import OlMap from 'ol/Map';
@@ -26,21 +26,7 @@ import { boundingExtent, containsCoordinate } from 'ol/extent';
 
 // Opacity Slider Component
 const OpacitySlider = ({ opacity, setOpacity }: { opacity: number, setOpacity: (opacity: number) => void }) => (
-  <div
-    style={{
-      width: 180,
-      height: 'fit-content',
-      zIndex: 1,
-      backgroundColor: 'rgba(0, 0, 0, 0.7)',
-      padding: '8px',
-      paddingBottom: '12px',
-      borderRadius: '4px',
-      color: 'white',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '0.75em',
-    }}
-  >
+  <div className="w-[180px] h-fit bg-black/70 z-10 p-2 pb-4 rounded-md text-white flex flex-col gap-3">
     <Label>Radar Opacity</Label>
     <Slider defaultValue={[opacity * 100]} onValueChange={([value]: number[]) => setOpacity(value / 100)} />
   </div>
@@ -63,20 +49,7 @@ const BaseLayerPicker = ({ map }: { map: OlMap }) => {
   };
 
   return (
-    <div
-      style={{
-        width: 180,
-        height: 'fit-content',
-        zIndex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-        padding: '8px',
-        borderRadius: '4px',
-        color: 'white',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '0.75em',
-      }}
-    >
+    <div className="w-[180px] h-fit bg-black/70 z-10 p-2 rounded-md text-white flex flex-col gap-3">
       <Label>Base Layer</Label>
       {/* @ts-ignore */}
       <Combobox label="Base Layer" options={[{ label: 'Simple Dark', value: 'Simple Dark' }, { label: 'Aerial', value: 'Aerial' }, { label: 'VFR Sectional', value: 'VFR Sectional' }, { label: 'IFR Chart', value: 'IFR Chart' }]} defaultValue={selectedLayer} onValueChange={onChange} />
