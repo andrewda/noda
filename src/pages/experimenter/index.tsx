@@ -33,10 +33,10 @@ export default function ExperimenterPage() {
 
   const localStream = useLocalStream();
   const { peerConnection, connectionStatus, dataChannel, tracks, trackControls, createOffer } = usePeerConnection({ streamCount: 8 });
-  // const localTracks = useMemo(() => new Map(Array.from(trackControls?.entries() ?? []).map(([i, { outputTrack }]) => [i, outputTrack])), [trackControls]);
+  const localTracks = useMemo(() => new Map(Array.from(trackControls?.entries() ?? []).map(([i, { outputTrack }]) => [i, outputTrack])), [trackControls]);
 
   const remoteAudioMonitors = useAudioMonitor(tracks);
-  // const localAudioMonitors = useAudioMonitor(localTracks);
+  const localAudioMonitors = useAudioMonitor(localTracks);
 
   const [configIndex, setConfigIndex] = useState<string | undefined>(undefined);
   const [selectedAircraftCallsign, setSelectedAircraftCallsign] = useState<string | undefined>(undefined);
@@ -56,6 +56,19 @@ export default function ExperimenterPage() {
 
   const activeScript = useScript(startTime, config?.script, spokenScriptEvents, completedScriptEvents, running ? aircraft : {}, globalTime ?? 0);
   const backgroundScript = useScript(startTime, config?.background_script, [], backgroundCompletedScriptEvents, running ? aircraft : {}, globalTime ?? 0);
+
+  const localFrequencyMonitors = useMemo(() => {
+    const monitors = new Map<string, boolean>();
+
+    localAudioMonitors.forEach((monitor, i) => {
+      const aircraftItem = aircraft[Object.keys(aircraft)[i]];
+      if (aircraftItem?.frequency) {
+        monitors.set(aircraftItem.frequency, monitor || monitors.get(aircraftItem.frequency) || false);
+      }
+    });
+
+    return monitors;
+  }, [localAudioMonitors, aircraft])
 
   useEffect(() => {
     if (backgroundScript?.length >= 3) {
@@ -191,11 +204,13 @@ export default function ExperimenterPage() {
 
   const renderScriptEvent = (scriptEvent: any) => {
     if (scriptEvent.dialog) {
+      const aircraftItem = aircraft[scriptEvent?.callsign];
       return (
         <>
           <div className="flex-grow">
             <div className="font-mono">
               <span className={cn('cursor-pointer text-neutral-50', { 'text-fuchsia-400': scriptEvent.callsign === selectedAircraftCallsign })} onClick={() => setSelectedAircraftCallsign(scriptEvent.callsign)}>{scriptEvent.callsign}</span>
+              <span className="text-xs italic text-neutral-400 ml-2">(<span className={cn({ 'text-fuchsia-400': localFrequencyMonitors.get(aircraftItem.frequency ?? '') ?? false })}>{aircraftItem.frequency ?? 'N/A'}</span>)</span>
               <span className="text-xs text-neutral-400 ml-2">{scriptEvent.condition ?? ''}</span>
             </div>
             <div className="text-xs font-mono text-neutral-200">{scriptEvent.dialog}</div>
@@ -272,6 +287,7 @@ export default function ExperimenterPage() {
         <AircraftGrid
           aircraft={aircraft}
           remoteAudioMonitors={remoteAudioMonitors}
+          localFrequencyMonitors={localFrequencyMonitors}
           selectedAircraftCallsign={selectedAircraftCallsign}
           onSelectAircraft={setSelectedAircraftCallsign}
           onStartTransmit={(callsign) => beginTransmit({ callsign })}

@@ -64,7 +64,7 @@ export default function Home() {
     });
 
     return monitors;
-  }, [remoteAudioMonitors, aircraft])
+  }, [remoteAudioMonitors, aircraft]);
 
   useEffect(() => {
     if (!selectedAircraftCallsign && Object.keys(aircraft).length > 0) {

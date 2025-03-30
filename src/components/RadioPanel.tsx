@@ -99,7 +99,10 @@ function Radio({ radio, selected, className, onSelect, setMonitoring, setTransmi
   const handleBlur = (event: any) => {
     let value = parseFloat(event.target.value);
 
-    if (!value) return;
+    if (!value) {
+      setInternalFrequency(radio.frequency);
+      return;
+    };
 
     if (value < 100) {
       value += 100;
@@ -194,7 +197,7 @@ type RadioPanelProps = {
 }
 export default function RadioPanel({ radios, selectedAircraftCallsign, onSelectAircraft, onMonitoringChange, onTransmittingChange, onSetFrequency }: RadioPanelProps) {
   return (
-    <div className="grid grid-cols-4 gap-4 m-3">
+    <div className="grid grid-cols-4 gap-4 p-3 bg-neutral-900 border-r-2 border-neutral-950">
       {Object.values(radios).filter((radio, idx) => radio.aircraft || (idx === (Object.keys(radios).length ?? 0) - 1)).map((radio, i) => (
         <Radio
           key={i}

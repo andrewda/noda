@@ -3,17 +3,19 @@ import { AircraftStateBoard } from "./C2Panel";
 import { frequencyToFacility, MonitorIndicator } from "./RadioPanel";
 import { Button } from "./ui/button";
 import SpeakIcon from '@mui/icons-material/RecordVoiceOver';
+import { cn } from "@/lib/utils";
 
 export interface AircraftGridProps {
   aircraft: Record<string, AircraftStateBoard>;
   selectedAircraftCallsign: string | undefined;
   remoteAudioMonitors: Map<number, boolean>;
+  localFrequencyMonitors: Map<string, boolean>;
   onSelectAircraft: ((aircraftCallsign: string | undefined) => void) | undefined;
   onStartTransmit: ((aircraftCallsign: string | undefined) => void) | undefined;
   onEndTransmit: ((aircraftCallsign: string | undefined) => void) | undefined;
 }
 
-export const AircraftGrid = ({ aircraft, remoteAudioMonitors, selectedAircraftCallsign, onSelectAircraft, onStartTransmit, onEndTransmit }: AircraftGridProps) => {
+export const AircraftGrid = ({ aircraft, remoteAudioMonitors, localFrequencyMonitors, selectedAircraftCallsign, onSelectAircraft, onStartTransmit, onEndTransmit }: AircraftGridProps) => {
   const [flashingCallsigns, setFlashingCallsigns] = useState<Set<string> | undefined>(undefined);
   const previousAircraftRef = useRef(aircraft);
 
@@ -55,7 +57,9 @@ export const AircraftGrid = ({ aircraft, remoteAudioMonitors, selectedAircraftCa
               <div className={`font-mono ${callsign === selectedAircraftCallsign ? 'text-fuchsia-400' : 'text-neutral-200'}`}>{callsign}</div>
             </div>
             <div className="text-xs font-mono text-neutral-400">{aircraft.altitude.toFixed(0)} ft / {aircraft.tas.toFixed(0)} kt</div>
-            <div className={`text-xs font-mono text-neutral-400 ${flashingCallsigns?.has(callsign) ? 'flash-change' : ''}`}>{aircraft.frequency} / {frequencyToFacility[aircraft.frequency] ?? ''}</div>
+            <div className={cn('text-xs font-mono text-neutral-400', { 'flash-change': flashingCallsigns?.has(callsign), 'text-fuchsia-400': localFrequencyMonitors.get(aircraft.frequency ?? '') ?? false })}>
+              {aircraft.frequency} / {frequencyToFacility[aircraft.frequency] ?? ''}
+            </div>
           </div>
           <Button className="w-12 active:bg-cyan-500/80" onMouseDown={() => onStartTransmit?.(callsign)} onMouseUp={() => onEndTransmit?.(callsign)}>
             <SpeakIcon style={{ fontSize: '1.2em' }} />
