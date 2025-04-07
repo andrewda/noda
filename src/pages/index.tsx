@@ -139,9 +139,9 @@ export default function Home() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <div className="flex flex-col w-[620px]">
+      <div className="flex flex-col w-[620px] gap-1">
+        <RadioPanel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={onSetSelectedAircraft} onMonitoringChange={onMonitoringChange} onTransmittingChange={onTransmittingChange} onSetFrequency={onSetFrequency} />
         <C2Panel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={onSetSelectedAircraft} />
-        <RadioPanel radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={onSetSelectedAircraft} onMonitoringChange={onMonitoringChange} onTransmittingChange={onTransmittingChange} onSetFrequency={onSetFrequency} />
       </div>
       <ResizablePanes uniqueId="one" className="flex-1">
         <Pane id="P0" size={3}>

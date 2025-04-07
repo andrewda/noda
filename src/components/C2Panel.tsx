@@ -354,7 +354,7 @@ export default function C2Panel({ aircraft, radios, selectedAircraftCallsign, on
 
   return (
     <div className="flex flex-row flex-grow">
-      <AircraftListGutter aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={onSelectAircraft} />
+      {/* <AircraftListGutter aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={onSelectAircraft} /> */}
       <AircraftCommandPanel aircraft={selectedAircraft} radio={selectedRadio} />
     </div>
   )

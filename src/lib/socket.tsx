@@ -9,6 +9,7 @@ const getSocketUrl = () => {
   // TODO: allow this to be a query param
   const url = new URL(window.location.href);
   url.pathname = '/';
+  url.protocol = 'https:';
   if (url.port === '3000') {
     url.port = '6111';
   }

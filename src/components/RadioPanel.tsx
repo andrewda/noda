@@ -4,6 +4,7 @@ import Monitor from '../../public/images/monitor.svg';
 import Ownship from '../../public/images/ownship.svg';
 import Transmit from '../../public/images/transmit.svg';
 import { cn } from '@/lib/utils';
+import { AircraftStateBoard } from './C2Panel';
 
 export type RadioCommunicationBoard = {
   id: string;
@@ -29,6 +30,47 @@ export const frequencyToFacility: Record<string, string> = {
   '119.600': 'KEUG APP',
   '118.900': 'KEUG TWR',
   '119.300': 'KHIO TWR',
+}
+
+function getFlightPhaseString(flightPhase: number) {
+  // AT_GATE_ORIGIN = 1,
+  // TAXI_ORIGIN = 2,
+  // TAKEOFF = 3,
+  // INITIAL_CLIMB = 4,
+  // CLIMB = 5,
+  // CRUISE = 6,
+  // DESCENT = 7,
+  // APPROACH = 8,
+  // LANDING = 9,
+  // TAXI_DEST = 10,
+  // AT_GATE_DEST = 11
+
+  switch (flightPhase) {
+    case 1:
+      return 'Gate';
+    case 2:
+      return 'Taxi';
+    case 3:
+      return 'Takeoff';
+    case 4:
+      return 'Initial Climb';
+    case 5:
+      return 'Climb';
+    case 6:
+      return 'Cruise';
+    case 7:
+      return 'Descent';
+    case 8:
+      return 'Approach';
+    case 9:
+      return 'Landing';
+    case 10:
+      return 'Taxi';
+    case 11:
+      return 'Gate';
+    default:
+      return 'Unknown';
+  }
 }
 
 type ReceiveIndicatorProps = {
@@ -73,6 +115,7 @@ export function MonitorIndicator({ receive, className }: ReceiveIndicatorProps) 
 
 type RadioProps = {
   radio: RadioCommunicationBoard;
+  aircraft: AircraftStateBoard | undefined;
   selected: boolean;
   className?: string;
   onSelect: () => void;
@@ -80,7 +123,7 @@ type RadioProps = {
   setTransmitting: (transmitting: boolean) => void;
   setFrequency: (frequency: string) => void;
 }
-function Radio({ radio, selected, className, onSelect, setMonitoring, setTransmitting, setFrequency }: RadioProps) {
+function Radio({ radio, aircraft, selected, className, onSelect, setMonitoring, setTransmitting, setFrequency }: RadioProps) {
   const [focused, setFocused] = useState<boolean>(false);
   const [internalFrequency, setInternalFrequency] = useState<string>(radio.frequency);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -142,25 +185,31 @@ function Radio({ radio, selected, className, onSelect, setMonitoring, setTransmi
   }
 
   return (
-    <div onMouseDown={onSelect} className={`w-full h-20 px-1 py-1.5 rounded border ${radio.aircraft ? 'cursor-pointer hover:brightness-[0.85]' : ''} ${selected ? 'border-fuchsia-400 bg-fuchsia-950/30 hover:brightness-100' : 'border-[#ababab]'} flex-col justify-between items-start inline-flex overflow-hidden ${className}`}>
+    <div onMouseDown={onSelect} className={`w-full h-28 px-1 py-1.5 rounded border ${radio.aircraft ? 'cursor-pointer hover:brightness-[0.85]' : ''} ${selected ? 'border-fuchsia-400 bg-fuchsia-950/30 hover:brightness-100' : 'border-[#ababab]'} flex-col justify-between items-start inline-flex overflow-hidden ${className}`}>
       <div className="self-stretch px-0.5 justify-between items-center inline-flex">
-        <div className={`h-5 relative flex flex-row items-center gap-1 ${selected ? 'text-fuchsia-400' : 'text-gray-200'}`}>
+        <div className={`h-8 relative flex flex-row items-center gap-1 ${selected ? 'text-fuchsia-400' : 'text-gray-200'}`}>
           {radio.aircraft ? (
             <>
               <Ownship width={16} height={16} />
-              <div className="text-sm font-bold font-mono">{radio.aircraft}</div>
+              <div className="text-sm font-bold font-mono flex flex-col">
+                <span>{radio.aircraft}</span>
+                <span className="text-xs font-normal text-neutral-400">
+                  {getFlightPhaseString(aircraft?.flightPhase ?? 0)}
+                </span>
+              </div>
             </>
           ) : <div className="text-xs italic font-bold text-gray-400">No Aircraft</div>}
         </div>
         <MonitorIndicator receive={radio.receiving} className="w-3.5 h-3.5" />
       </div>
+      <hr className="w-[90%] border-neutral-600 border-b-2 self-center" />
       <div className="flex self-stretch px-1 justify-between items-start gap-5">
         <div className="flex-col flex-shrink-0 gap-1.5 justify-between items-center flex">
           <Monitor height={16} className={`cursor-pointer hover:brightness-75 ${radio.monitoring ? 'text-teal-400 drop-shadow-[0_0_4px]' : 'text-gray-300/60'}`} onClick={() => setMonitoring(!radio.monitoring)} />
           <Transmit height={16} className={`cursor-pointer hover:brightness-75 ${radio.transmitting ? 'text-teal-400 drop-shadow-[0_0_4px]' : 'text-gray-300/60'}`} onMouseDown={() => setTransmitting(true)} onMouseUp={() => setTransmitting(false)} />
         </div>
         <div className="flex flex-grow flex-col justify-between items-end h-full min-w-0">
-          <div className="inline-flex justify-end items-center gap-1 cursor-pointer text-gray-200 hover:brightness-75" onClick={() => inputRef.current?.select()}>
+          <div className="inline-flex justify-end items-center gap-1 cursor-pointer text-gray-200 bg-background rounded-sm p-[2px] m-[-2px] hover:brightness-75" onClick={() => inputRef.current?.select()}>
             <input
               ref={inputRef}
               type="number"
@@ -190,18 +239,20 @@ function Radio({ radio, selected, className, onSelect, setMonitoring, setTransmi
 type RadioPanelProps = {
   selectedAircraftCallsign: string | undefined;
   radios: Record<string, RadioCommunicationBoard>;
+  aircraft: Record<string, AircraftStateBoard>;
   onSelectAircraft: (aircraftCallsign: string | undefined) => void;
   onMonitoringChange: (radio: number, monitoring: boolean) => void;
   onTransmittingChange: (radio: number, transmitting: boolean) => void;
   onSetFrequency: (radio: number, frequency: string) => void;
 }
-export default function RadioPanel({ radios, selectedAircraftCallsign, onSelectAircraft, onMonitoringChange, onTransmittingChange, onSetFrequency }: RadioPanelProps) {
+export default function RadioPanel({ radios, aircraft, selectedAircraftCallsign, onSelectAircraft, onMonitoringChange, onTransmittingChange, onSetFrequency }: RadioPanelProps) {
   return (
     <div className="grid grid-cols-4 gap-4 p-3 bg-neutral-900 border-r-2 border-neutral-950">
-      {Object.values(radios).filter((radio, idx) => radio.aircraft || (idx === (Object.keys(radios).length ?? 0) - 1)).map((radio, i) => (
+      {Object.entries(radios).filter(([key, radio]) => radio.aircraft).map(([key, radio], i) => (
         <Radio
           key={i}
           radio={radio}
+          aircraft={aircraft[radio.aircraft ?? '']}
           selected={radio.aircraft ? radio.aircraft === selectedAircraftCallsign : false}
           onSelect={() => radio.aircraft ? onSelectAircraft(radio.aircraft) : null}
           setMonitoring={(monitoring) => onMonitoringChange(i, monitoring)}
