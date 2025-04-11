@@ -1,0 +1,3 @@
+[submodule "AirTrafficSim"]
+	path = AirTrafficSim
+	url = https://github.com/andrewda/airtrafficsim

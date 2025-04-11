@@ -35,8 +35,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# TODO: setup git submodule
-AirTrafficSim
+AirTrafficSim_bak
 aviation-data
 
 certificates

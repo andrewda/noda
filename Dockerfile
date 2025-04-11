@@ -25,6 +25,11 @@ RUN mkdir -p certificates && \
 
 WORKDIR /app/AirTrafficSim
 
+RUN apt update && \
+    apt install unzip && \
+    rm -rf airtrafficsim/data/navigation/xplane airtrafficsim/data/performance/BADA && \
+    unzip data.zip
+
 # Create the conda environment defined in environment.yml
 RUN conda env create -f environment.yml && conda clean -afy
 
