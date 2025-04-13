@@ -74,6 +74,7 @@ export type AircraftStateBoard = {
   armedCommand: string | undefined,
 
   frequency: string;
+  controlType: 'participant' | 'non-participant';
 }
 
 function clamp(value: number, min: number, max: number) {

@@ -5,12 +5,6 @@ const nextConfig = {
   output: 'export',
   reactStrictMode: true,
   webpack: config => {
-    config.plugins.push(
-      new webpack.DefinePlugin({
-        CESIUM_BASE_URL: JSON.stringify('cesium'),
-      }),
-    );
-
     // add @svgr/webpack
     config.module.rules.push({
       test: /\.svg$/,

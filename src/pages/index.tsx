@@ -31,7 +31,7 @@ const makeRadio = (id: string) => ({
 
 export default function Home() {
   const socket = useSocket();
-  const { paused, aircraft, weather } = useSimulation({
+  const { paused, aircraft, backgroundAircraft, weather } = useSimulation({
     onAircraftAdded: (aircraft, globalTime) => {
       if (globalTime > 0) {
         toast(`New aircraft: ${aircraft.callsign}`, { duration: 10000 });
@@ -146,7 +146,7 @@ export default function Home() {
       <ResizablePanes uniqueId="one" className="flex-1">
         <Pane id="P0" size={3}>
           <Toaster position="top-left" containerStyle={{ position: 'relative' }} />
-          <MapPanel weather={weather} aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={onSetSelectedAircraft} />
+          <MapPanel weather={weather} aircraft={aircraft} backgroundAircraft={backgroundAircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={onSetSelectedAircraft} />
         </Pane>
         <Pane id="P1" size={1} minSize={1}>
           <TimelinePanel aircraft={aircraft} radios={radios} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={onSetSelectedAircraft} />

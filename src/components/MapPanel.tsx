@@ -59,6 +59,7 @@ const BaseLayerPicker = ({ map }: { map: OlMap }) => {
 
 interface MapPanelProps {
   aircraft: Record<string, AircraftStateBoard> | undefined,
+  backgroundAircraft: Record<string, AircraftStateBoard> | undefined;
   radios: Record<string, RadioCommunicationBoard> | undefined;
   weather: string | undefined;
   selectedAircraftCallsign: string | undefined;
@@ -68,6 +69,7 @@ interface MapPanelProps {
 // Main MapPanel Component
 const MapPanel = ({
   aircraft,
+  backgroundAircraft,
   weather,
   radios,
   selectedAircraftCallsign,
@@ -234,7 +236,7 @@ const MapPanel = ({
       if (selectedFeatures.length > 0) {
         const selectedFeature = selectedFeatures[0];
         const aircraftItem = selectedFeature.get('aircraft');
-        if (aircraftItem) {
+        if (aircraftItem && aircraftItem.controlType !== 'non-participant') {
           onSelectAircraft?.(aircraftItem.callsign);
         }
       } else {
@@ -391,6 +393,83 @@ const MapPanel = ({
       }
     });
 
+    Object.values(backgroundAircraft || {}).forEach((aircraftItem, idx) => {
+      const callsign = aircraftItem.callsign;
+      callsignsPresent.add(callsign);
+
+      const coords = fromLonLat([aircraftItem.position[1], aircraftItem.position[0]]);
+      const point = new Point(coords);
+
+      const receiving = radios?.[idx]?.receiving ?? false;
+
+      const altitudeText = Math.round(aircraftItem.altitude / 100).toString().padStart(3, '0');
+      const airspeedText = Math.round(aircraftItem.tas).toString().padStart(3, '0');
+
+      const aircraftLabelStyle = new Style({
+        text: new Text({
+          text: `${aircraftItem.callsign}\n${altitudeText}/${airspeedText}`,
+          font: 'bold 12px "Roboto Mono"',
+          fill: new Fill({ color: 'white' }),
+          backgroundFill: new Fill({ color: 'black' }),
+          padding: [4, 6, 2, 6],
+          offsetY: -25,
+          offsetX: 35,
+          overflow: true,
+        }),
+        image: new CircleStyle({
+          radius: 3,
+          fill: new Fill({ color: receiving ? '#00d30a' : 'transparent' }),
+          displacement: [62, 1]
+        }),
+      });
+
+      // Create aircraft dot style
+      const aircraftDotStyle = new Style({
+        image: new CircleStyle({
+          radius: 5,
+          fill: new Fill({ color: 'lightgrey' }),
+          stroke: new Stroke({ color: 'black', width: 1 }),
+        }),
+      });
+
+      const feature = new Feature({ geometry: point, aircraft: aircraftItem });
+      feature.setStyle((feature, resolution) => [aircraftDotStyle, aircraftLabelStyle]);
+
+      aircraftSource.addFeature(feature);
+
+      // Update aircraft trail
+      let positionsArray: { position: number[], timestamp: number }[] = aircraftTrailsRef.current.get(callsign);
+      if (!positionsArray) {
+        positionsArray = [];
+      }
+      // Append the new position
+      positionsArray.push({ position: aircraftItem.position, timestamp: now });
+
+      // Remove positions older than 60 seconds
+      positionsArray = positionsArray.filter((p) => p.timestamp >= cutoffTime);
+
+      // Update the map
+      aircraftTrailsRef.current.set(callsign, positionsArray);
+
+      // Now create a LineString feature if there are at least two positions
+      if (positionsArray.length >= 2) {
+        const coordinates = positionsArray.map((p) =>
+          fromLonLat([p.position[1], p.position[0]])
+        );
+        const lineFeature = new Feature({
+          geometry: new LineString(coordinates),
+        });
+
+        lineFeature.setStyle(
+          new Style({
+            stroke: new Stroke({ color: 'yellow', width: 4 }),
+          })
+        );
+
+        aircraftTrailsSource.addFeature(lineFeature);
+      }
+    });
+
     // Remove entries for aircraft no longer present
     // @ts-ignore
     for (const callsign of aircraftTrailsRef.current.keys()) {
@@ -481,7 +560,7 @@ const MapPanel = ({
         });
       }
     }
-  }, [aircraft, radios, selectedAircraftCallsign, map]);
+  }, [aircraft, backgroundAircraft, radios, selectedAircraftCallsign, map]);
 
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>

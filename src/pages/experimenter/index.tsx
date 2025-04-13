@@ -45,7 +45,7 @@ export default function ExperimenterPage() {
   const [transmitStartTime, setTransmitStartTime] = useState<Date>();
   const [connectionState, setConnectionState] = useState<'connected' | 'disconnected'>(socket?.connected ? 'connected' : 'disconnected');
 
-  const { lastMessageTime, paused, globalTime, aircraft, weather } = useSimulation();
+  const { lastMessageTime, paused, globalTime, aircraft, backgroundAircraft, weather } = useSimulation();
 
   const config = useMemo(() => configs['groups'][Number(configIndex)], [configIndex]);
 
@@ -54,8 +54,8 @@ export default function ExperimenterPage() {
 
   const [backgroundCompletedScriptEvents, setBackgroundCompletedScriptEvents] = useState<string[]>([]);
 
-  const activeScript = useScript(startTime, config?.script, spokenScriptEvents, completedScriptEvents, running ? aircraft : {}, globalTime ?? 0);
-  const backgroundScript = useScript(startTime, config?.background_script, [], backgroundCompletedScriptEvents, running ? aircraft : {}, globalTime ?? 0);
+  const activeScript = useScript(startTime, config?.script, spokenScriptEvents, completedScriptEvents, running ? {...aircraft, ...backgroundAircraft} : {}, globalTime ?? 0);
+  const backgroundScript = useScript(startTime, config?.background_script, [], backgroundCompletedScriptEvents, running ? {...aircraft, ...backgroundAircraft}  : {}, globalTime ?? 0);
 
   const localFrequencyMonitors = useMemo(() => {
     const monitors = new Map<string, boolean>();
@@ -313,7 +313,7 @@ export default function ExperimenterPage() {
 
       <ResizablePanes uniqueId="one" className="flex-1">
         <Pane id="P0" size={3}>
-          <MapPanel weather={weather} aircraft={aircraft} radios={undefined} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
+          <MapPanel weather={weather} aircraft={aircraft} backgroundAircraft={backgroundAircraft} radios={undefined} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
         </Pane>
         <Pane id="P1" size={1} minSize={1}>
           <TimelinePanel aircraft={aircraft} radios={undefined} selectedAircraftCallsign={selectedAircraftCallsign} onSelectAircraft={setSelectedAircraftCallsign} />
