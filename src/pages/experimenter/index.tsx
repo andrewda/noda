@@ -169,7 +169,7 @@ export default function ExperimenterPage() {
 
     // @ts-ignore
     const { defer, ...newAircraft } = config.aircraft.find(({ callsign }) => callsign === replacementAircraft);
-    const newOrder = Object.keys(aircraft).map((callsign) => callsign === removeAircraft ? replacementAircraft : callsign);
+    const newOrder = [...Object.keys(aircraft), ...Object.keys(backgroundAircraft)].map((callsign) => callsign === removeAircraft ? replacementAircraft : callsign);
 
     // Create a new aircraft
     socket?.emit('command', {

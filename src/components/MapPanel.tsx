@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import * as geomag from 'geomag';
+import * as turf from '@turf/turf';
+
 import { Feature } from 'ol';
 import OlMap from 'ol/Map';
 import View from 'ol/View';
@@ -13,7 +16,7 @@ import { Image as ImageLayer, Tile as TileLayer, Vector as VectorLayer } from 'o
 import LayerGroup from 'ol/layer/Group';
 import { fromLonLat, transformExtent } from 'ol/proj';
 import { ImageStatic, Vector as VectorSource, XYZ } from 'ol/source';
-import { Fill, Stroke, Style, Text } from 'ol/style';
+import { Fill, Icon, Stroke, Style, Text } from 'ol/style';
 import CircleStyle from 'ol/style/Circle';
 import { AircraftStateBoard } from './C2Panel';
 import { RadioCommunicationBoard } from './RadioPanel';
@@ -23,6 +26,7 @@ import { Slider } from './ui/slider';
 
 import 'ol/ol.css'; // Import OpenLayers CSS
 import { boundingExtent, containsCoordinate } from 'ol/extent';
+import ImageStyle from 'ol/style/Image';
 
 // Opacity Slider Component
 const OpacitySlider = ({ opacity, setOpacity }: { opacity: number, setOpacity: (opacity: number) => void }) => (
@@ -308,6 +312,7 @@ const MapPanel = ({
 
     const now = Date.now();
     const cutoffTime = now - 60000; // 60 seconds
+    // const cutoffTime = now - (60000/3); // 60 seconds
 
     const callsignsPresent = new Set();
 
@@ -344,11 +349,11 @@ const MapPanel = ({
 
       // Create aircraft dot style
       const aircraftDotStyle = new Style({
-        image: new CircleStyle({
-          radius: 5,
-          fill: new Fill({ color: selected ? 'magenta' : 'lightgrey' }),
-          stroke: new Stroke({ color: 'black', width: 1 }),
-        }),
+        image: new Icon({
+          src: '/images/ownship-map.svg',
+          rotation: aircraftItem.heading * Math.PI / 180,
+          scale: 0.8,
+        })
       });
 
       const feature = new Feature({ geometry: point, aircraft: aircraftItem });
@@ -400,36 +405,54 @@ const MapPanel = ({
       const coords = fromLonLat([aircraftItem.position[1], aircraftItem.position[0]]);
       const point = new Point(coords);
 
-      const receiving = radios?.[idx]?.receiving ?? false;
+      const ALERT_PROXIMAL_ALTITUDE_SEPARATION = 5000; // feet
+      const ALERT_PROXIMAL_HORIZONTAL_SEPARATION = 10; // nautical miles
+      const ALERT_CAUTION_ALTITUDE_SEPARATION = 2500; // feet
+      const ALERT_CAUTION_HORIZONTAL_SEPARATION = 5; // nautical miles
+      const ALERT_WARNING_ALTITUDE_SEPARATION = 1500; // feet
+      const ALERT_WARNING_HORIZONTAL_SEPARATION = 2; // nautical miles
+
+      const ALERT_LEVELS = ['distant', 'proximal', 'caution', 'warning'];
+      const ALERT_COLORS = [null, 'teal', 'yellow', 'red'];
+
+      const nearestAlertLevel = Math.max(...Object.values(aircraft ?? {}).map((ownship: AircraftStateBoard) => ({
+        vertical: ownship.altitude - aircraftItem.altitude,
+        horizontal: turf.distance(ownship.position.toReversed(), aircraftItem.position.toReversed(), { units: 'nauticalmiles' })
+      })).map(({ vertical, horizontal }) => {
+        if (vertical <= ALERT_WARNING_ALTITUDE_SEPARATION && horizontal <= ALERT_WARNING_HORIZONTAL_SEPARATION) {
+          return 3;
+        } else if (vertical <= ALERT_CAUTION_ALTITUDE_SEPARATION && horizontal <= ALERT_CAUTION_HORIZONTAL_SEPARATION) {
+          return 2;
+        } else if (vertical <= ALERT_PROXIMAL_ALTITUDE_SEPARATION && horizontal <= ALERT_PROXIMAL_HORIZONTAL_SEPARATION) {
+          return 1;
+        } else {
+          return 0;
+        }
+      })) ?? 0;
 
       const altitudeText = Math.round(aircraftItem.altitude / 100).toString().padStart(3, '0');
       const airspeedText = Math.round(aircraftItem.tas).toString().padStart(3, '0');
-
       const aircraftLabelStyle = new Style({
         text: new Text({
           text: `${aircraftItem.callsign}\n${altitudeText}/${airspeedText}`,
           font: 'bold 12px "Roboto Mono"',
-          fill: new Fill({ color: 'white' }),
-          backgroundFill: new Fill({ color: 'black' }),
+          fill: new Fill({ color: 'black' }),
+          backgroundFill: new Fill({ color: 'lightgrey' }),
+          backgroundStroke: ALERT_COLORS[nearestAlertLevel] ? new Stroke({ color: ALERT_COLORS[nearestAlertLevel], width: 3 }) : undefined,
           padding: [4, 6, 2, 6],
-          offsetY: -25,
-          offsetX: 35,
+          offsetY: -30,
+          offsetX: 45,
           overflow: true,
-        }),
-        image: new CircleStyle({
-          radius: 3,
-          fill: new Fill({ color: receiving ? '#00d30a' : 'transparent' }),
-          displacement: [62, 1]
         }),
       });
 
-      // Create aircraft dot style
       const aircraftDotStyle = new Style({
-        image: new CircleStyle({
-          radius: 5,
-          fill: new Fill({ color: 'lightgrey' }),
-          stroke: new Stroke({ color: 'black', width: 1 }),
+        image: new Icon({
+          src: `/images/aircraft/${ALERT_LEVELS[nearestAlertLevel]}.png`,
+          rotation: aircraftItem.heading * Math.PI / 180,
+          scale: 0.6,
         }),
+        stroke: new Stroke({ color: 'black', width: 100 }),
       });
 
       const feature = new Feature({ geometry: point, aircraft: aircraftItem });
@@ -462,7 +485,7 @@ const MapPanel = ({
 
         lineFeature.setStyle(
           new Style({
-            stroke: new Stroke({ color: 'yellow', width: 4 }),
+            stroke: new Stroke({ color: 'gray', width: 4 }),
           })
         );
 

@@ -267,8 +267,8 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
             <div className="flex flex-1 pl-1 pr-1 justify-start items-center gap-2 w-full">
               <FromTo width={30} height={50} className="text-fuchsia-500 grow-0 shrink-0 basis-[30px]" />
               <div className="flex flex-col items-center gap-2 min-w-0">
-                {[aircraft.departureAirport, aircraft.arrivalAirport].map((icao) => (
-                  <div className="flex items-center gap-2 self-stretch" key={icao}>
+                {[aircraft.departureAirport, aircraft.arrivalAirport].map((icao, idx) => (
+                  <div className="flex items-center gap-2 self-stretch" key={icao + idx}>
                     <Airport width={24} height={24} className="text-fuchsia-500 grow-0 shrink-0 basis-[24px]" />
                     <div className="flex flex-col text-gray-200 min-w-0">
                       <div className="font-mono text-sm pl-[1px]">{icao}</div>

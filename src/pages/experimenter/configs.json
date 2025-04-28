@@ -5,14 +5,68 @@
       "description": "4",
       "weather": "nominal",
       "aircraft": [
-        { "control_type": "participant", "callsign": "HMT 110", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["YIBPU", "ENDZZ", "UBG"], "cruise_alt": 3000 },
-        { "control_type": "participant", "callsign": "HMT 120", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KRDM", "arrival_runway": "RW11", "approach": "R11", "flight_plan": ["JALAG", "CUKIS", "JJACE", "JJETT", "YONKU"], "starting_leg": 1, "starting_alt": 10000, "cruise_alt": 10000 },
-        { "control_type": "participant", "callsign": "HMT 130", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KHIO", "arrival_runway": "RW13R", "approach": "R13R", "flight_plan": ["JALAG", "PITER", "DUCKA"], "starting_leg": 0, "starting_alt": 6000, "cruise_alt": 7000 },
-        { "control_type": "participant", "callsign": "HMT 140", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KKLS", "arrival_runway": "RW12", "approach": "R12", "flight_plan": ["JALAG", "LOATH", "AMAVE"], "cruise_alt": 8000 },
-        { "control_type": "non-participant", "callsign": "UAL 650", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["YIBPU", "ENDZZ", "UBG"], "cruise_alt": 3000, "starting_leg": 1, "starting_alt": 3000 }
+        { "control_type": "participant", "callsign": "HMT 110", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500, "starting_leg": 1, "starting_alt": 4500 },
+        { "control_type": "participant", "callsign": "HMT 120", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500, "starting_leg": 0, "starting_alt": 4500 },
+        { "control_type": "participant", "callsign": "HMT 130", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500 },
+        { "control_type": "participant", "callsign": "HMT 140", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500 },
+        { "control_type": "non-participant", "callsign": "UAL 650", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW29", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["ZEVAD", "FOSNI", "WHIFF", "UBG"], "cruise_alt": 5000, "starting_leg": 1, "starting_alt": 3000 },
+        { "control_type": "non-participant", "callsign": "DL 8273", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KRDM", "arrival_runway": "RW11", "approach": "", "flight_plan": ["YIBPU", "WALDO", "BOTTL", "CESUK", "SNOKY"], "cruise_alt": 4000, "starting_leg": 1, "starting_alt": 10000 },
+
+        { "control_type": "participant", "callsign": "HMT 130", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500 },
+        { "control_type": "non-participant", "callsign": "DL 8273", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KMFR", "departure_runway": "RW32", "arrival_airport": "KRDM", "arrival_runway": "RW11", "approach": "", "flight_plan": ["OED", "WZZRD", "SSTRS", "COPPR", "LOYCE", "BOTTL", "JURDY"], "cruise_alt": 4000, "starting_leg": 1, "starting_alt": 30000 }
+
       ],
       "script": []
     },
+
+    {
+      "name": "Trial 1b",
+      "description": "",
+      "weather": "nominal",
+      "aircraft": [
+        { "control_type": "participant", "callsign": "HMT 110", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500, "starting_leg": 0, "starting_alt": 4500 },
+        { "control_type": "participant", "callsign": "HMT 120", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500 },
+        { "control_type": "participant", "callsign": "HMT 130", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500 },
+        { "control_type": "participant", "callsign": "HMT 140", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500 },
+
+        { "control_type": "non-participant", "callsign": "UAL 650", "aircraft_type": "B737", "cas": 140, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW29", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["ZEVAD", "FOSNI", "WHIFF", "UBG"], "cruise_alt": 4000, "starting_leg": 0, "starting_alt": 1000 },
+        { "control_type": "non-participant", "callsign": "SP 800", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KRDM", "arrival_runway": "RW11", "approach": "", "flight_plan": ["YIBPU", "WALDO", "BOTTL", "LOYCE", "SNOKY"], "cruise_alt": 4000, "starting_leg": 1, "starting_alt": 4000 },
+        { "control_type": "non-participant", "callsign": "DL 8273", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KMFR", "departure_runway": "RW32", "arrival_airport": "KRDM", "arrival_runway": "RW11", "approach": "", "flight_plan": ["OED", "WZZRD", "SSTRS", "COPPR", "FOSNI", "BOTTL", "JURDY"], "cruise_alt": 4000, "starting_leg": 1, "starting_alt": 36000 },
+        { "control_type": "non-participant", "callsign": "UAL 244", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW11", "arrival_airport": "KPDX", "arrival_runway": "RW28R", "approach": "R28RX", "flight_plan": ["ASLYN", "POCIT", "DRACK", "ELKES", "REEDI"], "cruise_alt": 5000, "starting_leg": 0, "starting_alt": 15000 },
+
+        { "control_type": "non-participant", "callsign": "SKW 1222", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KRDM", "arrival_runway": "RW11", "approach": "", "flight_plan": ["YIBPU", "WISSL", "ZORNS", "BNO"], "cruise_alt": 15000, "starting_leg": 1, "starting_alt": 15000 },
+        { "control_type": "non-participant", "callsign": "UAL 192", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW11", "arrival_airport": "KPDX", "arrival_runway": "RW28R", "approach": "R28RX", "flight_plan": ["URBIA", "COPPR", "WHIFF", "GLORR", "UBG"], "cruise_alt": 12000, "starting_leg": 0, "starting_alt": 12000 },
+        { "control_type": "non-participant", "callsign": "DL 2282", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW11", "arrival_airport": "KPDX", "arrival_runway": "RW28R", "approach": "R28RX", "flight_plan": ["SSTRS", "OCTAD", "SUPOC", "VECCU", "UBG"], "cruise_alt": 18000, "starting_leg": 0, "starting_alt": 18000 }
+      ],
+      "script": []
+    },
+
+    {
+      "name": "Trial 2b",
+      "description": "",
+      "weather": "nominal",
+      "aircraft": [
+        { "control_type": "participant", "callsign": "HMT 110", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500, "starting_leg": 1, "starting_alt": 4500 },
+        { "control_type": "participant", "callsign": "HMT 120", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500, "starting_leg": 0, "starting_alt": 4500 },
+        { "control_type": "participant", "callsign": "HMT 130", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500 },
+        { "control_type": "participant", "callsign": "HMT 140", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500 },
+        { "defer": true, "control_type": "participant", "callsign": "HMT 110'", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500 },
+
+        { "control_type": "non-participant", "callsign": "SP 200", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW29", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["ZEVAD", "LOYCE", "BOTTL", "EENIE", "WHIFF", "UBG"], "cruise_alt": 5000, "starting_leg": 2, "starting_alt": 5000 },
+        { "control_type": "non-participant", "callsign": "SP 900", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW29", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["ZEVAD", "URBIA", "LOYCE", "ZEVAD", "JJETT", "WHIFF", "UBG"], "cruise_alt": 5000, "starting_leg": 1, "starting_alt": 12000 },
+        { "control_type": "non-participant", "callsign": "SP 700", "aircraft_type": "C208", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW29", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["ZEVAD", "ARNOY", "SNOKY", "WHIFF", "UBG"], "cruise_alt": 5000, "starting_leg": 1, "starting_alt": 5000 },
+        { "control_type": "non-participant", "callsign": "DL 2626", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KRDM", "arrival_runway": "RW11", "approach": "", "flight_plan": ["YIBPU", "ELKES", "EENIE", "COPPR", "PUHTS"], "cruise_alt": 5000, "starting_leg": 1, "starting_alt": 20000 },
+        { "control_type": "non-participant", "callsign": "UAL 377", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW11", "arrival_airport": "KPDX", "arrival_runway": "RW28R", "approach": "R28RX", "flight_plan": ["ASLYN", "POCIT", "DRACK", "ELKES", "REEDI"], "cruise_alt": 5000, "starting_leg": 0, "starting_alt": 15000 },
+
+        { "control_type": "non-participant", "callsign": "SKW 1222", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KRDM", "arrival_runway": "RW11", "approach": "", "flight_plan": ["YIBPU", "WALDO", "WISSL", "ZORNS", "BNO"], "cruise_alt": 15000, "starting_leg": 1, "starting_alt": 15000 },
+        { "control_type": "non-participant", "callsign": "UAL 192", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW11", "arrival_airport": "KPDX", "arrival_runway": "RW28R", "approach": "R28RX", "flight_plan": ["URBIA", "COPPR", "WHIFF", "GLORR", "UBG"], "cruise_alt": 12000, "starting_leg": 0, "starting_alt": 12000 },
+        { "control_type": "non-participant", "callsign": "DL 2282", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW11", "arrival_airport": "KPDX", "arrival_runway": "RW28R", "approach": "R28RX", "flight_plan": ["SSTRS", "OCTAD", "SUPOC", "VECCU", "UBG"], "cruise_alt": 18000, "starting_leg": 0, "starting_alt": 18000 }
+      ],
+      "script": [
+        { "callsign": "HMT 110", "trigger": { "type": "landed" }, "replace": "HMT 110'" }
+      ]
+    },
+
     {
       "name": "Group 1",
       "description": "4/long/light",
