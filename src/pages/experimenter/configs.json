@@ -38,7 +38,19 @@
         { "control_type": "non-participant", "callsign": "UAL 192", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW11", "arrival_airport": "KPDX", "arrival_runway": "RW28R", "approach": "R28RX", "flight_plan": ["URBIA", "COPPR", "WHIFF", "GLORR", "UBG"], "cruise_alt": 12000, "starting_leg": 0, "starting_alt": 12000 },
         { "control_type": "non-participant", "callsign": "DL 2282", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW11", "arrival_airport": "KPDX", "arrival_runway": "RW28R", "approach": "R28RX", "flight_plan": ["SSTRS", "OCTAD", "SUPOC", "VECCU", "UBG"], "cruise_alt": 18000, "starting_leg": 0, "starting_alt": 18000 }
       ],
-      "script": []
+      "script": [
+
+      ],
+      "background_script": [
+        { "callsign": "SKW 1222", "trigger": { "type": "time", "time": 50 }, "speaker": "SKW 1222", "dialog": "Seattle Center, Skywest 12-22 requesting climb to flight level 1 9 0.", "file": "SKW_1222_request_climb.wav" },
+        { "callsign": "SKW 1222", "trigger": { "type": "time", "time": 56 }, "speaker": "KSE", "dialog": "Skywest 12-22, climb and maintain flight level 1 9 0.", "file": "SKW_1222_instruct_climb.wav" },
+
+        { "callsign": "UAL 650", "trigger": { "type": "time", "time": 240 }, "speaker": "KSE", "dialog": "United 6-50, proceed direct WHIFF.", "file": "UAL_650_instruct_direct_whiff.wav" },
+        { "callsign": "UAL 650", "trigger": { "type": "time", "time": 246 }, "speaker": "UAL 650", "dialog": "Direct WHIFF, United 6-50.", "file": "UAL_650_readback_direct_whiff.wav" },
+
+        { "callsign": "UAL 244", "trigger": { "type": "time", "time": 840 }, "speaker": "KSE", "dialog": "United 2-4-4, proceed direct DRACK.", "file": "UAL_244_instruct_direct_drack.wav" },
+        { "callsign": "UAL 244", "trigger": { "type": "time", "time": 846 }, "speaker": "UAL 244", "dialog": "Direct DRACK, United 2-44.", "file": "UAL_244_readback_direct_drack.wav" }
+      ]
     },
 
     {
@@ -64,70 +76,6 @@
       ],
       "script": [
         { "callsign": "HMT 110", "trigger": { "type": "landed" }, "replace": "HMT 110'" }
-      ]
-    },
-
-    {
-      "name": "Group 1",
-      "description": "4/long/light",
-      "weather": "nominal",
-      "aircraft": [
-        { "callsign": "HMT 525", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["YIBPU", "ENDZZ", "UBG"], "cruise_alt": 3000 },
-        { "callsign": "HMT 954", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KUAO", "arrival_runway": "RW17", "approach": "R17", "flight_plan": ["YIBPU", "MOKIY"], "cruise_alt": 4000 },
-        { "callsign": "HMT 498", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KHIO", "arrival_runway": "RW13R", "approach": "R13R", "flight_plan": ["JALAG", "PITER", "DUCKA"], "cruise_alt": 7000 },
-        { "callsign": "HMT 710", "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28R", "arrival_airport": "KKLS", "arrival_runway": "RW12", "approach": "R12", "flight_plan": ["JALAG", "LOATH", "AMAVE"], "cruise_alt": 8000 }
-      ],
-      "script": [
-        { "callsign": "HMT 525", "trigger": { "type": "time", "time": 95 }, "dialog": "cleared for takeoff Runway 28L" },
-        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "contact Portland Departure 118.1" },
-        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "Portland Departure, Portland altimeter 2999" },
-        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "ENDZZ" }, "dialog": "contact Seattle Center 125.8" },
-        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "ENDZZ" }, "dialog": "Seattle Center, Salem altimeter 2996" },
-        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "UBG" }, "dialog": "turn right heading 100, vectors for traffic" },
-
-        { "callsign": "HMT 954", "trigger": { "type": "time", "time": 35 }, "dialog": "cleared for takeoff Runway 28L" },
-        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "contact Portland Departure 118.1" },
-        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "YIBPU" }, "dialog": "Portland Departure, Aurora altimeter 2999" },
-        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "MOKIY", "distance": -4 }, "dialog": "4 miles from MOKIY, cross MOKIY at or above 3500, cleared for the RNAV 17 approach at Aurora" },
-        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "LUTZZ" }, "dialog": "contact Aurora Tower 120.35" },
-        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "LUTZZ" }, "dialog": "Aurora Tower, winds 100 at 4, cleared to land Runway 17" },
-
-        { "callsign": "HMT 498", "trigger": { "type": "time", "time": 5 }, "dialog": "cleared for takeoff Runway 28R" },
-        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "contact Portland Departure 118.1" },
-        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "Portland Departure, Portland altimeter 2999" },
-        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER", "distance": -8 }, "dialog": "contact Seattle Center 125.8" },
-        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER", "distance": -8 }, "dialog": "Seattle Center, Hillsboro altimeter 2998" },
-        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER" }, "dialog": "8 miles from DUCKA, cross DUCKA at or above 5000, cleared for the RNAV 13R approach at Hillsboro" },
-        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "DUCKA" }, "dialog": "contact Hillsboro Tower 119.3" },
-        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "DUCKA" }, "dialog": "Hillsboro Tower, winds 120 at 4, cleared to land Runway 13R" },
-
-        { "callsign": "HMT 710", "trigger": { "type": "time", "time": 65 }, "dialog": "cleared for takeoff Runway 28R" },
-        { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "contact Portland Departure 118.1" },
-        { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "JALAG" }, "dialog": "Portland Departure, Portland altimeter 2999" },
-        { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "LOATH", "distance": -15 }, "dialog": "contact Seattle Center 125.8" },
-        { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "LOATH", "distance": -15 }, "dialog": "Seattle Center, Kelso altimeter 3002" },
-        { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "LOATH", "distance": -10 }, "dialog": "descend and maintain 6000" }
-      ],
-      "background_script": [
-        { "callsign": "HMT 525", "trigger": { "type": "time", "time": 22 }, "file": "contact_ground_emirates_203-alloy.wav" },
-        { "callsign": "HMT 525", "trigger": { "type": "time", "time": 52 }, "file": "taxi_united_235-alloy.wav" },
-        { "callsign": "HMT 525", "trigger": { "type": "time", "time": 83 }, "file": "landing_cirrus_7rd-alloy.wav" },
-        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "YIBPU", "distance": -2 }, "file": "takeoff_delta_71-alloy.wav" },
-        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "ENDZZ", "distance": -10 }, "file": "contact_tower_allegiant_999-alloy.wav" },
-        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "ENDZZ", "distance": -7 }, "file": "contact_tower_cessna_2fg-alloy.wav" },
-        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "ENDZZ", "distance": -5 }, "file": "attention_all_aircraft_pdx-alloy.wav" },
-        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "ENDZZ", "distance": -3 }, "file": "descend_american_482-alloy.wav" },
-        { "callsign": "HMT 525", "trigger": { "type": "waypoint", "waypoint": "UBG", "distance": -3 }, "file": "climb_cessna_5mt-alloy.wav" },
-
-        { "callsign": "HMT 954", "trigger": { "type": "waypoint", "waypoint": "FIDOV", "distance": -4 }, "file": "pattern_cessna_2lc-alloy.wav" },
-
-        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER", "distance": -15 }, "file": "turn_jetblue_211-alloy.wav" },
-        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER", "distance": -11 }, "file": "climb_frontier_521-alloy.wav" },
-        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER", "distance": -6 }, "file": "turn_southwest_122-alloy.wav" },
-        { "callsign": "HMT 498", "trigger": { "type": "waypoint", "waypoint": "PITER", "distance": -5 }, "file": "climb_horizon_330-alloy.wav" },
-
-        { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "LOATH", "distance": -19 }, "file": "contact_departure_southwest_619-alloy.wav" },
-        { "callsign": "HMT 710", "trigger": { "type": "waypoint", "waypoint": "LOATH", "distance": -12 }, "file": "descend_aircanada_812-alloy.wav" }
       ]
     }
   ]

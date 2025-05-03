@@ -3,14 +3,28 @@ from pathlib import Path
 from openai import OpenAI
 client = OpenAI()
 
+config_file_path = Path(__file__).parent / "src" / "pages" / "experimenter" / "configs.json"
+
+voice_map = {
+  'KSE': 'echo',
+  'SKW 1222': 'alloy',
+  'UAL 650': 'onyx',
+  'UAL 244': 'onyx',
+}
+
 # load json file
-with open('speech.json') as f:
+with open(config_file_path) as f:
   data = json.load(f)
 
-voice = 'alloy'
+script_items = [{**script_item, "voice": (voice_map[script_item['speaker']] if 'speaker' in script_item else 'echo')} for group in data['groups'] for script_item in (group['background_script'] if 'background_script' in group else [])]
 
-for item in data:
-  speech_file_path = Path(__file__).parent / "public" / "speech" / f"{item['file']}-{voice}.wav"
+for item in script_items:
+  if 'file' not in item:
+    print(f"Skipping item without file: {item}")
+    continue
+
+  voice = item['voice']
+  speech_file_path = Path(__file__).parent / "public" / "speech" / f"{item['file']}"
 
   if speech_file_path.exists():
     continue
@@ -18,10 +32,11 @@ for item in data:
   print(f"Generating speech for {item['file']}")
 
   response = client.audio.speech.create(
-    model="tts-1",
+    model="gpt-4o-mini-tts",
     voice=voice,
-    input=item['text'],
+    input=item['dialog'],
     response_format="wav",
+    instructions="You are an air traffic controller. Speak in a calm and clear tone, with a slightly fast pace.",
     speed=1.0
   )
 
