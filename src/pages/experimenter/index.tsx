@@ -83,7 +83,8 @@ export default function ExperimenterPage() {
       backgroundScript.forEach((scriptEvent: any) => {
         const aircraftItem = aircraft[scriptEvent?.callsign];
 
-        const trackIndex = Object.keys(aircraft).findIndex((callsign) => callsign === scriptEvent.callsign);
+        let trackIndex = Object.keys(aircraft).findIndex((callsign) => callsign === scriptEvent.callsign);
+        trackIndex = trackIndex === -1 ? 0 : trackIndex;
         setBackgroundCompletedScriptEvents((prev) => [...prev, scriptEvent.id]);
 
         trackControls.get(trackIndex)?.playAudio(`/speech/${scriptEvent.file}`).then((audioNode) => {

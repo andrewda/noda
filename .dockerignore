@@ -1,0 +1,5 @@
+**/node_modules
+AirTrafficSim/airtrafficsim/data/navigation/xplane
+AirTrafficSim/airtrafficsim/data/performance/BADA
+AirTrafficSim/airtrafficsim/data/result/*
+!AirTrafficSim/airtrafficsim/data/result/.gitignore

@@ -26,7 +26,6 @@ import { Slider } from './ui/slider';
 
 import 'ol/ol.css'; // Import OpenLayers CSS
 import { boundingExtent, containsCoordinate } from 'ol/extent';
-import ImageStyle from 'ol/style/Image';
 
 // Opacity Slider Component
 const OpacitySlider = ({ opacity, setOpacity }: { opacity: number, setOpacity: (opacity: number) => void }) => (
@@ -214,8 +213,8 @@ const MapPanel = ({
       target: mapElement.current ?? undefined,
       layers: [baseLayerGroup],
       view: new View({
-        center: fromLonLat([-95, 37]), // Center of USA
-        zoom: 4,
+        center: fromLonLat([-121.5492, 44.2909]), // Center of USA
+        zoom: 10,
       }),
       controls: defaultControls({ attribution: false, rotate: false, zoom: false }),
     });
@@ -262,7 +261,7 @@ const MapPanel = ({
     // Update Weather Layer
     if (weather) {
       const extent = transformExtent(
-        [-127.45, 40.55, -107.27, 50.20],
+        [-127.45, 39.75, -107.27, 49.6],
         'EPSG:4326',
         map.getView().getProjection()
       );
@@ -407,9 +406,9 @@ const MapPanel = ({
 
       const ALERT_PROXIMAL_ALTITUDE_SEPARATION = 5000; // feet
       const ALERT_PROXIMAL_HORIZONTAL_SEPARATION = 10; // nautical miles
-      const ALERT_CAUTION_ALTITUDE_SEPARATION = 2500; // feet
+      const ALERT_CAUTION_ALTITUDE_SEPARATION = 1000; // feet
       const ALERT_CAUTION_HORIZONTAL_SEPARATION = 5; // nautical miles
-      const ALERT_WARNING_ALTITUDE_SEPARATION = 1500; // feet
+      const ALERT_WARNING_ALTITUDE_SEPARATION = 600; // feet
       const ALERT_WARNING_HORIZONTAL_SEPARATION = 2; // nautical miles
 
       const ALERT_LEVELS = ['distant', 'proximal', 'caution', 'warning'];
@@ -517,10 +516,10 @@ const MapPanel = ({
 
       // Rings
       const innerCircle = new Feature({
-        geometry: circular(latlon, 10 * 1852, 64).transform('EPSG:4326', 'EPSG:3857'),
+        geometry: circular(latlon, 5 * 1852, 64).transform('EPSG:4326', 'EPSG:3857'),
       });
       const outerCircle = new Feature({
-        geometry: circular(latlon, 20 * 1852, 64).transform('EPSG:4326', 'EPSG:3857'),
+        geometry: circular(latlon, 10 * 1852, 64).transform('EPSG:4326', 'EPSG:3857'),
       });
 
       innerCircle.setStyle(
