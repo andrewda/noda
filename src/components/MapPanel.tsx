@@ -389,7 +389,7 @@ const MapPanel = ({
 
         lineFeature.setStyle(
           new Style({
-            stroke: new Stroke({ color: 'yellow', width: 4 }),
+            stroke: new Stroke({ color: 'gray', width: 4 }),
           })
         );
 
@@ -412,10 +412,10 @@ const MapPanel = ({
       const ALERT_WARNING_HORIZONTAL_SEPARATION = 2; // nautical miles
 
       const ALERT_LEVELS = ['distant', 'proximal', 'caution', 'warning'];
-      const ALERT_COLORS = [null, 'teal', 'yellow', 'red'];
+      const ALERT_COLORS = [null, 'cyan', 'yellow', 'red'];
 
       const nearestAlertLevel = Math.max(...Object.values(aircraft ?? {}).map((ownship: AircraftStateBoard) => ({
-        vertical: ownship.altitude - aircraftItem.altitude,
+        vertical: Math.abs(ownship.altitude - aircraftItem.altitude),
         horizontal: turf.distance(ownship.position.toReversed(), aircraftItem.position.toReversed(), { units: 'nauticalmiles' })
       })).map(({ vertical, horizontal }) => {
         if (vertical <= ALERT_WARNING_ALTITUDE_SEPARATION && horizontal <= ALERT_WARNING_HORIZONTAL_SEPARATION) {
@@ -515,27 +515,36 @@ const MapPanel = ({
       ];
 
       // Rings
-      const innerCircle = new Feature({
+      const cautionCircle = new Feature({
+        geometry: circular(latlon, 2 * 1852, 64).transform('EPSG:4326', 'EPSG:3857'),
+      });
+      const warningCircle = new Feature({
         geometry: circular(latlon, 5 * 1852, 64).transform('EPSG:4326', 'EPSG:3857'),
       });
-      const outerCircle = new Feature({
+      const proximalCircle = new Feature({
         geometry: circular(latlon, 10 * 1852, 64).transform('EPSG:4326', 'EPSG:3857'),
       });
 
-      innerCircle.setStyle(
+      cautionCircle.setStyle(
         new Style({
           stroke: new Stroke({ color: 'red', width: 3 }),
           // fill: new Fill({ color: 'rgba(255, 0, 0, 0.1)' }),
         })
       );
-      outerCircle.setStyle(
+      warningCircle.setStyle(
         new Style({
-          stroke: new Stroke({ color: 'blue', width: 3 }),
+          stroke: new Stroke({ color: 'yellow', width: 3 }),
+          // fill: new Fill({ color: 'rgba(255, 0, 0, 0.1)' }),
+        })
+      );
+      proximalCircle.setStyle(
+        new Style({
+          stroke: new Stroke({ color: 'cyan', width: 3 }),
           // fill: new Fill({ color: 'rgba(0, 0, 255, 0.1)' }),
         })
       );
 
-      ringsSource.addFeatures([innerCircle, outerCircle]);
+      ringsSource.addFeatures([cautionCircle, warningCircle, proximalCircle]);
 
       // Flight Plan
       if (selectedAircraft.flightPlanPos?.length > 0) {

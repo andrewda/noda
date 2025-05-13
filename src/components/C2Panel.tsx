@@ -1,7 +1,7 @@
 import { useSocket } from '@/lib/socket';
 import LaunchIcon from '@mui/icons-material/Launch';
 import { PopoverTrigger } from '@radix-ui/react-popover';
-import { Check, Loader2 } from 'lucide-react';
+import { Check, Loader2, ArrowRight } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import Airport from '../../public/images/airport.svg';
@@ -289,8 +289,9 @@ function AircraftCommandPanel({ aircraft, radio }: AircraftCommandPanelProps) {
                       <DropdownMenuContent>
                         <DropdownMenuLabel className={isDirectTo ? 'text-fuchsia-400' : ''}>{item}</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className={`flex items-center [&>svg]:size-6 ${isDirectTo ? 'cursor-not-allowed' : 'cursor-pointer'}`} disabled={isDirectTo} onClick={() => armCommand({ label: `Direct To ${item}`, command: 'flight_plan', payload: { flight_plan_index: i } })}>
-                          <DirectTo /> Direct To
+                        <DropdownMenuItem className={`flex items-center [&>svg]:size-6 ${isDirectTo ? 'cursor-not-allowed' : 'cursor-pointer'}`} disabled={isDirectTo} onClick={() => armCommand({ label: `Activate Leg To ${item}`, command: 'flight_plan', payload: { flight_plan_index: i - 1 } })}>
+                          {/* <DirectTo /> Direct To */}
+                          <ArrowRight /> Activate Leg
                         </DropdownMenuItem>
                      </DropdownMenuContent>
                     </DropdownMenu>

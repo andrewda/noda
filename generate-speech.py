@@ -10,6 +10,8 @@ voice_map = {
   'SKW 1222': 'alloy',
   'UAL 650': 'onyx',
   'UAL 244': 'onyx',
+  'UAL 377': 'onyx',
+  'DL 2282': 'alloy',
 }
 
 # load json file

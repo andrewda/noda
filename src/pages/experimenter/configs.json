@@ -24,14 +24,14 @@
       "description": "",
       "weather": "nominal",
       "aircraft": [
-        { "control_type": "participant", "callsign": "HMT 110", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500, "starting_leg": 0, "starting_alt": 4500 },
+        { "control_type": "participant", "callsign": "HMT 110", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "KS87E", "HORRN", "BOTTL"], "cruise_alt": 4500, "starting_leg": 1, "starting_alt": 4500 },
         { "control_type": "participant", "callsign": "HMT 120", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500 },
-        { "control_type": "participant", "callsign": "HMT 130", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500 },
+        { "control_type": "participant", "callsign": "HMT 130", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "KS87E", "HORRN", "BOTTL"], "cruise_alt": 4500 },
         { "control_type": "participant", "callsign": "HMT 140", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500 },
 
-        { "control_type": "non-participant", "callsign": "UAL 650", "aircraft_type": "B737", "cas": 140, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW29", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["ZEVAD", "FOSNI", "WHIFF", "UBG"], "cruise_alt": 4000, "starting_leg": 0, "starting_alt": 1000 },
-        { "control_type": "non-participant", "callsign": "SP 800", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KRDM", "arrival_runway": "RW11", "approach": "", "flight_plan": ["YIBPU", "WALDO", "BOTTL", "LOYCE", "SNOKY"], "cruise_alt": 4000, "starting_leg": 1, "starting_alt": 4000 },
-        { "control_type": "non-participant", "callsign": "DL 8273", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KMFR", "departure_runway": "RW32", "arrival_airport": "KRDM", "arrival_runway": "RW11", "approach": "", "flight_plan": ["OED", "WZZRD", "SSTRS", "COPPR", "FOSNI", "BOTTL", "JURDY"], "cruise_alt": 4000, "starting_leg": 1, "starting_alt": 36000 },
+        { "control_type": "non-participant", "callsign": "SP 800", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KRDM", "arrival_runway": "RW11", "approach": "", "flight_plan": ["YIBPU", "MANTE", "HORRN", "WISSL", "JJETT"], "cruise_alt": 4000, "starting_leg": 1, "starting_alt": 5000 },
+        { "control_type": "non-participant", "callsign": "UAL 650", "aircraft_type": "C208", "cas": 140, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW29", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["WUREX", "FOSNI", "WHIFF", "UBG"], "cruise_alt": 5000, "starting_leg": 0, "starting_alt": 1000 },
+        { "control_type": "non-participant", "callsign": "DL 8273", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KMFR", "departure_runway": "RW32", "arrival_airport": "KRDM", "arrival_runway": "RW11", "approach": "", "flight_plan": ["OED", "MAVER", "WALDO", "BCHLR", "SSTRS"], "cruise_alt": 4000, "starting_leg": 1, "starting_alt": 4000 },
         { "control_type": "non-participant", "callsign": "UAL 244", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW11", "arrival_airport": "KPDX", "arrival_runway": "RW28R", "approach": "R28RX", "flight_plan": ["ASLYN", "POCIT", "DRACK", "ELKES", "REEDI"], "cruise_alt": 5000, "starting_leg": 0, "starting_alt": 15000 },
 
         { "control_type": "non-participant", "callsign": "SKW 1222", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KRDM", "arrival_runway": "RW11", "approach": "", "flight_plan": ["YIBPU", "WISSL", "ZORNS", "BNO"], "cruise_alt": 15000, "starting_leg": 1, "starting_alt": 15000 },
@@ -39,17 +39,30 @@
         { "control_type": "non-participant", "callsign": "DL 2282", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW11", "arrival_airport": "KPDX", "arrival_runway": "RW28R", "approach": "R28RX", "flight_plan": ["SSTRS", "OCTAD", "SUPOC", "VECCU", "UBG"], "cruise_alt": 18000, "starting_leg": 0, "starting_alt": 18000 }
       ],
       "script": [
+        { "callsign": "HMT 120", "trigger": { "type": "time", "time": 240 }, "dialog": "depart now" },
+        { "callsign": "HMT 130", "trigger": { "type": "time", "time": 600 }, "dialog": "depart now" },
+        { "callsign": "HMT 140", "trigger": { "type": "time", "time": 1020 }, "dialog": "depart now" },
 
+        { "callsign": "HMT 110", "trigger": { "type": "time", "time": 330 }, "dialog": "SP 800 is approaching the drop zone. No contact on HMT 110." }
       ],
       "background_script": [
-        { "callsign": "SKW 1222", "trigger": { "type": "time", "time": 50 }, "speaker": "SKW 1222", "dialog": "Seattle Center, Skywest 12-22 requesting climb to flight level 1 9 0.", "file": "SKW_1222_request_climb.wav" },
-        { "callsign": "SKW 1222", "trigger": { "type": "time", "time": 56 }, "speaker": "KSE", "dialog": "Skywest 12-22, climb and maintain flight level 1 9 0.", "file": "SKW_1222_instruct_climb.wav" },
+        { "callsign": "SKW 1222", "trigger": { "type": "time", "time": 50 }, "speaker": "SKW 1222", "dialog": "Seattle Center, Skywest 12-22 requesting climb to flight level one niner zero.", "file": "SKW_1222_instruct_fl_190.wav" },
+        { "callsign": "SKW 1222", "trigger": { "type": "time", "time": 56 }, "speaker": "KSE", "dialog": "Skywest 12-22, climb and maintain flight level one niner zero.", "file": "SKW_1222_readback_fl_190.wav" },
 
         { "callsign": "UAL 650", "trigger": { "type": "time", "time": 240 }, "speaker": "KSE", "dialog": "United 6-50, proceed direct WHIFF.", "file": "UAL_650_instruct_direct_whiff.wav" },
         { "callsign": "UAL 650", "trigger": { "type": "time", "time": 246 }, "speaker": "UAL 650", "dialog": "Direct WHIFF, United 6-50.", "file": "UAL_650_readback_direct_whiff.wav" },
 
+        { "callsign": "DL 2282", "trigger": { "type": "time", "time": 325 }, "speaker": "KSE", "dialog": "Delta 22-82, climb and maintain flight level one eight zero.", "file": "DL_2282_instruct_fl_180.wav" },
+        { "callsign": "DL 2282", "trigger": { "type": "time", "time": 331 }, "speaker": "DL 2282", "dialog": "Up to one niner zero, Delta 22-82.", "file": "DL_2282_readback_fl_180.wav" },
+
+        { "callsign": "DL 2282", "trigger": { "type": "time", "time": 620 }, "speaker": "KSE", "dialog": "Delta 22-82, proceed direct DRACK.", "file": "DL_2282_instruct_direct_drack.wav" },
+        { "callsign": "DL 2282", "trigger": { "type": "time", "time": 626 }, "speaker": "DL 2282", "dialog": "Direct DRACK, Delta 22-82.", "file": "DL_2282_readback_direct_drack.wav" },
+
         { "callsign": "UAL 244", "trigger": { "type": "time", "time": 840 }, "speaker": "KSE", "dialog": "United 2-4-4, proceed direct DRACK.", "file": "UAL_244_instruct_direct_drack.wav" },
-        { "callsign": "UAL 244", "trigger": { "type": "time", "time": 846 }, "speaker": "UAL 244", "dialog": "Direct DRACK, United 2-44.", "file": "UAL_244_readback_direct_drack.wav" }
+        { "callsign": "UAL 244", "trigger": { "type": "time", "time": 846 }, "speaker": "UAL 244", "dialog": "Direct DRACK, United 2-44.", "file": "UAL_244_readback_direct_drack.wav" },
+
+        { "callsign": "UAL 650", "trigger": { "type": "time", "time": 600 }, "speaker": "KSE", "dialog": "United 6-50, traffic 11 o'clock, altitude indicates four thousand five hundred.", "file": "UAL_650_instruct_traffic_11.wav" },
+        { "callsign": "UAL 650", "trigger": { "type": "time", "time": 606 }, "speaker": "UAL 650", "dialog": "Negative on that traffic, United 6-50.", "file": "UAL_650_readback_traffic_11.wav" }
       ]
     },
 
@@ -59,23 +72,45 @@
       "weather": "nominal",
       "aircraft": [
         { "control_type": "participant", "callsign": "HMT 110", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500, "starting_leg": 1, "starting_alt": 4500 },
-        { "control_type": "participant", "callsign": "HMT 120", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500, "starting_leg": 0, "starting_alt": 4500 },
+        { "control_type": "participant", "callsign": "HMT 120", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "KS87E", "HORRN", "BOTTL"], "cruise_alt": 4500 },
         { "control_type": "participant", "callsign": "HMT 130", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500 },
-        { "control_type": "participant", "callsign": "HMT 140", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500 },
+        { "control_type": "participant", "callsign": "HMT 140", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "KS87E", "HORRN", "BOTTL"], "cruise_alt": 4500 },
         { "defer": true, "control_type": "participant", "callsign": "HMT 110'", "initial_frequency": "123.450", "departure_airport": "6K5", "departure_runway": "RW20", "arrival_airport": "6K5", "arrival_runway": "RW20", "approach": "", "flight_plan": ["SMRDK", "EENIE", "SNOKY", "LOYCE", "BOTTL"], "cruise_alt": 4500 },
 
-        { "control_type": "non-participant", "callsign": "SP 200", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW29", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["ZEVAD", "LOYCE", "BOTTL", "EENIE", "WHIFF", "UBG"], "cruise_alt": 5000, "starting_leg": 2, "starting_alt": 5000 },
-        { "control_type": "non-participant", "callsign": "SP 900", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW29", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["ZEVAD", "URBIA", "LOYCE", "ZEVAD", "JJETT", "WHIFF", "UBG"], "cruise_alt": 5000, "starting_leg": 1, "starting_alt": 12000 },
-        { "control_type": "non-participant", "callsign": "SP 700", "aircraft_type": "C208", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW29", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["ZEVAD", "ARNOY", "SNOKY", "WHIFF", "UBG"], "cruise_alt": 5000, "starting_leg": 1, "starting_alt": 5000 },
-        { "control_type": "non-participant", "callsign": "DL 2626", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KRDM", "arrival_runway": "RW11", "approach": "", "flight_plan": ["YIBPU", "ELKES", "EENIE", "COPPR", "PUHTS"], "cruise_alt": 5000, "starting_leg": 1, "starting_alt": 20000 },
-        { "control_type": "non-participant", "callsign": "UAL 377", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW11", "arrival_airport": "KPDX", "arrival_runway": "RW28R", "approach": "R28RX", "flight_plan": ["ASLYN", "POCIT", "DRACK", "ELKES", "REEDI"], "cruise_alt": 5000, "starting_leg": 0, "starting_alt": 15000 },
+        { "control_type": "non-participant", "callsign": "SP 900", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW29", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["ZEVAD", "URBIA", "LOYCE", "ZEVAD", "JJETT", "UBG"], "cruise_alt": 5000, "starting_leg": 1, "starting_alt": 10000 },
+        { "control_type": "non-participant", "callsign": "SP 200", "aircraft_type": "C208", "cas": 140, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW29", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["ZEVAD", "HORRN", "KS84E", "UBG"], "cruise_alt": 5000, "starting_leg": 1, "starting_alt": 5000 },
+        { "control_type": "non-participant", "callsign": "SP 700", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW29", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["ZEVAD", "JERMM", "CUPRI", "MMASN", "SNOKY", "UBG"], "cruise_alt": 5000, "starting_leg": 1, "starting_alt": 5000 },
+        { "control_type": "non-participant", "callsign": "DL 2626", "aircraft_type": "C208", "cas": 140, "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KRDM", "arrival_runway": "RW11", "approach": "", "flight_plan": ["YIBPU", "JJETT", "WHIFF", "COPPR", "PUHTS"], "cruise_alt": 5000, "starting_leg": 1, "starting_alt": 6000 },
+        { "control_type": "non-participant", "callsign": "UAL 377", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW11", "arrival_airport": "KPDX", "arrival_runway": "RW28R", "approach": "R28RX", "flight_plan": ["ASLYN", "POCIT", "DRACK", "ELKES", "REEDI"], "cruise_alt": 5000, "starting_leg": 0, "starting_alt": 5000 },
 
         { "control_type": "non-participant", "callsign": "SKW 1222", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KPDX", "departure_runway": "RW28L", "arrival_airport": "KRDM", "arrival_runway": "RW11", "approach": "", "flight_plan": ["YIBPU", "WALDO", "WISSL", "ZORNS", "BNO"], "cruise_alt": 15000, "starting_leg": 1, "starting_alt": 15000 },
         { "control_type": "non-participant", "callsign": "UAL 192", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW11", "arrival_airport": "KPDX", "arrival_runway": "RW28R", "approach": "R28RX", "flight_plan": ["URBIA", "COPPR", "WHIFF", "GLORR", "UBG"], "cruise_alt": 12000, "starting_leg": 0, "starting_alt": 12000 },
         { "control_type": "non-participant", "callsign": "DL 2282", "aircraft_type": "B737", "cas": 180, "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW11", "arrival_airport": "KPDX", "arrival_runway": "RW28R", "approach": "R28RX", "flight_plan": ["SSTRS", "OCTAD", "SUPOC", "VECCU", "UBG"], "cruise_alt": 18000, "starting_leg": 0, "starting_alt": 18000 }
       ],
       "script": [
-        { "callsign": "HMT 110", "trigger": { "type": "landed" }, "replace": "HMT 110'" }
+        { "callsign": "HMT 110", "trigger": { "type": "landed" }, "replace": "HMT 110'" },
+
+        { "callsign": "HMT 120", "trigger": { "type": "time", "time": 30 }, "dialog": "depart now" },
+        { "callsign": "HMT 130", "trigger": { "type": "time", "time": 90 }, "dialog": "depart now" },
+        { "callsign": "HMT 140", "trigger": { "type": "time", "time": 240 }, "dialog": "depart now" },
+        { "callsign": "HMT 110'", "trigger": { "type": "time", "time": 1170 }, "dialog": "depart now" },
+
+        { "callsign": "HMT 120", "trigger": { "type": "time", "time": 175 }, "dialog": "SP 200 is approaching the drop zone. HMT 120 is in sight, no factor." },
+        { "callsign": "HMT 110", "trigger": { "type": "time", "time": 295 }, "dialog": "SP 900 is approaching the drop zone and will be turning out to the east. HMT 110 ypu should be no factor." },
+        { "callsign": "HMT 130", "trigger": { "type": "time", "time": 630 }, "dialog": "SP 700 is approaching the drop zone. We do not have HMT 130 in sight." }
+      ],
+      "background_script": [
+        { "callsign": "SKW 1222", "trigger": { "type": "time", "time": 50 }, "speaker": "SKW 1222", "dialog": "Seattle Center, Skywest 12-22 requesting climb to flight level one niner zero.", "file": "SKW_1222_instruct_fl_190.wav" },
+        { "callsign": "SKW 1222", "trigger": { "type": "time", "time": 56 }, "speaker": "KSE", "dialog": "Skywest 12-22, climb and maintain flight level one niner zero.", "file": "SKW_1222_readback_fl_190.wav" },
+
+        { "callsign": "DL 2282", "trigger": { "type": "time", "time": 325 }, "speaker": "KSE", "dialog": "Delta 22-82, climb and maintain flight level one eight zero.", "file": "DL_2282_instruct_fl_180.wav" },
+        { "callsign": "DL 2282", "trigger": { "type": "time", "time": 330 }, "speaker": "DL 2282", "dialog": "Up to one niner zero, Delta 22-82.", "file": "DL_2282_readback_fl_180.wav" },
+
+        { "callsign": "DL 2282", "trigger": { "type": "time", "time": 620 }, "speaker": "KSE", "dialog": "Delta 22-82, proceed direct DRACK.", "file": "DL_2282_instruct_direct_drack.wav" },
+        { "callsign": "DL 2282", "trigger": { "type": "time", "time": 626 }, "speaker": "DL 2282", "dialog": "Direct DRACK, Delta 22-82.", "file": "DL_2282_readback_direct_drack.wav" },
+
+        { "callsign": "UAL 377", "trigger": { "type": "time", "time": 1130 }, "speaker": "KSE", "dialog": "United 3-7-7, maintain five thousand, expect one-five thousand in one zero miles.", "file": "UAL_377_instruct_maintain_5000.wav" },
+        { "callsign": "UAL 377", "trigger": { "type": "time", "time": 1138 }, "speaker": "UAL 377", "dialog": "Maintain five thousand, United 3-77.", "file": "UAL_377_readback_maintain_5000.wav" }
       ]
     }
   ]
