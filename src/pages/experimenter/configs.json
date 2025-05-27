@@ -1,8 +1,29 @@
 {
   "groups": [
+  {
+      "name": "Training",
+      "description": "5 min",
+      "weather": "nominal",
+      "aircraft": [
+        { "control_type": "participant", "callsign": "HMT 110", "initial_frequency": "123.450", "departure_airport": "S39", "departure_runway": "RW10", "arrival_airport": "S39", "arrival_runway": "RW10", "approach": "", "flight_plan": ["OGEYU", "ZUDMI", "STILZ", "ARNOY", "COFMO"], "cruise_alt": 4500, "starting_leg": 2, "starting_alt": 4500 },
+        { "control_type": "participant", "callsign": "HMT 120", "initial_frequency": "123.450", "departure_airport": "S39", "departure_runway": "RW10", "arrival_airport": "S39", "arrival_runway": "RW10", "approach": "", "flight_plan": ["OGEYU", "ZUDMI", "STILZ", "ARNOY", "COFMO"], "cruise_alt": 4500, "starting_leg": 0, "starting_alt": 4500 },
+        { "control_type": "participant", "callsign": "HMT 130", "initial_frequency": "123.450", "departure_airport": "S39", "departure_runway": "RW10", "arrival_airport": "S39", "arrival_runway": "RW10", "approach": "", "flight_plan": ["OGEYU", "ZUDMI", "STILZ", "ARNOY", "COFMO"], "cruise_alt": 4500 },
+        { "control_type": "participant", "callsign": "HMT 140", "initial_frequency": "123.450", "departure_airport": "S39", "departure_runway": "RW10", "arrival_airport": "S39", "arrival_runway": "RW10", "approach": "", "flight_plan": ["OGEYU", "ZUDMI", "STILZ", "ARNOY", "COFMO"], "cruise_alt": 4500 },
+
+        { "control_type": "non-participant", "callsign": "UAL 344", "aircraft_type": "C208", "initial_frequency": "123.450", "departure_airport": "KRDM", "departure_runway": "RW29", "arrival_airport": "KSLE", "arrival_runway": "RW13", "approach": "R13", "flight_plan": ["JOREM", "FLUSS", "NAXZY", "COPPR", "UBG"], "cruise_alt": 5000, "starting_leg": 0, "starting_alt": 1000 }
+      ],
+      "script": [
+        { "callsign": "HMT 130", "trigger": { "type": "time", "time": 30 }, "dialog": "depart now" }
+      ],
+      "background_script": [
+        { "callsign": "UAL 344", "trigger": { "type": "time", "time": 10 }, "speaker": "KSE", "dialog": "United 3-44, proceed direct FLUSS.", "file": "UAL_344_instruct_direct_whiff.wav" },
+        { "callsign": "UAL 344", "trigger": { "type": "time", "time": 16 }, "speaker": "UAL 344", "dialog": "Direct FLUSS, United 3-44.", "file": "UAL_344_readback_direct_whiff.wav" }
+      ]
+    },
+
     {
       "name": "Training",
-      "description": "",
+      "description": "10 min",
       "weather": "nominal",
       "aircraft": [
         { "control_type": "participant", "callsign": "HMT 110", "initial_frequency": "123.450", "departure_airport": "S39", "departure_runway": "RW10", "arrival_airport": "S39", "arrival_runway": "RW10", "approach": "", "flight_plan": ["OGEYU", "ZUDMI", "STILZ", "ARNOY", "COFMO"], "cruise_alt": 4500, "starting_leg": 1, "starting_alt": 4500 },
